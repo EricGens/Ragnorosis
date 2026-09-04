@@ -1,7 +1,6 @@
 // Production → Equipment / Manpower conversion (skeleton §4.5). These accumulate toward discrete
 // units, so fractions are floored and banked, never discarded.
 
-import { productionFor } from '../snapshot'
 import type { BuildingType, FactionId, GameState } from '../types'
 import { isLand } from '../types'
 
@@ -13,25 +12,24 @@ export function facilityMultiplier(level: number): number {
 }
 
 /**
- * A faction's effective conversion multiplier for a facility type. Production is pooled
- * faction-wide, so each region's facility improves conversion of that region's own contribution:
- * the multiplier is the Production-weighted average across controlled regions.
+ * A faction's effective conversion multiplier for a facility type. These represent nation-scale
+ * infrastructure (a training pipeline, an industrial supply chain) that the whole faction draws
+ * on regardless of where it's built, not a per-region bonus — so the multiplier is
+ * facilityMultiplier() applied to the *sum* of levels across every controlled region. A faction
+ * holding six regions with a level-1 facility each gets the same bonus as a one-region faction
+ * with a single level-6 facility.
  */
 export function factionFacilityMultiplier(
   state: GameState,
   faction: FactionId,
   facility: Extract<BuildingType, 'production-facility' | 'training-facility'>,
 ): number {
-  let weighted = 0
-  let total = 0
+  let totalLevel = 0
   for (const id of state.regionOrder) {
     const r = state.regions[id]
-    if (!isLand(r) || r.controller !== faction) continue
-    const p = productionFor(state, r).total
-    weighted += p * facilityMultiplier(r.buildings[facility] ?? 0)
-    total += p
+    if (isLand(r) && r.controller === faction) totalLevel += r.buildings[facility] ?? 0
   }
-  return total > 0 ? weighted / total : 1
+  return facilityMultiplier(totalLevel)
 }
 
 /** Floor to whole units, carrying the fraction forward. */

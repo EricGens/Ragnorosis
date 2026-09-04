@@ -10,11 +10,10 @@ describe('facility multiplier', () => {
     expect(facilityMultiplier(0)).toBe(1)
   })
 
-  it('weights each region by its share of the faction pool', () => {
-    // US: NW Land 600 (PF L2 → 1.4), N Land 600 (PF L5 → 2.0), W Land 500 (none → 1.0)
+  it('sums levels across every controlled region — nation-scale infrastructure, not per-region', () => {
+    // US: NW Land PF L2, N Land PF L5, W Land none → sum 7 → 1 + 0.2×7 = 2.4
     const state = createInitialState(DUMMY_MAP)
-    const expected = (600 * 1.4 + 600 * 2.0 + 500 * 1.0) / 1700
-    expect(factionFacilityMultiplier(state, 'united-states', 'production-facility')).toBeCloseTo(expected)
+    expect(factionFacilityMultiplier(state, 'united-states', 'production-facility')).toBeCloseTo(facilityMultiplier(7))
     // No controlled regions → neutral multiplier.
     expect(factionFacilityMultiplier(state, 'gamer', 'training-facility')).toBe(1)
   })

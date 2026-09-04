@@ -121,10 +121,10 @@ describe('pulse-end conversions', () => {
   const after = advancePulse(base)
   const f = after.factions[US]
 
-  it('credits Equipment through the weighted Production Facility bonus', () => {
-    // Balanced with no projects: 566 + 283 = 849 equipment points × 1.494 multiplier.
-    expect(f.equipment).toBeGreaterThan(1200)
-    expect(f.equipment).toBeLessThan(1300)
+  it('credits Equipment through the summed Production Facility bonus', () => {
+    // Balanced with no projects: 566 + 283 = 849 equipment points × facilityMultiplier(7) = 2.4.
+    expect(f.equipment).toBeGreaterThan(1900)
+    expect(f.equipment).toBeLessThan(2100)
   })
 
   it('credits Manpower under the 2% cap and draws it from Population', () => {
