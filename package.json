@@ -13,6 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "immer": "^11.1.18",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zustand": "^5.0.15"
