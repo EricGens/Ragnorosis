@@ -4,6 +4,7 @@ import { DUMMY_MAP } from '../sim/data/dummyMap'
 import type { Region, RegionId } from '../sim/types'
 import { isLand } from '../sim/types'
 import { useGameStore } from '../store/gameStore'
+import { useUIStore } from '../store/uiStore'
 import { factionColor } from './factionColors'
 
 // Map space is a 1000×1000 square: a 3×3 land grid of 200-unit cells inset by 200 on each side,
@@ -45,7 +46,10 @@ const MAX_ZOOM = 4
 export function MapView() {
   const regionOrder = useGameStore((s) => s.game.regionOrder)
   const regions = useGameStore((s) => s.game.regions)
-  const [hovered, setHovered] = useState<RegionId | null>(null)
+  const hovered = useUIStore((s) => s.hovered)
+  const pinned = useUIStore((s) => s.pinned)
+  const setHovered = useUIStore((s) => s.setHovered)
+  const togglePin = useUIStore((s) => s.togglePin)
   const [view, setView] = useState({ x: 0, y: 0, zoom: 1 })
   const svgRef = useRef<SVGSVGElement>(null)
 
@@ -99,8 +103,10 @@ export function MapView() {
           key={id}
           region={regions[id]}
           layout={DUMMY_MAP.layout[id]}
-          hovered={hovered === id}
-          onHover={setHovered}
+          hovered={hovered?.kind === 'region' && hovered.id === id}
+          pinned={pinned?.kind === 'region' && pinned.id === id}
+          onHover={(r) => setHovered(r ? { kind: 'region', id: r } : null)}
+          onClick={(r) => togglePin({ kind: 'region', id: r })}
         />
       ))}
     </svg>
@@ -111,28 +117,40 @@ function RegionShape({
   region,
   layout,
   hovered,
+  pinned,
   onHover,
+  onClick,
 }: {
   region: Region
   layout: MapLayout
   hovered: boolean
+  pinned: boolean
   onHover: (id: RegionId | null) => void
+  onClick: (id: RegionId) => void
 }) {
   const { points, cx, cy } = shapeFor(layout)
   const land = isLand(region)
+  const lit = hovered || pinned
   const fill = land
-    ? hovered ? 'var(--color-land-hover)' : 'var(--color-land)'
-    : hovered ? 'var(--color-sea-hover)' : 'var(--color-sea)'
+    ? lit ? 'var(--color-land-hover)' : 'var(--color-land)'
+    : lit ? 'var(--color-sea-hover)' : 'var(--color-sea)'
   const controller = land ? region.controller : null
 
   return (
     <g
       onMouseEnter={() => onHover(region.id)}
       onMouseLeave={() => onHover(null)}
+      onClick={() => onClick(region.id)}
       className="cursor-pointer"
       data-region={region.id}
+      data-pinned={pinned || undefined}
     >
-      <polygon points={points} fill={fill} stroke="var(--color-ink-950)" strokeWidth={3} />
+      <polygon
+        points={points}
+        fill={fill}
+        stroke={pinned ? 'var(--color-signal)' : 'var(--color-ink-950)'}
+        strokeWidth={3}
+      />
       {controller && (
         <polygon
           points={points}
