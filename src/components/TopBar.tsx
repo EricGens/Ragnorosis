@@ -3,7 +3,7 @@ import { FACTIONS } from '../sim/data/factions'
 import { formatInt, formatMoney } from '../sim/format'
 import { FOCUSES } from '../sim/formulas/allocation'
 import { computeAllocation } from '../sim/steps/productionSteps'
-import { useGameStore } from '../store/gameStore'
+import { useDisplayGame, useGameStore } from '../store/gameStore'
 
 const FOCUS_LABEL: Record<(typeof FOCUSES)[number], string> = {
   balanced: 'Balanced',
@@ -13,7 +13,7 @@ const FOCUS_LABEL: Record<(typeof FOCUSES)[number], string> = {
 }
 
 export function TopBar() {
-  const game = useGameStore((s) => s.game)
+  const game = useDisplayGame()
   const tick = game.tick
   const globalTension = game.globalTension
   const activeFaction = useGameStore((s) => s.activeFaction)

@@ -64,9 +64,12 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
 - **Focus changes** made mid-Pulse apply at the next Pulse boundary. A change made while auto-paused at
   the boundary applies as soon as play resumes.
 - **Pulse-boundary ordering:** when tick 168 completes — run pulse-end resolution (Money, Legitimacy,
-  Population/GDP growth, immigration, Stability drift, Equipment/Manpower credit), then compute the next
-  pulse's snapshot (Energy fair-share and sourcing, Weather snapshot, Production total, focus allocation,
-  per-tick rates), then auto-pause.
+  Equipment/Manpower credit, Population/GDP growth, immigration, Stability drift), then auto-pause. The
+  **next pulse's snapshot** (Energy fair-share and sourcing, Weather snapshot, Production total, focus
+  allocation, per-tick rates) is taken on the **first tick of the new pulse**, not at the boundary — so
+  anything changed while paused on the boundary (focus, a devtools edit to Superiority, reserves, or
+  Weather) applies to the pulse about to run. While paused on a boundary the UI previews that snapshot
+  from the current inputs, so edits show their effect immediately.
 
 ## Other rulings
 

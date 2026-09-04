@@ -178,6 +178,20 @@ function RegionShape({
           {region.country}
         </text>
       )}
+      {region.weatherActive && (
+        <text
+          x={cx}
+          y={cy - 40}
+          textAnchor="middle"
+          fill="var(--color-warn)"
+          fontSize={14}
+          letterSpacing={2}
+          pointerEvents="none"
+          aria-label="Weather active"
+        >
+          WEATHER
+        </text>
+      )}
     </g>
   )
 }

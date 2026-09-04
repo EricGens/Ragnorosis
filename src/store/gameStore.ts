@@ -1,11 +1,23 @@
 import { produce } from 'immer'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { advancePulse, advanceTick } from '../sim/advance'
-import { TICKS_PER_SECOND, type Speed } from '../sim/clock'
+import { TICKS_PER_SECOND, tickInPulse, type Speed } from '../sim/clock'
 import { queueBuild, type QueueResult } from '../sim/construction'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
+import { computePulseSnapshot } from '../sim/snapshot'
 import { createInitialState } from '../sim/state'
 import type { BuildingType, FactionId, Focus, GameState, RegionId } from '../sim/types'
+
+/**
+ * The game state as the UI should show it. While paused on a pulse boundary the coming pulse's
+ * snapshot hasn't been taken yet, so preview it from the current inputs — edits made in the
+ * devtools then show their effect immediately instead of one pulse later.
+ */
+export function useDisplayGame(): GameState {
+  const game = useGameStore((s) => s.game)
+  return useMemo(() => (tickInPulse(game.tick) === 0 ? { ...game, pulse: computePulseSnapshot(game) } : game), [game])
+}
 
 export type Screen = 'title' | 'faction-select' | 'game'
 

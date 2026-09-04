@@ -1,7 +1,7 @@
 import { FACTIONS } from '../../sim/data/factions'
 import type { FactionId, Region } from '../../sim/types'
 import { isLand } from '../../sim/types'
-import { useGameStore } from '../../store/gameStore'
+import { useDisplayGame } from '../../store/gameStore'
 import { factionColor } from '../factionColors'
 import { BuildingGrid } from './BuildingGrid'
 import { PANEL_WIDTH } from './gameArea'
@@ -25,7 +25,7 @@ export function RegionPanel({
   pinned: boolean
   onClose: () => void
 }) {
-  const game = useGameStore((s) => s.game)
+  const game = useDisplayGame()
   const { header, stats } = regionDisplay(game, region, perspective)
 
   return (

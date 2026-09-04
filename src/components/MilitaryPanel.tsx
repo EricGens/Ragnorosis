@@ -3,7 +3,7 @@ import { formatInt } from '../sim/format'
 import { factionFacilityMultiplier } from '../sim/formulas/conversion'
 import { manpowerCap } from '../sim/formulas/manpower'
 import { computeAllocation } from '../sim/steps/productionSteps'
-import { useGameStore } from '../store/gameStore'
+import { useDisplayGame, useGameStore } from '../store/gameStore'
 import { useUIStore } from '../store/uiStore'
 
 /**
@@ -29,8 +29,9 @@ export function MilitaryButton() {
 
 export function MilitaryPanel() {
   const open = useUIStore((s) => s.militaryOpen)
-  const game = useGameStore((s) => s.game)
-  const faction = useGameStore((s) => s.game.factions[s.activeFaction])
+  const game = useDisplayGame()
+  const activeFaction = useGameStore((s) => s.activeFaction)
+  const faction = game.factions[activeFaction]
   if (!open) return null
 
   const cap = manpowerCap(game, faction.id)
