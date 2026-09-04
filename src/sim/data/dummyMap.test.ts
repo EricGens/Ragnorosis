@@ -123,7 +123,7 @@ describe('dummy map starting values', () => {
 
   it('starts every faction with empty pools and Balanced focus', () => {
     for (const f of Object.values(state.factions)) {
-      expect([f.money, f.legitimacy, f.equipment, f.manpower]).toEqual([0, 0, 0, 0])
+      expect([f.money, f.research, f.legitimacy, f.equipment, f.manpower]).toEqual([0, 0, 0, 0, 0])
       expect(f.focus).toBe('balanced')
     }
   })

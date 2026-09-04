@@ -24,7 +24,7 @@ export function buildAdjacency(regionIds: RegionId[], edges: [RegionId, RegionId
 }
 
 function initialFaction(id: FactionId): FactionState {
-  return { id, money: 0, legitimacy: 0, equipment: 0, manpower: 0, focus: 'balanced' }
+  return { id, money: 0, research: 0, legitimacy: 0, equipment: 0, manpower: 0, focus: 'balanced' }
 }
 
 export function createInitialState(map: MapDefinition, seed = 1): GameState {

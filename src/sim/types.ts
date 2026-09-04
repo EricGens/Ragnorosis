@@ -83,6 +83,7 @@ export function isLand(region: Region): region is LandRegion {
 export interface FactionState {
   id: FactionId
   money: number
+  research: number
   legitimacy: number
   /** Small Arms — the only Equipment type in Epoch 1. */
   equipment: number

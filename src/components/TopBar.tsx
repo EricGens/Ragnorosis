@@ -1,11 +1,13 @@
 import { SPEEDS, TICKS_PER_PULSE, formatDate, pulseOf, tickInPulse } from '../sim/clock'
 import { FACTIONS } from '../sim/data/factions'
+import { formatInt, formatMoney } from '../sim/format'
 import { useGameStore } from '../store/gameStore'
 
 export function TopBar() {
   const tick = useGameStore((s) => s.game.tick)
   const globalTension = useGameStore((s) => s.game.globalTension)
   const activeFaction = useGameStore((s) => s.activeFaction)
+  const faction = useGameStore((s) => s.game.factions[s.activeFaction])
   const speed = useGameStore((s) => s.speed)
   const running = useGameStore((s) => s.running)
   const setSpeed = useGameStore((s) => s.setSpeed)
@@ -15,6 +17,9 @@ export function TopBar() {
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-ink-700 bg-ink-900 px-4">
       <div className="flex items-center gap-6 text-sm">
         <span className="tracking-[0.2em] text-ink-200 uppercase">{FACTIONS[activeFaction].name}</span>
+        <Stat label="Money" value={formatMoney(faction.money)} />
+        <Stat label="Research" value={formatInt(faction.research)} />
+        <Stat label="Legitimacy" value={faction.legitimacy.toFixed(1)} />
       </div>
 
       <div className="flex items-center gap-6">
