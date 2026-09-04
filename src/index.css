@@ -1,1 +1,35 @@
 @import 'tailwindcss';
+
+/* Dark-web / cyberthriller motif: near-black grounds, phosphor accents, monospace numerals. */
+@theme {
+  --color-ink-950: #06080b;
+  --color-ink-900: #0b0f14;
+  --color-ink-800: #121821;
+  --color-ink-700: #1b2430;
+  --color-ink-600: #2a3644;
+  --color-ink-400: #5b6b7d;
+  --color-ink-200: #aebbc9;
+  --color-ink-100: #e6edf3;
+  --color-signal: #35f0a8;
+  --color-signal-dim: #1f9c6f;
+  --color-warn: #f5c542;
+  --color-alert: #ff4d5e;
+  --color-land: #1e3a2a;
+  --color-land-hover: #2a5a3c;
+  --color-sea: #12293f;
+  --color-sea-hover: #1c4266;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, ui-monospace, monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-ink-950);
+  color: var(--color-ink-100);
+  font-family: var(--font-mono);
+  overflow: hidden;
+}
