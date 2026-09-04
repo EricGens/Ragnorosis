@@ -42,6 +42,7 @@ function Window({ window: w }: { window: PinnedWindow }) {
         <span className="text-[11px] tracking-[0.15em] text-signal uppercase">{w.title}</span>
         <button
           type="button"
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={() => closeWindow(w.id)}
           aria-label={`Close ${w.title}`}
           className="ml-3 text-ink-400 hover:text-ink-100"
