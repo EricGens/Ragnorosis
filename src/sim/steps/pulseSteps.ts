@@ -3,10 +3,12 @@
 import { legitimacyPerPulse, moneyPerPulse, populationGrowthPerPulse } from '../formulas/economy'
 import { planImmigration } from '../formulas/immigration'
 import { driftStability, stabilityAnchor } from '../formulas/stability'
-import { formatMoney, formatPopulation } from '../format'
+import { formatInt, formatMoney, formatPopulation } from '../format'
 import { log } from '../log'
+import { computePulseSnapshot } from '../snapshot'
 import type { GameState, LandRegion } from '../types'
 import { FACTION_IDS, isLand } from '../types'
+import { creditPulseOutputs } from './productionSteps'
 
 function landRegions(state: GameState): LandRegion[] {
   return state.regionOrder.map((id) => state.regions[id]).filter(isLand)
@@ -72,7 +74,28 @@ export function driftAllStability(state: GameState): void {
 export function resolvePulseEnd(state: GameState): void {
   collectMoney(state)
   collectLegitimacy(state)
+  creditPulseOutputs(state)
   growPopulation(state)
   applyImmigration(state)
   driftAllStability(state)
+}
+
+/** Pulse-start: take the Energy/Weather snapshot the coming pulse runs on, and log it. */
+export function beginPulse(state: GameState): void {
+  state.pulse = computePulseSnapshot(state)
+  const { totalSupply, totalDemand, fairShare, energy } = state.pulse
+  log(
+    state,
+    'energy',
+    `Energy: ${formatInt(totalSupply)} supply vs ${formatInt(totalDemand)} demand — fair share ${(fairShare * 100).toFixed(1)}%`,
+  )
+  for (const [id, r] of Object.entries(energy)) {
+    if (r.delivered + 1e-9 < r.entitlement) {
+      log(
+        state,
+        'energy',
+        `${state.regions[id].name} blockaded: ${formatInt(r.delivered)} of ${formatInt(r.entitlement)} entitled Energy delivered (${(r.fulfillment * 100).toFixed(1)}%)`,
+      )
+    }
+  }
 }

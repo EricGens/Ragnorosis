@@ -29,7 +29,13 @@ interface UIStore {
   pinned: EntityRef | null
   /** Tooltips pinned as independent floating windows; closed only manually. */
   windows: PinnedWindow[]
+  /** Region whose building-type selector is open. */
+  selectorRegion: string | null
+  militaryOpen: boolean
 
+  openSelector: (regionId: string) => void
+  closeSelector: () => void
+  toggleMilitary: () => void
   setHovered: (ref: EntityRef | null) => void
   /** Left-click: pin this entity, or unpin it if it is already pinned. */
   togglePin: (ref: EntityRef) => void
@@ -46,6 +52,12 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   hovered: null,
   pinned: null,
   windows: [],
+  selectorRegion: null,
+  militaryOpen: false,
+
+  openSelector: (regionId) => set({ selectorRegion: regionId }),
+  closeSelector: () => set({ selectorRegion: null }),
+  toggleMilitary: () => set({ militaryOpen: !get().militaryOpen }),
 
   setHovered: (ref) => set({ hovered: ref }),
 

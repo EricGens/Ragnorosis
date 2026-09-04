@@ -1,7 +1,9 @@
 import { FACTIONS } from '../../sim/data/factions'
 import type { FactionId, Region } from '../../sim/types'
+import { isLand } from '../../sim/types'
 import { useGameStore } from '../../store/gameStore'
 import { factionColor } from '../factionColors'
+import { BuildingGrid } from './BuildingGrid'
 import { PANEL_WIDTH } from './gameArea'
 import { regionDisplay } from './regionStats'
 import { StatRow } from './StatRow'
@@ -24,7 +26,7 @@ export function RegionPanel({
   onClose: () => void
 }) {
   const game = useGameStore((s) => s.game)
-  const { header, stats, buildings } = regionDisplay(game, region, perspective)
+  const { header, stats } = regionDisplay(game, region, perspective)
 
   return (
     <aside
@@ -75,19 +77,7 @@ export function RegionPanel({
           ))}
         </div>
 
-        {buildings.length > 0 && (
-          <div className="mt-3 border-t border-ink-700 pt-2">
-            <div className="mb-1 text-[11px] tracking-[0.15em] text-ink-400 uppercase">Buildings</div>
-            <ul className="text-xs text-ink-200">
-              {buildings.map((b) => (
-                <li key={b.name} className="flex justify-between py-0.5">
-                  <span>{b.name}</span>
-                  <span className="text-ink-100">L{b.level}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {isLand(region) && <BuildingGrid region={region} perspective={perspective} />}
       </div>
     </aside>
   )

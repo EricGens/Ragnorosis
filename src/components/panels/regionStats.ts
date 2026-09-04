@@ -7,9 +7,10 @@ import { FACTIONS } from '../../sim/data/factions'
 import { formatInt, formatMoney, formatPercent, formatPopulation } from '../../sim/format'
 import { defensibility } from '../../sim/formulas/defensibility'
 import { moneyPerPulse, perCapitaGdp, popularityCut, researchPerTick } from '../../sim/formulas/economy'
-import { fossilEnergyDemand, regionProduction, regionSupply } from '../../sim/formulas/production'
+import { fossilEnergyDemand, regionSupply } from '../../sim/formulas/production'
 import { gdpStabilityInput, stabilityAnchor } from '../../sim/formulas/stability'
-import type { FactionId, GameState, LandRegion, Region } from '../../sim/types'
+import { productionFor } from '../../sim/snapshot'
+import type { EnergyResult, FactionId, GameState, LandRegion, Region } from '../../sim/types'
 import { FACTION_IDS, isLand } from '../../sim/types'
 import type { TooltipContent } from '../../store/uiStore'
 
@@ -68,7 +69,7 @@ export function regionDisplay(state: GameState, region: Region, perspective: Fac
       : { sea: sup.sea },
   }
 
-  const stats = isLand(region) ? landStats(region, perspective) : maritimeStats(region)
+  const stats = isLand(region) ? landStats(state, region, perspective) : maritimeStats(region)
   const buildings = isLand(region)
     ? Object.entries(region.buildings)
         .filter(([, level]) => (level ?? 0) > 0)
@@ -82,9 +83,10 @@ function maritimeStats(region: Region): StatDescriptor[] {
   return [energyStat(region, 0)]
 }
 
-function landStats(region: LandRegion, perspective: FactionId): StatDescriptor[] {
+function landStats(state: GameState, region: LandRegion, perspective: FactionId): StatDescriptor[] {
   const perCapita = perCapitaGdp(region)
-  const production = regionProduction(region) // TODO(slice 5): pass this pulse's Energy fulfillment
+  const production = productionFor(state, region)
+  const energy = state.pulse.energy[region.id]
   const anchor = stabilityAnchor(region)
   const controllerName = region.controller ? FACTIONS[region.controller].name : 'no one'
   const controllerPop = region.controller ? region.popularity[region.controller] : null
@@ -159,7 +161,7 @@ function landStats(region: LandRegion, perspective: FactionId): StatDescriptor[]
         ],
       },
     },
-    energyStat(region, fossilEnergyDemand(region)),
+    energyStat(region, fossilEnergyDemand(region), energy, state),
     {
       key: 'stability',
       label: 'Stability',
@@ -211,21 +213,32 @@ function landStats(region: LandRegion, perspective: FactionId): StatDescriptor[]
   ]
 }
 
-function energyStat(region: Region, demand: number): StatDescriptor {
+function energyStat(region: Region, demand: number, energy?: EnergyResult, state?: GameState): StatDescriptor {
+  const pct = energy ? `${(energy.fulfillment * 100).toFixed(1)}%` : null
+  const blockaded = energy ? energy.delivered + 1e-9 < energy.entitlement : false
+  const lines = [
+    `Fossil-fuel supply rate: ${formatInt(region.energyReserve)} per Pulse (does not deplete).`,
+    demand > 0 ? `Local demand: ${formatInt(demand)} per Pulse (100 per Fossil Fuel Plant level).` : 'No local demand.',
+  ]
+  if (energy && state) {
+    lines.push(
+      `This pulse: ${formatInt(energy.delivered)} delivered of ${formatInt(energy.entitlement)} entitled (global fair share ${(state.pulse.fairShare * 100).toFixed(1)}%).`,
+      energy.sources.length > 0
+        ? `Sourced from: ${energy.sources.map((id) => state.regions[id].name).join(', ')}.`
+        : 'No reachable source.',
+    )
+    if (blockaded) lines.push('Blockaded: delivery is below the fair-share baseline because sources are unreachable.')
+  }
+  lines.push(
+    'Sourced same-country first, then outward along paths where your Air/Sea Superiority is at least 50%. Under global shortage every faction receives the same share of its own demand; a blockade can only push a region further below that.',
+    'Not gated by political Control.',
+  )
   return {
     key: 'energy',
     label: 'Energy',
-    value: demand > 0 ? `${formatInt(region.energyReserve)} / ${formatInt(demand)}` : formatInt(region.energyReserve),
-    tone: demand > region.energyReserve ? 'warn' : undefined,
-    tooltip: {
-      title: 'Energy',
-      lines: [
-        `Fossil-fuel supply rate: ${formatInt(region.energyReserve)} per Pulse (does not deplete).`,
-        demand > 0 ? `Local demand: ${formatInt(demand)} per Pulse (100 per Fossil Fuel Plant level).` : 'No local demand.',
-        'Sourced same-country first, then outward along clear paths. Under global shortage every faction receives the same share of its own demand; a blockade can push a region further below that.',
-        'Not gated by political Control — access follows Air/Sea Superiority.',
-      ],
-    },
+    value: pct ? `${formatInt(region.energyReserve)} · ${pct}` : formatInt(region.energyReserve),
+    tone: energy ? (blockaded ? 'bad' : energy.fulfillment < 1 ? 'warn' : undefined) : undefined,
+    tooltip: { title: 'Energy', lines },
   }
 }
 

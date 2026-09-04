@@ -57,6 +57,10 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
 - **Mid-pulse construction leftover:** if a building completes mid-Pulse and nothing else is queued when
   play resumes, the remaining Construction stream for that pulse is rerouted to Equipment/Manpower
   proportionally at pulse end.
+- **Facility bonuses on a pooled resource:** Production/Training Facilities are per-region but the
+  pool is faction-wide, so a faction's effective conversion multiplier is the **Production-weighted
+  average** of `1 + 0.2 × level` across its controlled regions — each region's facility improves the
+  conversion of that region's own contribution. *(Implementation ruling; flagged for confirmation.)*
 - **Focus changes** made mid-Pulse apply at the next Pulse boundary. A change made while auto-paused at
   the boundary applies as soon as play resumes.
 - **Pulse-boundary ordering:** when tick 168 completes — run pulse-end resolution (Money, Legitimacy,

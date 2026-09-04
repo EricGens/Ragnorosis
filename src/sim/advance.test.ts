@@ -71,7 +71,12 @@ describe('advancePulse', () => {
       s.regionOrder.reduce((sum, id) => (s.regions[id].type === 'land' ? sum + (s.regions[id] as LandRegion).population : sum), 0)
     const totalGdp = (s: typeof s0) =>
       s.regionOrder.reduce((sum, id) => (s.regions[id].type === 'land' ? sum + (s.regions[id] as LandRegion).gdp : sum), 0)
-    expect(totalGdp(s1) / totalPop(s1)).toBeCloseTo(totalGdp(s0) / totalPop(s0), 0)
+    // Growth and immigration preserve per-capita exactly; Manpower training removes a few thousand
+    // people without moving GDP, so allow a small upward drift.
+    const pcBefore = totalGdp(s0) / totalPop(s0)
+    const pcAfter = totalGdp(s1) / totalPop(s1)
+    expect(pcAfter).toBeGreaterThanOrEqual(pcBefore)
+    expect(pcAfter - pcBefore).toBeLessThan(pcBefore * 0.001)
   })
 
   it('drifts Stability toward the anchor', () => {

@@ -1,17 +1,32 @@
 import { SPEEDS, TICKS_PER_PULSE, formatDate, pulseOf, tickInPulse } from '../sim/clock'
 import { FACTIONS } from '../sim/data/factions'
 import { formatInt, formatMoney } from '../sim/format'
+import { FOCUSES } from '../sim/formulas/allocation'
+import { computeAllocation } from '../sim/steps/productionSteps'
 import { useGameStore } from '../store/gameStore'
 
+const FOCUS_LABEL: Record<(typeof FOCUSES)[number], string> = {
+  balanced: 'Balanced',
+  equipment: 'Equipment',
+  manpower: 'Manpower',
+  construction: 'Construction',
+}
+
 export function TopBar() {
-  const tick = useGameStore((s) => s.game.tick)
-  const globalTension = useGameStore((s) => s.game.globalTension)
+  const game = useGameStore((s) => s.game)
+  const tick = game.tick
+  const globalTension = game.globalTension
   const activeFaction = useGameStore((s) => s.activeFaction)
-  const faction = useGameStore((s) => s.game.factions[s.activeFaction])
+  const faction = game.factions[activeFaction]
   const speed = useGameStore((s) => s.speed)
   const running = useGameStore((s) => s.running)
   const setSpeed = useGameStore((s) => s.setSpeed)
   const toggleRun = useGameStore((s) => s.toggleRun)
+  const setFocus = useGameStore((s) => s.setFocus)
+
+  // While paused on a boundary the coming pulse hasn't locked its allocation yet — preview it.
+  const allocation = tickInPulse(tick) === 0 ? computeAllocation(game, activeFaction) : faction.allocation
+  const cycleFocus = () => setFocus(FOCUSES[(FOCUSES.indexOf(faction.focus) + 1) % FOCUSES.length])
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-ink-700 bg-ink-900 px-4">
@@ -20,6 +35,20 @@ export function TopBar() {
         <Stat label="Money" value={formatMoney(faction.money)} />
         <Stat label="Research" value={formatInt(faction.research)} />
         <Stat label="Legitimacy" value={faction.legitimacy.toFixed(1)} />
+        <div className="flex items-end gap-2">
+          <Stat label="Production" value={formatInt(allocation.total)} />
+          <button
+            type="button"
+            onClick={cycleFocus}
+            title={`Equipment ${formatInt(allocation.equipment)} · Manpower ${formatInt(allocation.manpower)} · Construction ${formatInt(allocation.construction)}. Click to change focus.`}
+            className={`rounded border px-2 py-0.5 text-[11px] tracking-[0.15em] uppercase ${
+              allocation.warning ? 'border-warn text-warn' : 'border-ink-600 text-ink-200 hover:border-signal-dim hover:text-signal'
+            }`}
+          >
+            {FOCUS_LABEL[faction.focus]}
+            {allocation.warning && ' !'}
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-6">

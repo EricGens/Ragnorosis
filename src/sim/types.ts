@@ -80,6 +80,34 @@ export function isLand(region: Region): region is LandRegion {
   return region.type === 'land'
 }
 
+export type ProductionCategory = 'equipment' | 'manpower' | 'construction'
+
+/** This pulse's Production split for a faction, fixed at pulse start (skeleton §4.3). */
+export interface ProductionAllocation {
+  total: number
+  equipment: number
+  manpower: number
+  construction: number
+  /** Every destination was capped or empty — Production had nowhere to go. */
+  warning: boolean
+}
+
+export const ZERO_ALLOCATION: ProductionAllocation = { total: 0, equipment: 0, manpower: 0, construction: 0, warning: false }
+
+/** One grid square under construction. Only one level receives progress at a time. */
+export interface ConstructionProject {
+  id: number
+  regionId: RegionId
+  building: BuildingType
+  /** The level currently being built. */
+  level: number
+  /** Locked when this level started building. */
+  cost: number
+  progress: number
+  /** Further levels queued behind this one; each is priced when it actually starts. */
+  queuedLevels: number
+}
+
 export interface FactionState {
   id: FactionId
   money: number
@@ -89,6 +117,23 @@ export interface FactionState {
   equipment: number
   manpower: number
   focus: Focus
+  allocation: ProductionAllocation
+  projects: ConstructionProject[]
+  nextProjectId: number
+  /** Banked fractional conversion progress (floor, carry forward). */
+  equipmentRemainder: number
+  manpowerRemainder: number
+  /** Construction stream with no project to flow into; rerouted at pulse end. */
+  constructionLeftover: number
+}
+
+/** Something that auto-pauses the game and needs the player's attention. */
+export type Interrupt = {
+  kind: 'construction-complete'
+  faction: FactionId
+  regionId: RegionId
+  building: BuildingType
+  level: number
 }
 
 export type LogCategory = 'time' | 'economy' | 'stability' | 'energy' | 'construction' | 'weather' | 'dev'
@@ -107,9 +152,36 @@ export interface SimSettings {
   immigrationRate: number
 }
 
+/** Outcome of the Energy sourcing calculation for one consuming region this Pulse. */
+export interface EnergyResult {
+  demand: number
+  /** demand × global fair share — the universal baseline before blockade effects. */
+  entitlement: number
+  delivered: number
+  /** delivered ÷ demand, 0–1. Fossil output is curtailed by this. */
+  fulfillment: number
+  /** Regions actually drawn from, in order. */
+  sources: RegionId[]
+}
+
+/**
+ * Values computed once at pulse start and held for the whole pulse (skeleton §1.4, §4.4).
+ * A snapshot of computed outcomes — never edited directly; edit the inputs instead.
+ */
+export interface PulseSnapshot {
+  totalSupply: number
+  totalDemand: number
+  /** min(1, supply ÷ demand): every faction gets this share of its own demand under shortage. */
+  fairShare: number
+  energy: Record<RegionId, EnergyResult>
+  /** Weather state at pulse start, used for Renewable output all pulse. */
+  weather: Record<RegionId, boolean>
+}
+
 export interface GameState {
   /** Absolute tick count since game start. */
   tick: number
+  pulse: PulseSnapshot
   regions: Record<RegionId, Region>
   /** Stable display/iteration order. */
   regionOrder: RegionId[]
@@ -120,4 +192,5 @@ export interface GameState {
   rngSeed: number
   settings: SimSettings
   log: LogEntry[]
+  interrupts: Interrupt[]
 }

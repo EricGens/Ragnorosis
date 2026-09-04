@@ -1,4 +1,7 @@
+import { InterruptNotice } from './InterruptNotice'
 import { MapView } from './MapView'
+import { MilitaryButton, MilitaryPanel } from './MilitaryPanel'
+import { BuildingSelector } from './panels/BuildingSelector'
 import { EntityPanel } from './panels/EntityPanel'
 import { GAME_AREA_ID } from './panels/gameArea'
 import { PinnedWindows } from './panels/PinnedWindows'
@@ -12,6 +15,10 @@ export function GameScreen() {
         <MapView />
         <EntityPanel />
         <PinnedWindows />
+        <MilitaryButton />
+        <MilitaryPanel />
+        <InterruptNotice />
+        <BuildingSelector />
       </main>
     </div>
   )

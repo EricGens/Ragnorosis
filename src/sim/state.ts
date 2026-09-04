@@ -1,6 +1,7 @@
 import type { MapDefinition } from './data/dummyMap'
+import { computePulseSnapshot } from './snapshot'
 import type { FactionId, FactionState, GameState, Region, RegionId, SimSettings } from './types'
-import { FACTION_IDS } from './types'
+import { FACTION_IDS, ZERO_ALLOCATION } from './types'
 
 export const DEFAULT_SETTINGS: SimSettings = {
   weatherChancePerTick: 0,
@@ -24,7 +25,21 @@ export function buildAdjacency(regionIds: RegionId[], edges: [RegionId, RegionId
 }
 
 function initialFaction(id: FactionId): FactionState {
-  return { id, money: 0, research: 0, legitimacy: 0, equipment: 0, manpower: 0, focus: 'balanced' }
+  return {
+    id,
+    money: 0,
+    research: 0,
+    legitimacy: 0,
+    equipment: 0,
+    manpower: 0,
+    focus: 'balanced',
+    allocation: { ...ZERO_ALLOCATION },
+    projects: [],
+    nextProjectId: 1,
+    equipmentRemainder: 0,
+    manpowerRemainder: 0,
+    constructionLeftover: 0,
+  }
 }
 
 export function createInitialState(map: MapDefinition, seed = 1): GameState {
@@ -39,8 +54,9 @@ export function createInitialState(map: MapDefinition, seed = 1): GameState {
   const factions = {} as Record<FactionId, FactionState>
   for (const id of FACTION_IDS) factions[id] = initialFaction(id)
 
-  return {
+  const state: GameState = {
     tick: 0,
+    pulse: { totalSupply: 0, totalDemand: 0, fairShare: 1, energy: {}, weather: {} },
     regions,
     regionOrder,
     adjacency: buildAdjacency(regionOrder, map.edges),
@@ -49,5 +65,8 @@ export function createInitialState(map: MapDefinition, seed = 1): GameState {
     rngSeed: seed,
     settings: { ...DEFAULT_SETTINGS },
     log: [],
+    interrupts: [],
   }
+  state.pulse = computePulseSnapshot(state)
+  return state
 }
