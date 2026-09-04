@@ -1,3 +1,4 @@
+import { DevtoolsButton, DevtoolsPanel } from './devtools/DevtoolsPanel'
 import { InterruptNotice } from './InterruptNotice'
 import { MapView } from './MapView'
 import { MilitaryButton, MilitaryPanel } from './MilitaryPanel'
@@ -18,6 +19,8 @@ export function GameScreen() {
         <MilitaryButton />
         <MilitaryPanel />
         <InterruptNotice />
+        <DevtoolsButton />
+        <DevtoolsPanel />
         <BuildingSelector />
       </main>
     </div>

@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import { create } from 'zustand'
-import { advanceTick } from '../sim/advance'
+import { advancePulse, advanceTick } from '../sim/advance'
 import { TICKS_PER_SECOND, type Speed } from '../sim/clock'
 import { queueBuild, type QueueResult } from '../sim/construction'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
@@ -27,6 +27,8 @@ interface GameStore {
   toggleRun: () => void
   pause: () => void
   stepTick: () => void
+  /** Devtools: advance to the next pulse boundary instantly (interrupts are collected, not honored). */
+  stepPulse: () => void
 
   setFocus: (focus: Focus) => void
   queueBuild: (regionId: RegionId, building: BuildingType) => QueueResult
@@ -106,6 +108,11 @@ export const useGameStore = create<GameStore>()((set, get) => {
       const { state, pulseCompleted, interrupted } = advanceTick(get().game)
       set({ game: state })
       if (pulseCompleted || interrupted) get().pause()
+    },
+
+    stepPulse: () => {
+      get().pause()
+      set({ game: advancePulse(get().game) })
     },
 
     setFocus: (focus) =>

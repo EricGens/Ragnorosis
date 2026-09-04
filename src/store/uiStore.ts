@@ -32,10 +32,12 @@ interface UIStore {
   /** Region whose building-type selector is open. */
   selectorRegion: string | null
   militaryOpen: boolean
+  devtoolsOpen: boolean
 
   openSelector: (regionId: string) => void
   closeSelector: () => void
   toggleMilitary: () => void
+  toggleDevtools: () => void
   setHovered: (ref: EntityRef | null) => void
   /** Left-click: pin this entity, or unpin it if it is already pinned. */
   togglePin: (ref: EntityRef) => void
@@ -54,10 +56,12 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   windows: [],
   selectorRegion: null,
   militaryOpen: false,
+  devtoolsOpen: false,
 
   openSelector: (regionId) => set({ selectorRegion: regionId }),
   closeSelector: () => set({ selectorRegion: null }),
   toggleMilitary: () => set({ militaryOpen: !get().militaryOpen }),
+  toggleDevtools: () => set({ devtoolsOpen: !get().devtoolsOpen }),
 
   setHovered: (ref) => set({ hovered: ref }),
 
