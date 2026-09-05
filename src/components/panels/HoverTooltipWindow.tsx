@@ -43,7 +43,7 @@ export function HoverTooltipWindow() {
     <div
       ref={ref}
       role="tooltip"
-      className="pointer-events-none absolute z-20 w-72 rounded border border-ink-600 bg-ink-800/95 p-3 shadow-xl"
+      className="pointer-events-none absolute z-[35] w-72 rounded border border-ink-600 bg-ink-800/95 p-3 shadow-xl"
       style={{ left: x, top: y ?? tooltip.anchor.y }}
     >
       <div className="mb-1 text-[11px] tracking-[0.15em] text-signal uppercase">{tooltip.content.title}</div>
