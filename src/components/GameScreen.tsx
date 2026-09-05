@@ -5,6 +5,7 @@ import { MilitaryButton, MilitaryPanel } from './MilitaryPanel'
 import { BuildingSelector } from './panels/BuildingSelector'
 import { EntityPanel } from './panels/EntityPanel'
 import { GAME_AREA_ID } from './panels/gameArea'
+import { HoverHintWindow } from './panels/HoverHintWindow'
 import { HoverTooltipWindow } from './panels/HoverTooltipWindow'
 import { PinnedWindows } from './panels/PinnedWindows'
 import { TopBar } from './TopBar'
@@ -17,6 +18,7 @@ export function GameScreen() {
         <MapView />
         <EntityPanel />
         <HoverTooltipWindow />
+        <HoverHintWindow />
         <PinnedWindows />
         <MilitaryButton />
         <MilitaryPanel />

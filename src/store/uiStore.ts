@@ -29,6 +29,12 @@ export interface HoverTooltip {
   anchor: Rect
 }
 
+/** A transient single-line hint (e.g. a building grid square's "New Building"), anchored to it. */
+export interface HoverHint {
+  text: string
+  anchor: Rect
+}
+
 interface UIStore {
   /** Entity under the cursor — shown as a preview. */
   hovered: EntityRef | null
@@ -38,6 +44,8 @@ interface UIStore {
   windows: PinnedWindow[]
   /** The tooltip preview for whatever stat row is currently hovered, if any. */
   hoverTooltip: HoverTooltip | null
+  /** The single-line hint for whatever building grid square is currently hovered, if any. */
+  hoverHint: HoverHint | null
   /** Region whose building-type selector is open. */
   selectorRegion: string | null
   militaryOpen: boolean
@@ -58,6 +66,9 @@ interface UIStore {
   /** Show a stat's tooltip as a preview beside its row. Replaces any other preview showing. */
   showHoverTooltip: (content: TooltipContent, anchor: Rect) => void
   hideHoverTooltip: () => void
+  /** Show a single-line hint beside whatever's hovered (e.g. a building grid square). */
+  showHoverHint: (text: string, anchor: Rect) => void
+  hideHoverHint: () => void
 }
 
 let nextWindowId = 1
@@ -67,6 +78,7 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   pinned: null,
   windows: [],
   hoverTooltip: null,
+  hoverHint: null,
   selectorRegion: null,
   militaryOpen: false,
   devtoolsOpen: false,
@@ -95,4 +107,8 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   showHoverTooltip: (content, anchor) => set({ hoverTooltip: { content, anchor } }),
 
   hideHoverTooltip: () => set({ hoverTooltip: null }),
+
+  showHoverHint: (text, anchor) => set({ hoverHint: { text, anchor } }),
+
+  hideHoverHint: () => set({ hoverHint: null }),
 }))

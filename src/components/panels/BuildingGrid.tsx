@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { BUILDINGS, BUILDING_TYPES, buildingCost } from '../../sim/data/buildings'
 import { findProject } from '../../sim/construction'
 import { formatInt } from '../../sim/format'
 import type { BuildingType, ConstructionProject, FactionId, LandRegion } from '../../sim/types'
 import { useGameStore } from '../../store/gameStore'
 import { useUIStore } from '../../store/uiStore'
+import { relativeRect } from './gameArea'
 
 const GRID_SQUARES = 6
 const CODES: Record<BuildingType, string> = {
@@ -70,17 +71,32 @@ export function BuildingGrid({ region, perspective }: { region: LandRegion; pers
 
 function OccupiedSquare({ square, canBuild, onUpgrade }: { square: Square; canBuild: boolean; onUpgrade: () => void }) {
   const [hover, setHover] = useState(false)
+  const ref = useRef<HTMLButtonElement>(null)
+  const showHint = useUIStore((s) => s.showHoverHint)
+  const hideHint = useUIStore((s) => s.hideHoverHint)
   const def = BUILDINGS[square.type]
   const p = square.project
   const atCap = def.maxLevel !== undefined && (p ? p.level + p.queuedLevels : square.level) >= def.maxLevel
   const upgradable = canBuild && !atCap
   const nextCost = buildingCost(square.type, (p ? p.level + p.queuedLevels : square.level) + 1)
+  const hintText = upgradable
+    ? `Upgrade Building — L${(p ? p.level + p.queuedLevels : square.level) + 1} costs ${formatInt(nextCost)}`
+    : atCap
+      ? `${def.name} is at its level cap`
+      : null
 
   return (
     <button
+      ref={ref}
       type="button"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      onMouseEnter={() => {
+        setHover(true)
+        if (hintText && ref.current) showHint(hintText, relativeRect(ref.current))
+      }}
+      onMouseLeave={() => {
+        setHover(false)
+        hideHint()
+      }}
       onClick={upgradable ? onUpgrade : undefined}
       disabled={!upgradable}
       className={`relative flex h-16 flex-col items-center justify-center rounded border border-ink-600 bg-ink-900/70 ${
@@ -100,23 +116,30 @@ function OccupiedSquare({ square, canBuild, onUpgrade }: { square: Square; canBu
         <span className="absolute top-0.5 right-1 text-[9px] text-ink-400">+{p.queuedLevels}</span>
       )}
       {hover && upgradable && (
-        <>
-          <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">+</span>
-          <Hint text={`Upgrade Building — L${(p ? p.level + p.queuedLevels : square.level) + 1} costs ${formatInt(nextCost)}`} />
-        </>
+        <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">+</span>
       )}
-      {hover && atCap && <Hint text={`${def.name} is at its level cap`} />}
     </button>
   )
 }
 
 function EmptySquare({ buildable, onClick }: { buildable: boolean; onClick: () => void }) {
   const [hover, setHover] = useState(false)
+  const ref = useRef<HTMLButtonElement>(null)
+  const showHint = useUIStore((s) => s.showHoverHint)
+  const hideHint = useUIStore((s) => s.hideHoverHint)
+
   return (
     <button
+      ref={ref}
       type="button"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      onMouseEnter={() => {
+        setHover(true)
+        if (buildable && ref.current) showHint('New Building', relativeRect(ref.current))
+      }}
+      onMouseLeave={() => {
+        setHover(false)
+        hideHint()
+      }}
       onClick={onClick}
       disabled={!buildable}
       className={`relative h-16 rounded border border-dashed ${
@@ -125,22 +148,8 @@ function EmptySquare({ buildable, onClick }: { buildable: boolean; onClick: () =
       aria-label={buildable ? 'New Building' : 'Empty square'}
     >
       {hover && buildable && (
-        <>
-          <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">+</span>
-          <Hint text="New Building" />
-        </>
+        <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">+</span>
       )}
     </button>
-  )
-}
-
-function Hint({ text }: { text: string }) {
-  return (
-    <span
-      role="tooltip"
-      className="pointer-events-none absolute -top-7 left-1/2 z-20 -translate-x-1/2 rounded border border-ink-600 bg-ink-800 px-2 py-0.5 text-[10px] whitespace-nowrap text-ink-100"
-    >
-      {text}
-    </span>
   )
 }
