@@ -4,7 +4,7 @@ import { isLand } from '../../sim/types'
 import { useDisplayGame } from '../../store/gameStore'
 import { factionColor } from '../factionColors'
 import { BuildingGrid } from './BuildingGrid'
-import { PANEL_WIDTH } from './gameArea'
+import { ENTITY_PANEL_ID, PANEL_WIDTH } from './gameArea'
 import { regionDisplay } from './regionStats'
 import { StatRow } from './StatRow'
 
@@ -30,6 +30,7 @@ export function RegionPanel({
 
   return (
     <aside
+      id={ENTITY_PANEL_ID}
       className="absolute top-4 left-4 z-10 max-h-[calc(100%-2rem)] overflow-y-auto rounded border border-ink-600 shadow-2xl"
       style={{ width: PANEL_WIDTH, backgroundImage: BACKGROUNDS[header.type] }}
       aria-label={`${header.name} panel`}

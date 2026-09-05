@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useUIStore, type TooltipContent } from '../../store/uiStore'
-import { gameArea, PANEL_RESERVED } from './gameArea'
+import { gameArea, reservedRects } from './gameArea'
 import type { StatDescriptor, Tone } from './regionStats'
 
 const toneClass: Record<Tone, string> = {
@@ -23,11 +23,11 @@ export function StatRow({ stat }: { stat: StatDescriptor }) {
       className="relative flex cursor-help items-baseline justify-between gap-4 rounded px-2 py-1 hover:bg-ink-100/5"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      onClick={() => openWindow(stat.tooltip, gameArea(), PANEL_RESERVED)}
+      onClick={() => openWindow(stat.tooltip, gameArea(), reservedRects())}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') openWindow(stat.tooltip, gameArea(), PANEL_RESERVED)
+        if (e.key === 'Enter' || e.key === ' ') openWindow(stat.tooltip, gameArea(), reservedRects())
       }}
     >
       <span className="text-[11px] tracking-[0.15em] text-ink-400 uppercase">{stat.label}</span>
