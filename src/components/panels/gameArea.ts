@@ -10,6 +10,14 @@ export function gameArea(): Size {
   return el ? { width: el.clientWidth, height: el.clientHeight } : { width: 1280, height: 720 }
 }
 
+/** An element's rect expressed relative to the game area's own top-left, not the viewport. */
+export function relativeRect(el: Element): Rect {
+  const area = document.getElementById(GAME_AREA_ID)
+  const a = area ? area.getBoundingClientRect() : { left: 0, top: 0 }
+  const r = el.getBoundingClientRect()
+  return { x: r.left - a.left, y: r.top - a.top, width: r.width, height: r.height }
+}
+
 /**
  * Rects that pinned windows should avoid — currently just the entity panel, measured from its
  * actual rendered footprint rather than a fixed guess, so windows can reuse the space below or
@@ -17,10 +25,6 @@ export function gameArea(): Size {
  * panel is open).
  */
 export function reservedRects(): Rect[] {
-  const area = document.getElementById(GAME_AREA_ID)
   const panel = document.getElementById(ENTITY_PANEL_ID)
-  if (!area || !panel) return []
-  const a = area.getBoundingClientRect()
-  const p = panel.getBoundingClientRect()
-  return [{ x: p.left - a.left, y: p.top - a.top, width: p.width, height: p.height }]
+  return panel ? [relativeRect(panel)] : []
 }

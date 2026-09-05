@@ -22,6 +22,13 @@ export interface PinnedWindow extends TooltipContent {
   y: number
 }
 
+/** A transient hover preview of a tooltip, anchored to the row the cursor is over. */
+export interface HoverTooltip {
+  content: TooltipContent
+  /** The hovered row's rect, relative to the game area — used to place the preview beside it. */
+  anchor: Rect
+}
+
 interface UIStore {
   /** Entity under the cursor — shown as a preview. */
   hovered: EntityRef | null
@@ -29,6 +36,8 @@ interface UIStore {
   pinned: EntityRef | null
   /** Tooltips pinned as independent floating windows; closed only manually. */
   windows: PinnedWindow[]
+  /** The tooltip preview for whatever stat row is currently hovered, if any. */
+  hoverTooltip: HoverTooltip | null
   /** Region whose building-type selector is open. */
   selectorRegion: string | null
   militaryOpen: boolean
@@ -46,6 +55,9 @@ interface UIStore {
   openWindow: (content: TooltipContent, area: Size, reserved?: Rect[]) => void
   closeWindow: (id: number) => void
   moveWindow: (id: number, x: number, y: number) => void
+  /** Show a stat's tooltip as a preview beside its row. Replaces any other preview showing. */
+  showHoverTooltip: (content: TooltipContent, anchor: Rect) => void
+  hideHoverTooltip: () => void
 }
 
 let nextWindowId = 1
@@ -54,6 +66,7 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   hovered: null,
   pinned: null,
   windows: [],
+  hoverTooltip: null,
   selectorRegion: null,
   militaryOpen: false,
   devtoolsOpen: false,
@@ -78,4 +91,8 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   closeWindow: (id) => set({ windows: get().windows.filter((w) => w.id !== id) }),
 
   moveWindow: (id, x, y) => set({ windows: get().windows.map((w) => (w.id === id ? { ...w, x, y } : w)) }),
+
+  showHoverTooltip: (content, anchor) => set({ hoverTooltip: { content, anchor } }),
+
+  hideHoverTooltip: () => set({ hoverTooltip: null }),
 }))
