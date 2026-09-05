@@ -88,6 +88,13 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
   Built into the core from the start.
 - **Art:** dark gradient placeholders stand in for terrain images until real assets exist.
 
+## Tuning adjustments (post-playtest)
+
+- **Building base costs cut to 1/5 of the skeleton's §4.2 table (2026-09-05):** buildings felt too
+  slow to complete. Fossil Fuel Plant 5,000→1,000, Renewable Plant 8,500→1,700, Production Facility
+  7,000→1,400, Training Facility 5,000→1,000, Fortification 10,000→2,000. The 5%-per-level escalating
+  stack curve is unchanged, just applied to the lower base.
+
 ## GDD changes needed
 
 - **§7.3 Production:** change "Fueled by the region's own Production output" to state that Production is
