@@ -92,10 +92,11 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
 
 ## Tuning adjustments (post-playtest)
 
-- **Building base costs cut to 1/5 of the skeleton's §4.2 table (2026-09-05):** buildings felt too
-  slow to complete. Fossil Fuel Plant 5,000→1,000, Renewable Plant 8,500→1,700, Production Facility
-  7,000→1,400, Training Facility 5,000→1,000, Fortification 10,000→2,000. The 5%-per-level escalating
-  stack curve is unchanged, just applied to the lower base.
+- **Building base costs cut to 1/5 (2026-09-05), folded back into skeleton §4.2 (2026-09-06):**
+  buildings felt too slow to complete. Fossil Fuel Plant 5,000→1,000, Renewable Plant 8,500→1,700,
+  Production Facility 7,000→1,400, Training Facility 5,000→1,000, Fortification 10,000→2,000. The
+  5%-per-level escalating stack curve is unchanged, just applied to the lower base. The skeleton's own
+  table now carries these values directly — no standing override left here.
 
 ## Superseded by source-doc updates
 
