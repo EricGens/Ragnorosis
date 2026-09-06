@@ -1,5 +1,5 @@
 # RAGNOROSIS — Game Design Document
-**Version 2.1 (Industrial Output terminology fix)** · Status: comprehensive design in progress, interview-driven
+**Version 2.2 (Production pooling clarified)** · Status: comprehensive design in progress, interview-driven
 
 > Shared context for building the game, written to hand to an AI coding collaborator
 > (Claude Fable). Plan: map the full design first, organized into **Development Epochs**
@@ -988,8 +988,11 @@ A **pool** (accumulate → pick techs → award on threshold), not spent pieceme
 Breakthrough** (multi-pulse, windfall RP) and **Assist Research** (1-pulse, flat **%** buff this turn).
 
 ### 7.3 Production
-Spent on regional **buildings/improvements** and **military units**. Fueled by the region's own Production
-output (§6.2 — corrected from an earlier "Industrial output" label, terminology drift for the same stat).
+Spent on regional **buildings/improvements** and **military units**. **Pooled faction-wide, not held
+separately per region** — every controlled region's Production output (§6.2 — corrected from an earlier
+"Industrial output" label, terminology drift for the same stat) sums into one faction-level total before
+being spent, the same way Money and Legitimacy already pool faction-wide. A region doesn't run its own
+separated economy loop.
 Agent mission: **Advise Industry** (1-pulse, flat **+5%** this turn). **Supply** (§8.7) is derived
 directly from a region'''s Production at a baseline 1:1 ratio, tech-modifiable — Molecular Machinery
 and Nanotechnology (§10.3.2) each add +10%, shown parenthetically as Production(Supply) on the region panel.

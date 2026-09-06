@@ -11,8 +11,8 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
   controlling faction's Popularity is below 50%, and scales linearly from 0 at 50% to **0.7** at 100%.
   Perfect conditions (100 Stability, 100% Popularity) therefore yield an effective 70% weekly tax rate.
   The US RBO half-cut without Control is **not** in Epoch 1.
-- **Research income (per Tick):** `GDP / 1B × Stability / 100`. Displayed as a per-Tick rate.
-  *(Doc bug: §1.6 cites this as "§1.4's formula" but §1.4 never states it.)*
+- **Research income (per Tick):** `GDP / 1B × Stability / 100`. Displayed as a per-Tick rate. (Now
+  stated explicitly in skeleton §1.4 as of the 2026-09-06 revision.)
 - **Region Production (per Pulse):** `Population / 100,000 + Σ plant output`, where a Fossil Fuel Plant
   at level N outputs `N × 100` curtailed 1:1 by Energy shortfall, and a Renewable Plant outputs `N × 100`
   (or `N × 50` while Weather is active, evaluated as a pulse-start snapshot). §4.4 supersedes §1.4's
@@ -45,8 +45,9 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
 ## Production pool & cadence
 
 - **Production is pooled faction-wide** across all controlled regions, then allocated by focus. A building
-  in any region is built from the faction's total. *(GDD §7.3 says "region's own Production" — stale.)*
-- The **4-concurrent-project limit is faction-wide** (may change after playtesting).
+  in any region is built from the faction's total. (GDD §7.3 now says this explicitly as of v2.2.)
+- The **4-concurrent-project limit is faction-wide** (may change after playtesting; skeleton confirms this
+  reading as of the 2026-09-06 revision).
 - **Construction streams per Tick** at the pulse-start rate (1/168 of the pulse share per tick), so a
   building can complete mid-Pulse and fire the auto-pause interrupt.
 - **Equipment and Manpower credit at Pulse end** as a lump. Their rates are fixed at pulse start, so
@@ -80,7 +81,8 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
 - **Stability anchor for Unaffiliated regions:** no controlling faction → the Popularity input is skipped
   and the anchor is the per-capita-GDP input alone (Task Force inputs arrive in a later epoch).
 - **Manpower conversion source:** Population is drawn from the faction's controlled regions proportionally
-  to their population. The 2% cap applies to the pool's size against total controlled population.
+  to their population, not to each region's share of pooled Production (skeleton confirms this reading as
+  of the 2026-09-06 revision). The 2% cap applies to the pool's size against total controlled population.
 - **Starting faction pools:** Money, Legitimacy, Equipment, Manpower all start at 0; focus starts Balanced.
 - **Red Queen defaults to 75% Popularity** like every other faction (SW Land's authored 0 stands). SW Land
   is the intended nonpermissive-region testbed for her Agents/Task Forces in later epochs.
@@ -95,9 +97,9 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
   7,000→1,400, Training Facility 5,000→1,000, Fortification 10,000→2,000. The 5%-per-level escalating
   stack curve is unchanged, just applied to the lower base.
 
-## GDD changes needed
+## Superseded by source-doc updates
 
-- **§7.3 Production:** change "Fueled by the region's own Production output" to state that Production is
-  pooled across all faction-controlled regions and allocated across Construction, Manpower, and Equipment
-  each Pulse (per skeleton §4.3).
-- **§1.4 of the skeleton:** add the Research formula that §1.6 cites.
+Both of the following were fixed directly in the source docs (2026-09-06) rather than staying as notes
+here: GDD §7.3 now states Production pools faction-wide (v2.2), and skeleton §1.4 now states the Research
+formula that §1.6 already cited. This file's account of both was correct throughout; the discrepancy was
+in the source docs, not the implementation.

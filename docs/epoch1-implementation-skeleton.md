@@ -131,9 +131,11 @@ and displayed now.
 **Research** — currency-like, but **not saved/spent at discrete decision points** — continuously pushes
 progress toward whatever tech a faction currently has focused. **Calculated every Tick, not just every
 Pulse** (resolved this session) — this is realistic enough that a highly-developed faction could complete
-several shallow, low-tier techs within a single Pulse. Income scales with GDP, Stability, and faction-specific
-buffs/maluses; raisable further via Agent Missions (a recurring output boost, and a separate large-lump-sum
-mission) — both deferred to the Agent epoch.
+several shallow, low-tier techs within a single Pulse. **Formula (added — previously only cited from §1.6,
+never actually stated here): `Research = (GDP / 1,000,000,000) × (Stability / 100)`** — the default-region
+worked example ($500B GDP, 50.0 Stability) gives 500 × 0.5 = 250, matching §1.6. Raisable further via Agent
+Missions (a recurring output boost, and a separate large-lump-sum mission) — both deferred to the Agent
+epoch.
 
 **Energy** — NEW, resolved this session, genuinely two related but distinct concepts:
 1. **Raw resource stat** — a variable amount per region representing local fossil-fuel reserves (Texas,
@@ -573,9 +575,13 @@ applied to Manpower or Equipment hitting their caps** — those have no real dec
 logic already knows where the excess goes), so an interrupt there would just be noise, especially disruptive
 mid-combat when a player is already managing real decisions.
 
-**Up to 4 concurrent building projects** (new build or level-upgrade, interchangeable against the same slot
-count, confirmed this session) — Construction's allocated share splits evenly across all active projects. A
-real speed-vs-breadth tradeoff: one project finishes fastest, four projects make broad simultaneous progress.
+**Up to 4 concurrent building projects, confirmed this session as a per-faction limit, not per-region** (new
+build or level-upgrade, interchangeable against the same slot count) — since Production pools faction-wide
+(§7.3), this is the only consistent reading: a faction with many controlled regions can only be actively
+building in a handful of them at any given moment, everywhere else waits its turn. Construction's allocated
+share splits evenly across all active projects, wherever they are. A real speed-vs-breadth tradeoff: one
+project finishes fastest, four projects (spread across as many different regions as the player chooses) make
+broad simultaneous progress instead.
 
 ### 4.4 Fossil Fuel & Renewable Plants — RESOLVED
 
@@ -602,8 +608,14 @@ buildings" framing was imprecise, not the underlying numbers.
 
 **Base conversion rates**, before any building bonus:
 - **Manpower:** 1 Production point → 1 Population converted to available Manpower. **Capped this epoch at 2%
-  of Population** (§1.4's growth work already established this cap; further refinement — raising the cap via
-  mobilization/conscription events, tentatively 2%→5%+ — deferred to the Task Force epoch).
+  of the faction's total Population, summed across every controlled region — confirmed this session as a
+  faction-wide cap, not per-region**, consistent with Manpower already being a faction-wide pool (§1.4's
+  growth work established the 2% figure itself; further refinement — raising the cap via mobilization/
+  conscription events, tentatively 2%→5%+ — deferred to the Task Force epoch). **Which region's Population
+  actually decreases, resolved this session: proportionally by each controlled region's Population size, not
+  by its contribution to the pooled Production.** In-fiction grounding: recruits are drawn from population
+  centers nationwide into training infrastructure (boot camps, flight schools, academies — the Training
+  Facility itself, §4.5), not preferentially drained from wherever the economic output happened to originate.
 - **Equipment:** 1 Production point → 1 unit of **Small Arms**, the only Equipment type this epoch.
   **Uncapped** — the real stockpile-vs-Task-Force-demand system is deferred to the Task Force epoch; for now,
   demand is simply unlimited.
@@ -726,10 +738,11 @@ happens.
 - A fully specified building system — five building types with real costs and formulas, the escalating-cost
   curve applied to real numbers for the first time, and a general Production-allocation mechanic (societal
   focus, proportional overflow) that later epochs can extend rather than rebuild.
-- **A global Equipment pool (Small Arms only, uncapped) and Manpower pool (capped at 2% of Population)** —
-  Epoch 2 can assume these exist and accumulate correctly, but should *not* assume the real stockpile-vs-
-  demand Equipment cap or the mobilization-based Manpower cap progression exist yet; both are explicitly
-  deferred, Epoch 1 only provides the simplified uncapped/flat-2%-capped versions.
+- **A global (faction-wide, not per-region) Equipment pool (Small Arms only, uncapped) and Manpower pool
+  (capped at 2% of the faction's total Population across all controlled regions)** — Epoch 2 can assume these
+  exist and accumulate correctly, but should *not* assume the real stockpile-vs-demand Equipment cap or the
+  mobilization-based Manpower cap progression exist yet; both are explicitly deferred, Epoch 1 only provides
+  the simplified uncapped/flat-2%-capped versions.
 - A Military panel UI element, partially built (pool display only) — ready for the Unit Editor and Task Force
   Editor to attach to it directly in later epochs rather than needing new top-level UI built from scratch.
 - **An application entry flow (title screen → Sandbox → faction select) and an active-faction-perspective
