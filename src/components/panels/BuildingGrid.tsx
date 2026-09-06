@@ -5,16 +5,11 @@ import { formatInt } from '../../sim/format'
 import type { BuildingType, ConstructionProject, FactionId, LandRegion } from '../../sim/types'
 import { useGameStore } from '../../store/gameStore'
 import { useUIStore } from '../../store/uiStore'
+import { BuildingIcon } from './buildingIcons'
 import { relativeRect } from './gameArea'
 
-const GRID_SQUARES = 6
-const CODES: Record<BuildingType, string> = {
-  'fossil-fuel-plant': 'FF',
-  'renewable-plant': 'RN',
-  'production-facility': 'PF',
-  'training-facility': 'TF',
-  fortification: 'FT',
-}
+/** 4×4, square cells — future-proofed for more building types than the current five. */
+const GRID_SQUARES = 16
 
 interface Square {
   type: BuildingType
@@ -48,7 +43,7 @@ export function BuildingGrid({ region, perspective }: { region: LandRegion; pers
   return (
     <div className="mt-3 border-t border-ink-700 pt-2">
       <div className="mb-1 text-[11px] tracking-[0.15em] text-ink-400 uppercase">Buildings</div>
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-4 gap-1.5">
         {Array.from({ length: GRID_SQUARES }, (_, i) => {
           const square = squares[i]
           if (square) {
@@ -99,13 +94,13 @@ function OccupiedSquare({ square, canBuild, onUpgrade }: { square: Square; canBu
       }}
       onClick={upgradable ? onUpgrade : undefined}
       disabled={!upgradable}
-      className={`relative flex h-16 flex-col items-center justify-center rounded border border-ink-600 bg-ink-900/70 ${
+      className={`relative flex aspect-square flex-col items-center justify-center gap-0.5 rounded border border-ink-600 bg-ink-900/70 ${
         upgradable ? 'cursor-pointer hover:border-signal-dim' : 'cursor-default'
       }`}
       title={def.name}
       aria-label={`${def.name} level ${square.level}`}
     >
-      <span className="text-sm tracking-widest text-ink-100">{CODES[square.type]}</span>
+      <BuildingIcon type={square.type} className="h-1/2 w-1/2 text-ink-100" />
       <span className="text-[11px] text-ink-200">L{square.level}</span>
       {p && (
         <div className="absolute inset-x-1 bottom-1 h-1 rounded bg-ink-700" aria-label="construction progress">
@@ -142,7 +137,7 @@ function EmptySquare({ buildable, onClick }: { buildable: boolean; onClick: () =
       }}
       onClick={onClick}
       disabled={!buildable}
-      className={`relative h-16 rounded border border-dashed ${
+      className={`relative aspect-square rounded border border-dashed ${
         buildable ? 'cursor-pointer border-ink-600 hover:border-signal-dim' : 'cursor-default border-ink-700/60'
       }`}
       aria-label={buildable ? 'New Building' : 'Empty square'}
