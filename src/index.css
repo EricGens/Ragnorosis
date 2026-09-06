@@ -33,3 +33,44 @@ body {
   font-family: var(--font-mono);
   overflow: hidden;
 }
+
+/* Custom scrollbar: dark track, a glowing signal-green thumb, and soft orb caps in place of the
+   native up/down arrows. Applies to any scrollable panel (Region panel, devtools log, …). */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-signal-dim) var(--color-ink-950);
+}
+
+::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
+}
+
+::-webkit-scrollbar-track {
+  background:
+    radial-gradient(circle 4px at 50% 10px, var(--color-signal) 45%, transparent 80%),
+    radial-gradient(circle 4px at 50% calc(100% - 10px), var(--color-signal) 45%, transparent 80%),
+    var(--color-ink-950);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-signal-dim);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  box-shadow: 0 0 6px 1px var(--color-signal);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-signal);
+  background-clip: padding-box;
+  box-shadow: 0 0 10px 2px var(--color-signal);
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--color-ink-950);
+}
