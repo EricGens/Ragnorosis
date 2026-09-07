@@ -5,6 +5,7 @@ import { manpowerCap } from '../sim/formulas/manpower'
 import { computeAllocation } from '../sim/steps/productionSteps'
 import { useDisplayGame, useGameStore } from '../store/gameStore'
 import { useUIStore } from '../store/uiStore'
+import { MilitaryIcon } from './panels/overlayIcons'
 
 /**
  * Persistent right-side button opening the Military interface (skeleton §4.6). Epoch 1 shows the
@@ -18,11 +19,13 @@ export function MilitaryButton() {
       type="button"
       onClick={toggle}
       aria-pressed={open}
-      className={`absolute top-1/2 right-0 z-10 -translate-y-1/2 rounded-l border border-r-0 px-1.5 py-4 text-[11px] tracking-[0.3em] uppercase [writing-mode:vertical-rl] ${
+      aria-label="Military"
+      title="Military"
+      className={`absolute top-1/2 right-0 z-10 -translate-y-1/2 rounded-l border border-r-0 p-2 ${
         open ? 'border-signal bg-signal/10 text-signal' : 'border-ink-600 bg-ink-900 text-ink-200 hover:text-signal'
       }`}
     >
-      Military
+      <MilitaryIcon className="h-6 w-6" />
     </button>
   )
 }

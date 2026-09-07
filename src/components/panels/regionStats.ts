@@ -10,7 +10,7 @@ import { moneyPerPulse, perCapitaGdp, popularityCut, researchPerTick } from '../
 import { fossilEnergyDemand, regionSupply } from '../../sim/formulas/production'
 import { gdpStabilityInput, stabilityAnchor } from '../../sim/formulas/stability'
 import { productionFor } from '../../sim/snapshot'
-import type { EnergyResult, FactionId, GameState, LandRegion, Region } from '../../sim/types'
+import type { EnergyResult, FactionId, GameState, LandRegion, Region, TerrainTrait } from '../../sim/types'
 import { FACTION_IDS, isLand } from '../../sim/types'
 import type { TooltipContent } from '../../store/uiStore'
 
@@ -26,12 +26,15 @@ export interface StatDescriptor {
   tooltip: TooltipContent
 }
 
+/** A region's identity badges — icon-only, with weather also carrying its remaining duration. */
+export type RegionTag = { kind: 'weather'; ticksRemaining: number } | { kind: TerrainTrait }
+
 export interface RegionHeader {
   name: string
   type: Region['type']
   controller: FactionId | null
   country?: string
-  tags: string[]
+  tags: RegionTag[]
   superiority: { air?: number; sea?: number }
 }
 
@@ -53,9 +56,9 @@ function isCoastal(state: GameState, region: Region): boolean {
 }
 
 export function regionDisplay(state: GameState, region: Region, perspective: FactionId): RegionDisplay {
-  const tags: string[] = []
-  if (region.weatherActive) tags.push(`Weather (${region.weatherTicksRemaining}t)`)
-  if (isLand(region)) for (const t of region.traits) tags.push(capitalize(t))
+  const tags: RegionTag[] = []
+  if (region.weatherActive) tags.push({ kind: 'weather', ticksRemaining: region.weatherTicksRemaining })
+  if (isLand(region)) for (const t of region.traits) tags.push({ kind: t })
 
   const sup = region.superiority[perspective]
   const header: RegionHeader = {
@@ -240,8 +243,4 @@ function energyStat(region: Region, demand: number, energy?: EnergyResult, state
     tone: energy ? (blockaded ? 'bad' : energy.fulfillment < 1 ? 'warn' : undefined) : undefined,
     tooltip: { title: 'Energy', lines },
   }
-}
-
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1)
 }

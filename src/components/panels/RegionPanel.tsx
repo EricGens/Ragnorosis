@@ -5,6 +5,8 @@ import { useDisplayGame } from '../../store/gameStore'
 import { factionColor } from '../factionColors'
 import { BuildingGrid } from './BuildingGrid'
 import { ENTITY_PANEL_ID, PANEL_WIDTH } from './gameArea'
+import { MountainousIcon, RuggedIcon, WeatherIcon } from './overlayIcons'
+import type { RegionTag } from './regionStats'
 import { regionDisplay } from './regionStats'
 import { StatRow } from './StatRow'
 
@@ -58,11 +60,9 @@ export function RegionPanel({
         </div>
 
         {header.tags.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-1">
+          <div className="mb-3 flex flex-wrap gap-1.5">
             {header.tags.map((t) => (
-              <span key={t} className="rounded border border-ink-600 px-1.5 py-0.5 text-[10px] tracking-wider text-ink-200 uppercase">
-                {t}
-              </span>
+              <TagBadge key={t.kind} tag={t} />
             ))}
           </div>
         )}
@@ -81,6 +81,25 @@ export function RegionPanel({
         {isLand(region) && <BuildingGrid region={region} perspective={perspective} />}
       </div>
     </aside>
+  )
+}
+
+const TAG_LABEL: Record<RegionTag['kind'], string> = {
+  weather: 'Weather',
+  rugged: 'Rugged',
+  mountainous: 'Mountainous',
+}
+
+function TagBadge({ tag }: { tag: RegionTag }) {
+  const Icon = tag.kind === 'weather' ? WeatherIcon : tag.kind === 'rugged' ? RuggedIcon : MountainousIcon
+  return (
+    <span
+      className="flex items-center gap-1 rounded border border-ink-600 px-1.5 py-0.5 text-ink-200"
+      title={TAG_LABEL[tag.kind]}
+    >
+      <Icon className="h-4 w-4" />
+      {tag.kind === 'weather' && <span className="text-[10px] tracking-wider">{tag.ticksRemaining}t</span>}
+    </span>
   )
 }
 

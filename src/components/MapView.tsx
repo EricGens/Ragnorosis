@@ -6,6 +6,7 @@ import { isLand } from '../sim/types'
 import { useGameStore } from '../store/gameStore'
 import { useUIStore } from '../store/uiStore'
 import { factionColor } from './factionColors'
+import { OilPlatformIcon, WeatherIcon } from './panels/overlayIcons'
 
 // Map space is a 1000×1000 square: a 3×3 land grid of 200-unit cells inset by 200 on each side,
 // with the surrounding ring split into four ocean quadrants so each maritime region touches the
@@ -179,18 +180,10 @@ function RegionShape({
         </text>
       )}
       {region.weatherActive && (
-        <text
-          x={cx}
-          y={cy - 40}
-          textAnchor="middle"
-          fill="var(--color-warn)"
-          fontSize={14}
-          letterSpacing={2}
-          pointerEvents="none"
-          aria-label="Weather active"
-        >
-          WEATHER
-        </text>
+        <WeatherIcon x={cx - 16} y={cy - 58} width={32} height={32} className="text-warn" pointerEvents="none" />
+      )}
+      {!land && region.energyReserve > 0 && (
+        <OilPlatformIcon x={cx - 20} y={cy + 20} width={40} height={40} className="text-ink-200" pointerEvents="none" />
       )}
     </g>
   )
