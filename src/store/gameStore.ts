@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { advancePulse, advanceTick } from '../sim/advance'
 import { TICKS_PER_SECOND, tickInPulse, type Speed } from '../sim/clock'
 import { queueBuild, type QueueResult } from '../sim/construction'
+import { orderMove, type MoveResult } from '../sim/military/movement'
 import { deleteDesign, renameDesign, saveDesign, type DesignInput, type RosterResult } from '../sim/military/roster'
 import {
   assignSlot,
@@ -62,6 +63,8 @@ interface GameStore {
   setTaskForceTarget: (tfId: number, designId: number, target: number) => TaskForceResult
   cycleTaskForcePriority: (tfId: number, designId: number) => void
   assignTaskForceSlot: (tfId: number, role: LineRole, index: number, designId: number | null) => TaskForceResult
+  /** Map orders: plain click replaces the order (redirect cost applies), shift-click appends a leg. */
+  orderMove: (tfId: number, destination: RegionId, append: boolean) => MoveResult
 
   setFocus: (focus: Focus) => void
   queueBuild: (regionId: RegionId, building: BuildingType) => QueueResult
@@ -168,6 +171,7 @@ export const useGameStore = create<GameStore>()((set, get) => {
     setTaskForceTarget: (tfId, designId, target) => run((d) => setTarget(d, tfId, designId, target)),
     cycleTaskForcePriority: (tfId, designId) => run((d) => cyclePriority(d, tfId, designId)),
     assignTaskForceSlot: (tfId, role, index, designId) => run((d) => assignSlot(d, tfId, role, index, designId)),
+    orderMove: (tfId, destination, append) => run((d) => orderMove(d, tfId, destination, append)),
 
     setFocus: (focus) =>
       set({ game: produce(get().game, (d) => void (d.factions[get().activeFaction].focus = focus)) }),

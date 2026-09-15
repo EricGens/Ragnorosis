@@ -8,8 +8,13 @@ import { FACTION_IDS } from '../types'
 export interface MapDefinition {
   regions: Region[]
   edges: [RegionId, RegionId][]
+  /** Edge lengths in miles where they differ from DEFAULT_DISTANCE (Epoch 2 skeleton §4.1). */
+  distances?: [RegionId, RegionId, number][]
   layout: Record<RegionId, MapLayout>
 }
+
+/** Every land-to-land edge on the dummy map is a flat 300 miles (§4.1). */
+export const DEFAULT_DISTANCE = 300
 
 /** Where a region sits on the rendered map. Land regions occupy grid cells; maritime regions wrap a corner. */
 export type MapLayout =
@@ -158,6 +163,21 @@ export const DUMMY_MAP: MapDefinition = {
     ['se-maritime', 'se-land'],
     ['se-maritime', 'e-land'],
     ['se-maritime', 's-land'],
+  ],
+  // Maritime distances (§4.1): 300 to the corner land region, 400 to each edge-middle, 500 between oceans.
+  distances: [
+    ['nw-maritime', 'n-land', 400],
+    ['nw-maritime', 'w-land', 400],
+    ['ne-maritime', 'n-land', 400],
+    ['ne-maritime', 'e-land', 400],
+    ['sw-maritime', 'w-land', 400],
+    ['sw-maritime', 's-land', 400],
+    ['se-maritime', 'e-land', 400],
+    ['se-maritime', 's-land', 400],
+    ['nw-maritime', 'ne-maritime', 500],
+    ['ne-maritime', 'se-maritime', 500],
+    ['se-maritime', 'sw-maritime', 500],
+    ['sw-maritime', 'nw-maritime', 500],
   ],
   layout: {
     'nw-land': { kind: 'grid', col: 0, row: 0 },

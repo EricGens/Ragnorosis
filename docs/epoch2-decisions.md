@@ -101,6 +101,35 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   wants are listed dimly as "no demand" so the Unit Editor route still exists for them. Battle Logs
   arrives with the combat slice rather than as a dead button now.
 
+## Movement (skeleton §4, §6 map orders)
+
+- **Distances are map data:** every edge defaults to 300 mi; the dummy map lists the maritime overrides
+  (300/400/500 per §4.1's table). The real map replaces the data, not the code.
+- **A Task Force with no unit types can't be ordered anywhere** — speed is the slowest ground design in its
+  composition, and an empty composition has no speed. Fill state doesn't gate movement (a planned-but-
+  unfilled Task Force still moves; combat strength is where fill matters).
+- **Permissive = domain control ≥ 50 for the moving faction**, the same threshold Energy routing uses.
+  Neutral and unaffiliated (not at war) territory is therefore Transit Speed; Hostile control is Combat
+  Speed even with no defender present (§4.5).
+- **Arriving in undefended hostile-controlled land captures it** (GDD §8.6.7 "conquest hands you the keys"):
+  the controller flips and Stability takes a **placeholder −25** hit — the GDD says "significant" without a
+  number; tune in playtesting. The consolidation lock (Organization restore + Stability floor before moving
+  on) arrives with Organization in the combat slice. Country war status is left alone — invasion already
+  requires the factions to be Hostile, and formal war declaration is the diplomacy epoch's business.
+- **Invading a region a hostile Task Force is "in" is refused (red X) until combat exists** — deliberately
+  not a half-built "waiting to fight" state. A hostile Task Force that reaches a leg's destination first
+  holds the mover in place until it leaves. Both fall away when transit combat (§4.6) lands.
+- **Pathing is Dijkstra on time** (distance ÷ the entered region's rate), excluding the sea and defended
+  regions. Ties are broken arbitrarily. Shift-click appends: a non-adjacent leg is pathed from the previous
+  leg's end, so the manual route is always contiguous.
+- **Redirect (§4.4):** a replacement order owes the current leg's progress back at Combat Speed before the
+  new path begins; an order that never advanced (progress 0) is replaced free — "not committed until time
+  actually advances" (§4.2). Halt is simply an order back to the occupied region, so it pays the same debt.
+  Leg overshoot within a tick is dropped rather than carried (at most an hour per leg).
+- **Map orders:** a pinned own Task Force is Active; clicking a region then issues the order instead of
+  pinning the region. Invalid destinations show a red X with the reason at the click point; the sound the
+  skeleton mentions waits for an audio pass.
+
 ## Source-doc fixes needed
 
 - **Skeleton §5.1:** replace the "~90-point advantage gap" caveat paragraph with the universal

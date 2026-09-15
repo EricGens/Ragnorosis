@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BUILDINGS, BUILDING_TYPES } from '../../sim/data/buildings'
 import { FACTIONS } from '../../sim/data/factions'
 import { FOCUSES } from '../../sim/formulas/allocation'
+import { teleportTaskForce } from '../../sim/military/movement'
 import { createTaskForce, deleteTaskForce, fillTaskForce, setTaskForceFaction } from '../../sim/military/taskForce'
 import {
   countries,
@@ -296,6 +297,15 @@ function TaskForceSection() {
             value={tf.faction}
             options={FACTION_OPTIONS}
             onChange={(v) => mutate((d) => setTaskForceFaction(d, tf.id, v))}
+          />
+          <SelectField
+            label="Teleport to"
+            value={tf.regionId}
+            options={game.regionOrder
+              .map((id) => game.regions[id])
+              .filter(isLand)
+              .map((r) => ({ value: r.id, label: r.name }))}
+            onChange={(v) => mutate((d) => teleportTaskForce(d, tf.id, v))}
           />
           <div className="mt-1 flex flex-wrap gap-2">
             <DevButton onClick={() => mutate((d) => fillTaskForce(d, tf.id))}>Fill to target</DevButton>

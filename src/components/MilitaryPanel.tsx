@@ -207,7 +207,11 @@ export function MilitaryPanel() {
                     className="flex w-full justify-between rounded px-1 py-0.5 text-left hover:bg-ink-100/5"
                   >
                     <span className="text-ink-100">
-                      {tf.name} <span className="text-ink-400">· {game.regions[tf.regionId].name}</span>
+                      {tf.name}{' '}
+                      <span className="text-ink-400">
+                        · {game.regions[tf.regionId].name}
+                        {tf.movement && tf.movement.legs.length > 0 && ` → ${game.regions[tf.movement.legs[0]].name}`}
+                      </span>
                     </span>
                     <span className={equipped < target ? 'text-warn' : 'text-ink-400'}>
                       {equipped}/{target} units

@@ -5,7 +5,7 @@ import { WINDOW_SIZE, findOpenSpace, type Rect, type Size } from '../components/
  * A reference to any inspectable map entity. Regions now; Task Forces and Agents plug in later
  * without needing their own panel plumbing.
  */
-export type EntityRef = { kind: 'region'; id: string }
+export type EntityRef = { kind: 'region'; id: string } | { kind: 'taskForce'; id: string }
 
 export function sameRef(a: EntityRef | null, b: EntityRef | null): boolean {
   return a !== null && b !== null && a.kind === b.kind && a.id === b.id

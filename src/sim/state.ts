@@ -1,4 +1,5 @@
-import type { MapDefinition } from './data/dummyMap'
+import { DEFAULT_DISTANCE, type MapDefinition } from './data/dummyMap'
+import { pairKey } from './relations'
 import { computePulseSnapshot } from './snapshot'
 import type { FactionId, FactionState, GameState, Region, RegionId, SimSettings } from './types'
 import { FACTION_IDS, ZERO_ALLOCATION } from './types'
@@ -22,6 +23,17 @@ export function buildAdjacency(regionIds: RegionId[], edges: [RegionId, RegionId
     adjacency[b].push(a)
   }
   return adjacency
+}
+
+/** Edge lengths: the default for every edge, then the map's overrides (which must name real edges). */
+export function buildDistances(edges: [RegionId, RegionId][], overrides: [RegionId, RegionId, number][] = []) {
+  const distances: Record<string, number> = {}
+  for (const [a, b] of edges) distances[pairKey(a, b)] = DEFAULT_DISTANCE
+  for (const [a, b, miles] of overrides) {
+    if (!(pairKey(a, b) in distances)) throw new Error(`Distance for non-edge ${a} ↔ ${b}`)
+    distances[pairKey(a, b)] = miles
+  }
+  return distances
 }
 
 function initialFaction(id: FactionId): FactionState {
@@ -62,6 +74,7 @@ export function createInitialState(map: MapDefinition, seed = 1): GameState {
     regions,
     regionOrder,
     adjacency: buildAdjacency(regionOrder, map.edges),
+    distances: buildDistances(map.edges, map.distances),
     factions,
     relations: { factions: {}, countries: {} },
     taskForces: [],

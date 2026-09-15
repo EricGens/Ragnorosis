@@ -137,14 +137,26 @@ export const LINE_ROLES: readonly LineRole[] = ['frontLine', 'longRange', 'cas']
 /** Slots per combat role (§5.1–5.3); each slot holds one unit. Reserves are everything unassigned. */
 export const LINE_SLOTS: Record<LineRole, number> = { frontLine: 12, longRange: 12, cas: 6 }
 
+/** A Task Force's standing move order (Epoch 2 skeleton §4). */
+export interface Movement {
+  /** Destinations still to reach, next first. */
+  legs: RegionId[]
+  /** Miles covered on the current leg. */
+  progress: number
+  /** Miles still to walk back (at Combat Speed) to the occupied region after a redirect (§4.4). */
+  backtrack: number
+}
+
 export interface TaskForce {
   id: number
   name: string
   faction: FactionId
+  /** The region the Task Force is "in" — unchanged until a leg actually completes (§4.3). */
   regionId: RegionId
   composition: CompositionLine[]
   /** Per role, the design id in each slot (null = empty). */
   lines: Record<LineRole, (number | null)[]>
+  movement: Movement | null
 }
 
 export interface FactionState {
@@ -230,6 +242,8 @@ export interface GameState {
   regionOrder: RegionId[]
   /** Pure boolean topology, symmetric. */
   adjacency: Record<RegionId, RegionId[]>
+  /** Miles between adjacent regions, keyed by sorted "a|b" pair (Epoch 2 skeleton §4.1). */
+  distances: Record<string, number>
   factions: Record<FactionId, FactionState>
   relations: RelationState
   taskForces: TaskForce[]

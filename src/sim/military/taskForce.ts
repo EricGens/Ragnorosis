@@ -61,6 +61,7 @@ export function createTaskForce(
     regionId,
     composition: [],
     lines: emptyLines(),
+    movement: null,
   }
   state.taskForces.push(tf)
   log(state, 'military', `${faction} raises ${tf.name} in ${region.name}`)

@@ -1,12 +1,13 @@
 import { useGameStore } from '../../store/gameStore'
 import { useUIStore } from '../../store/uiStore'
 import { RegionPanel } from './RegionPanel'
+import { TaskForcePanel } from './TaskForcePanel'
 
 /**
  * The generic hover/pin display (skeleton §2.2). With nothing pinned, shows whatever is hovered
  * as a preview. Once something is pinned, it displays exclusively — hovering other entities no
  * longer changes what's shown; only clicking a different entity or unpinning does. Dispatches on
- * entity kind so Task Forces and Agents can add their own panel body later without new plumbing.
+ * entity kind so Task Forces and Agents can add their own panel body without new plumbing.
  */
 export function EntityPanel() {
   const hovered = useUIStore((s) => s.hovered)
@@ -14,6 +15,7 @@ export function EntityPanel() {
   const unpin = useUIStore((s) => s.unpin)
   const perspective = useGameStore((s) => s.activeFaction)
   const regions = useGameStore((s) => s.game.regions)
+  const taskForces = useGameStore((s) => s.game.taskForces)
 
   const shown = pinned ?? hovered
   if (!shown) return null
@@ -23,6 +25,11 @@ export function EntityPanel() {
       const region = regions[shown.id]
       if (!region) return null
       return <RegionPanel region={region} perspective={perspective} pinned={pinned !== null} onClose={unpin} />
+    }
+    case 'taskForce': {
+      const tf = taskForces.find((t) => String(t.id) === shown.id)
+      if (!tf) return null
+      return <TaskForcePanel tf={tf} perspective={perspective} pinned={pinned !== null} onClose={unpin} />
     }
   }
 }

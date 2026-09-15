@@ -13,6 +13,13 @@ import { isLand } from '../types'
  * - Maritime: 100 — denial needs a hostile Task Force physically present (a declared hostility alone
  *   is a paper blockade), so until TFs exist every maritime region is open to everyone.
  */
+/** Below this a region is denied to the faction: Energy can't route through it, movement is at Combat Speed. */
+export const PERMISSIVE_THRESHOLD = 50
+
+export function isPermissive(state: GameState, faction: FactionId, region: Region): boolean {
+  return domainControl(state, faction, region) >= PERMISSIVE_THRESHOLD
+}
+
 export function domainControl(state: GameState, faction: FactionId, region: Region): number {
   if (!isLand(region)) return 100
   if (region.controller === null) return atWarWith(state, faction, region.country) ? 0 : 100

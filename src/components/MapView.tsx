@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MapLayout } from '../sim/data/dummyMap'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
-import type { Region, RegionId } from '../sim/types'
-import { isLand } from '../sim/types'
+import { pairKey } from '../sim/relations'
+import type { FactionId, Region, RegionId, TaskForce } from '../sim/types'
+import { FACTION_IDS, isLand } from '../sim/types'
 import { useGameStore } from '../store/gameStore'
-import { useUIStore } from '../store/uiStore'
+import { useUIStore, type EntityRef } from '../store/uiStore'
 import { factionColor } from './factionColors'
 import { OilPlatformIcon, WeatherIcon } from './panels/overlayIcons'
 
@@ -55,15 +56,22 @@ const PAN_STEP = 40
 const ZOOM_STEP = 1.15
 const MIN_ZOOM = 0.5
 const MAX_ZOOM = 4
+/** How long the red X for a rejected order stays on the map. */
+const FLASH_MS = 1100
 
 export function MapView() {
   const regionOrder = useGameStore((s) => s.game.regionOrder)
   const regions = useGameStore((s) => s.game.regions)
+  const taskForces = useGameStore((s) => s.game.taskForces)
+  const distances = useGameStore((s) => s.game.distances)
+  const activeFaction = useGameStore((s) => s.activeFaction)
+  const orderMove = useGameStore((s) => s.orderMove)
   const hovered = useUIStore((s) => s.hovered)
   const pinned = useUIStore((s) => s.pinned)
   const setHovered = useUIStore((s) => s.setHovered)
   const togglePin = useUIStore((s) => s.togglePin)
   const [view, setView] = useState({ x: 0, y: 0, zoom: 1 })
+  const [flash, setFlash] = useState<{ x: number; y: number; reason: string; key: number } | null>(null)
   const svgRef = useRef<SVGSVGElement>(null)
 
   // WASD scroll, +/- zoom (skeleton §2.1).
@@ -119,6 +127,41 @@ export function MapView() {
     return () => el.removeEventListener('wheel', onWheel)
   }, [])
 
+  useEffect(() => {
+    if (!flash) return
+    const t = setTimeout(() => setFlash(null), FLASH_MS)
+    return () => clearTimeout(t)
+  }, [flash])
+
+  const centers = useMemo(() => {
+    const out: Record<RegionId, { cx: number; cy: number }> = {}
+    for (const id of regionOrder) {
+      const { cx, cy } = shapeFor(DUMMY_MAP.layout[id])
+      out[id] = { cx, cy }
+    }
+    return out
+  }, [regionOrder])
+
+  /** The pinned Task Force, if it's one the player commands — it's "Active" for orders (§6). */
+  const activeTaskForce =
+    pinned?.kind === 'taskForce'
+      ? taskForces.find((t) => String(t.id) === pinned.id && t.faction === activeFaction)
+      : undefined
+
+  function onRegionClick(regionId: RegionId, e: React.MouseEvent) {
+    if (!activeTaskForce) {
+      togglePin({ kind: 'region', id: regionId })
+      return
+    }
+    const result = orderMove(activeTaskForce.id, regionId, e.shiftKey)
+    if (!result.ok) {
+      const svg = svgRef.current
+      if (!svg) return
+      const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM()!.inverse())
+      setFlash({ x: pt.x, y: pt.y, reason: result.reason, key: Date.now() })
+    }
+  }
+
   const viewSize = SIZE / view.zoom
   const viewBox = `${view.x + (SIZE - viewSize) / 2} ${view.y + (SIZE - viewSize) / 2} ${viewSize} ${viewSize}`
 
@@ -126,10 +169,27 @@ export function MapView() {
     <svg
       ref={svgRef}
       viewBox={viewBox}
-      className="h-full w-full select-none bg-ink-950"
+      className={`h-full w-full select-none bg-ink-950 ${activeTaskForce ? 'cursor-crosshair' : ''}`}
       role="img"
       aria-label="Region map"
+      data-active-task-force={activeTaskForce?.id}
     >
+      <defs>
+        {FACTION_IDS.map((id) => (
+          <marker
+            key={id}
+            id={`arrow-${id}`}
+            viewBox="0 0 10 10"
+            refX="9"
+            refY="5"
+            markerWidth="5"
+            markerHeight="5"
+            orient="auto"
+          >
+            <path d="M0,0 L10,5 L0,10 z" fill={factionColor(id)} />
+          </marker>
+        ))}
+      </defs>
       {regionOrder.map((id) => (
         <RegionShape
           key={id}
@@ -138,9 +198,56 @@ export function MapView() {
           hovered={hovered?.kind === 'region' && hovered.id === id}
           pinned={pinned?.kind === 'region' && pinned.id === id}
           onHover={(r) => setHovered(r ? { kind: 'region', id: r } : null)}
-          onClick={(r) => togglePin({ kind: 'region', id: r })}
+          onClick={onRegionClick}
         />
       ))}
+      {taskForces.map((tf) =>
+        tf.movement && tf.movement.legs.length > 0 ? (
+          <OrderArrow
+            key={`arrow-${tf.id}`}
+            tf={tf}
+            centers={centers}
+            legDistance={distances[pairKey(tf.regionId, tf.movement.legs[0])] ?? 1}
+          />
+        ) : null,
+      )}
+      {regionOrder.map((id) => (
+        <TaskForceMarkers
+          key={`tfs-${id}`}
+          taskForces={taskForces.filter((t) => t.regionId === id)}
+          center={centers[id]}
+          hovered={hovered}
+          pinned={pinned}
+          activeFaction={activeFaction}
+          onHover={setHovered}
+          onClick={(ref) => togglePin(ref)}
+        />
+      ))}
+      {flash && (
+        <g key={flash.key} pointerEvents="none" className="animate-pulse" data-order-flash={flash.reason}>
+          <line
+            x1={flash.x - 14}
+            y1={flash.y - 14}
+            x2={flash.x + 14}
+            y2={flash.y + 14}
+            stroke="var(--color-alert)"
+            strokeWidth={5}
+            strokeLinecap="round"
+          />
+          <line
+            x1={flash.x - 14}
+            y1={flash.y + 14}
+            x2={flash.x + 14}
+            y2={flash.y - 14}
+            stroke="var(--color-alert)"
+            strokeWidth={5}
+            strokeLinecap="round"
+          />
+          <text x={flash.x} y={flash.y + 34} textAnchor="middle" fill="var(--color-alert)" fontSize={13}>
+            {flash.reason}
+          </text>
+        </g>
+      )}
     </svg>
   )
 }
@@ -158,7 +265,7 @@ function RegionShape({
   hovered: boolean
   pinned: boolean
   onHover: (id: RegionId | null) => void
-  onClick: (id: RegionId) => void
+  onClick: (id: RegionId, e: React.MouseEvent) => void
 }) {
   const { points, cx, cy } = shapeFor(layout)
   const land = isLand(region)
@@ -176,7 +283,7 @@ function RegionShape({
     <g
       onMouseEnter={() => onHover(region.id)}
       onMouseLeave={() => onHover(null)}
-      onClick={() => onClick(region.id)}
+      onClick={(e) => onClick(region.id, e)}
       className="cursor-pointer"
       data-region={region.id}
       data-pinned={pinned || undefined}
@@ -219,6 +326,127 @@ function RegionShape({
       )}
       {!land && region.energyReserve > 0 && (
         <OilPlatformIcon x={cx - 20} y={cy + 20} width={40} height={40} className="text-ink-200" pointerEvents="none" />
+      )}
+    </g>
+  )
+}
+
+const MARKER_W = 60
+const MARKER_H = 24
+const MARKER_GAP = 6
+/** Markers sit in the lower part of the region, clear of the name and country labels. */
+const MARKER_DY = 58
+
+/** Board-game-piece Task Force icons, colour-coded by faction (§6), laid out in a row per region. */
+function TaskForceMarkers({
+  taskForces,
+  center,
+  hovered,
+  pinned,
+  activeFaction,
+  onHover,
+  onClick,
+}: {
+  taskForces: TaskForce[]
+  center: { cx: number; cy: number }
+  hovered: EntityRef | null
+  pinned: EntityRef | null
+  activeFaction: FactionId
+  onHover: (ref: EntityRef | null) => void
+  onClick: (ref: EntityRef) => void
+}) {
+  if (taskForces.length === 0) return null
+  const total = taskForces.length * MARKER_W + (taskForces.length - 1) * MARKER_GAP
+  const x0 = center.cx - total / 2
+  return (
+    <>
+      {taskForces.map((tf, i) => {
+        const ref: EntityRef = { kind: 'taskForce', id: String(tf.id) }
+        const isPinned = pinned?.kind === 'taskForce' && pinned.id === ref.id
+        const isHovered = hovered?.kind === 'taskForce' && hovered.id === ref.id
+        const x = x0 + i * (MARKER_W + MARKER_GAP)
+        const y = center.cy + MARKER_DY
+        const own = tf.faction === activeFaction
+        return (
+          <g
+            key={tf.id}
+            className="cursor-pointer"
+            data-task-force={tf.id}
+            onMouseEnter={() => onHover(ref)}
+            onMouseLeave={() => onHover(null)}
+            onClick={(e) => {
+              e.stopPropagation()
+              onClick(ref)
+            }}
+          >
+            <rect
+              x={x}
+              y={y}
+              width={MARKER_W}
+              height={MARKER_H}
+              rx={4}
+              fill={factionColor(tf.faction)}
+              fillOpacity={isHovered || isPinned ? 1 : 0.85}
+              stroke={isPinned ? 'var(--color-signal)' : 'var(--color-ink-950)'}
+              strokeWidth={isPinned ? 3 : 2}
+            />
+            <text
+              x={x + MARKER_W / 2}
+              y={y + MARKER_H / 2 + 1}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#0b0f14"
+              fontSize={11}
+              fontWeight={own ? 700 : 400}
+              pointerEvents="none"
+            >
+              {tf.name.length > 10 ? `${tf.name.slice(0, 9)}…` : tf.name}
+            </text>
+          </g>
+        )
+      })}
+    </>
+  )
+}
+
+/** The order arrow: solid for the progress made on the current leg, dashed for what remains (§4.2). */
+function OrderArrow({
+  tf,
+  centers,
+  legDistance,
+}: {
+  tf: TaskForce
+  centers: Record<RegionId, { cx: number; cy: number }>
+  legDistance: number
+}) {
+  const m = tf.movement!
+  const color = factionColor(tf.faction)
+  const from = centers[tf.regionId]
+  const chain = [from, ...m.legs.map((id) => centers[id])]
+  const points = chain.map((c) => `${c.cx},${c.cy}`).join(' ')
+  const next = chain[1]
+  const f = m.backtrack > 0 ? 0 : Math.min(1, m.progress / legDistance)
+  return (
+    <g pointerEvents="none" data-order-arrow={tf.id}>
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth={4}
+        strokeOpacity={0.9}
+        strokeDasharray="12 8"
+        markerEnd={`url(#arrow-${tf.faction})`}
+      />
+      {f > 0 && (
+        <line
+          x1={from.cx}
+          y1={from.cy}
+          x2={from.cx + (next.cx - from.cx) * f}
+          y2={from.cy + (next.cy - from.cy) * f}
+          stroke={color}
+          strokeWidth={6}
+          strokeLinecap="round"
+        />
       )}
     </g>
   )
