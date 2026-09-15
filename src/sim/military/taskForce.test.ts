@@ -66,36 +66,43 @@ describe('raising and composing', () => {
 })
 
 describe('line assignment (§6)', () => {
+  it('places new units on the Front Line automatically, until the 12 slots are full', () => {
+    // 3 Light + 1 AT were added to an empty Task Force: slots 0–2 and 3, nothing in Reserves.
+    expect(base.taskForces[0].lines.frontLine.slice(0, 5)).toEqual([1, 1, 1, 2, null])
+    const s = produce(base, (d) => void setTarget(d, 1, 1, 20))
+    expect(s.taskForces[0].lines.frontLine.filter((x) => x === 1)).toHaveLength(11) // 12 slots minus the AT
+    expect(s.taskForces[0].lines.frontLine.every((x) => x !== null)).toBe(true)
+  })
+
   it('offers only eligible, not-yet-fully-placed types', () => {
     const tf = base.taskForces[0]
-    expect(slotOptions(base, tf, 'frontLine').map((d) => d.name)).toEqual(['Light Infantry', 'AT Infantry'])
+    expect(slotOptions(base, tf, 'frontLine')).toEqual([]) // everything auto-placed already
     expect(slotOptions(base, tf, 'longRange')).toEqual([]) // no standoff weapons on Infantry
     expect(slotOptions(base, tf, 'cas')).toEqual([])
     const s = produce(base, (d) => {
-      assignSlot(d, 1, 'frontLine', 0, 2)
+      assignSlot(d, 1, 'frontLine', 3, null) // take the AT off the line
     })
-    expect(slotOptions(s, s.taskForces[0], 'frontLine').map((d) => d.name)).toEqual(['Light Infantry'])
+    expect(slotOptions(s, s.taskForces[0], 'frontLine').map((d) => d.name)).toEqual(['AT Infantry'])
     produce(s, (d) => {
-      expect(assignSlot(d, 1, 'frontLine', 1, 2)).toMatchObject({ ok: false }) // the one AT Infantry is placed
+      expect(assignSlot(d, 1, 'frontLine', 4, 1)).toMatchObject({ ok: false }) // every Light Infantry is placed
       expect(assignSlot(d, 1, 'longRange', 0, 1)).toMatchObject({ ok: false }) // not eligible
+      expect(assignSlot(d, 1, 'frontLine', 7, 2)).toEqual({ ok: true, id: 1 }) // anywhere the player likes
     })
   })
 
   it('vacates slots the count no longer covers and when the design is deleted', () => {
     const s = produce(base, (d) => {
-      assignSlot(d, 1, 'frontLine', 0, 1)
-      assignSlot(d, 1, 'frontLine', 5, 1)
-      assignSlot(d, 1, 'frontLine', 11, 1)
       setTarget(d, 1, 1, 2)
     })
     expect(s.taskForces[0].lines.frontLine.filter((x) => x === 1)).toHaveLength(2)
-    expect(s.taskForces[0].lines.frontLine[11]).toBeNull()
+    expect(s.taskForces[0].lines.frontLine[2]).toBeNull()
     const s2 = produce(s, (d) => {
       fillTaskForce(d, 1)
       deleteDesign(d, US, 1)
     })
     expect(s2.taskForces[0].composition.map((l) => l.designId)).toEqual([2])
-    expect(s2.taskForces[0].lines.frontLine.every((x) => x === null)).toBe(true)
+    expect(s2.taskForces[0].lines.frontLine.filter((x) => x === 1)).toHaveLength(0)
+    expect(s2.taskForces[0].lines.frontLine[3]).toBe(2) // the AT keeps its auto-placed slot
     expect(s2.factions[US].manpower).toBe(100) // Light's 2 × 50 returned; its Equipment is gone
     expect(s2.factions[US].stockpile[1]).toBeUndefined()
   })
@@ -106,13 +113,12 @@ describe('devtools reassignment (§7)', () => {
     const s = produce(base, (d) => {
       saveDesign(d, 'china', { name: 'Light Infantry', platform: 'infantry', modules: [SA] }) // same loadout
       saveDesign(d, 'china', { name: 'AT Infantry', platform: 'infantry', modules: [SA, 'inf-man-aa'] }) // name clash, different loadout
-      assignSlot(d, 1, 'frontLine', 0, 2)
       setTaskForceFaction(d, 1, 'china')
     })
     const tf = s.taskForces[0]
     expect(tf.faction).toBe('china')
     expect(s.factions.china.designs.map((d) => d.name)).toEqual(['Light Infantry', 'AT Infantry', 'AT Infantry (2)'])
     expect(tf.composition.map((l) => l.designId)).toEqual([1, 3])
-    expect(tf.lines.frontLine[0]).toBe(3)
+    expect(tf.lines.frontLine.slice(0, 4)).toEqual([1, 1, 1, 3]) // slots remapped along with the composition
   })
 })

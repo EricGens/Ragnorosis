@@ -124,8 +124,21 @@ export function setTarget(state: GameState, tfId: number, designId: number, targ
     line.manpower = next * mp
   }
   trimSlots(tf, designId, next)
+  autoPlace(tf, design, next)
   if (next === 0) tf.composition = tf.composition.filter((l) => l.designId !== designId)
   return { ok: true, id: tfId }
+}
+
+/**
+ * New units take empty Front Line slots by themselves (Eric, 2026-09-15): a Task Force should never
+ * sit with everything in Reserves relying on reinforcement rolls. The player can still rearrange.
+ */
+function autoPlace(tf: TaskForce, design: UnitDesign, target: number): void {
+  if (!eligibleRoles(design).includes('frontLine')) return
+  const line = tf.lines.frontLine
+  for (let i = 0; i < line.length && assignedCount(tf, design.id) < target; i++) {
+    if (line[i] === null) line[i] = design.id
+  }
 }
 
 /** Normal → High → Low → Normal (§3.8 chevrons). */

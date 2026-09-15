@@ -156,6 +156,9 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   arrive from the pipeline come organized, a destroyed unit shrinks the maximum (its contribution leaves
   with it, not double-counted), and a unit pushed to Reserves adds its contribution to the deficit.
 - **Both sides breaking on the same tick: the defender holds.**
+- **New units auto-place on the Front Line** as a type's count rises, until the 12 slots are full (Eric,
+  2026-09-15: protect a new player from a Task Force with everything in Reserves). The picker and
+  click-to-remove still let the player rearrange; lowering a count vacates its slots from the end.
 - **Shock speed source:** the average Combat Speed of the attacker's *initial* Front Line, per the GDD; if
   the line plan is empty (the force relies on reinforcement rolls) the average is over every unit in the
   force instead, and a force with no units gets no Shock. Found live: an empty initial line produced a
