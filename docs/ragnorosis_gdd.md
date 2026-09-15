@@ -1,5 +1,5 @@
 # RAGNOROSIS — Game Design Document
-**Version 2.2 (Production pooling clarified)** · Status: comprehensive design in progress, interview-driven
+**Version 2.10 (domain control's combat-bonus language corrected to point at the freedom-of-maneuver mechanism)** · Status: comprehensive design in progress, interview-driven
 
 > Shared context for building the game, written to hand to an AI coding collaborator
 > (Claude Fable). Plan: map the full design first, organized into **Development Epochs**
@@ -1115,7 +1115,14 @@ carrier tier.
 
 **Ground-side: universal baseline, plus stackable Cargo Hold modules.** Every ship, even with **zero modules**,
 carries a small baseline ground-forces capacity — flavor: a SEAL team riding a submarine, a small raiding party
-on a surface combatant — illustratively **1 light unit**. **Cargo Hold modules (confirmed: multiple allowed
+on a surface combatant — **1 Weight of capacity, confirmed as a genuine numeric threshold (previously only
+illustrative)**: Infantry, Humanoid Robot, Robot Dog, and FPV Drone Team each carry **1 Weight**, exactly
+filling this baseline — a single Infantry unit (~50 personnel) riding bare is the concrete case behind the
+SEAL-team flavor above. **Vehicle and anything heavier carries 5+ Weight** — genuinely too heavy for the
+baseline regardless of ship size, requiring a Cargo Hold module on *any* ship, submarine included, not just
+smaller vessels. This numeric threshold is what the existing Light/Heavy naval-embarkation classification
+was always describing — the two aren't separate systems to reconcile, the category *is* this threshold, now
+expressed with real numbers. **Cargo Hold modules (confirmed: multiple allowed
 per ship, unlike the air-capacity modules above)** trade away weapon/defensive module slots for real capacity:
 light units get more slots per hold than heavy ones (vehicles/tanks/Crab platforms) — more holds reflects more
 of the platform dedicated to carrying ground forces. This produces LPD-analogous ships. **Cargo Hold + Light Carrier on the same large-ship platform =
@@ -1158,22 +1165,28 @@ population; **peacetime + low popularity ⇒ very little recruitment**.
 A TF's combat behavior emerges from its blocks: armor+mech = fast and damage-resistant; massed early
 infantry = weak but a cheap way to hold key terrain.
 
-**[KEYSTONE — resolved] Aggregation must not collapse to scalars.** A TF aggregates into **profile
-vectors** — an *attack vector* over weapon archetypes and a *defense vector* over defense archetypes —
-matched via an **effectiveness matrix**, never summed into single Attack/Defense/Armor numbers (that would
-kill the rock-paper-scissors pillar). Cheap to compute, preserves multidimensional RPS. Range/speed handled
-as **sequencing** (range bands / engagement phases), not vector stats.
+**[KEYSTONE — resolved, terminology corrected in the Epoch 2 implementation pass] Aggregation must not
+collapse to scalars.** A TF aggregates into **profile vectors** — **corrected: an attack/defense vector over
+platform-target categories** (Infantry/Vehicle/Tank/Anti-Air, per the Epoch 2 doc §3.2, seed data expanding
+as more platforms are added — naval categories not yet started) — **matched via an effectiveness matrix**,
+never summed into single Attack/Defense/Armor numbers (that would kill the rock-paper-scissors pillar). The
+earlier framing here ("over weapon archetypes") described the primary vector incorrectly — weapon-type RPS
+(Lasers/Hypersonics/Rail Guns, §8.3.1 below) is real, but sits as a **narrower overlay** on top of the
+platform-category vector, not the primary index itself. Cheap to compute, preserves multidimensional RPS.
+Range/speed handled as **sequencing** (range bands / engagement phases), not vector stats.
 
 **Open sub-questions:**
-- **Speed rule:** does the **slowest** component set TF speed (classic wargame rule, discourages
-  kitchen-sink TFs), or a weighted average?
-- **Domain interaction:** partially resolved by the CAS/small-unit-AA channel (§8.6.8) — an air-heavy TF's
-  CAS still needs theater air superiority and is attrited by small-unit AA; the general land/sea/air
+- **Speed rule: resolved (Epoch 2 doc §4.5) — the slowest component sets TF speed** (classic wargame rule,
+  discourages kitchen-sink TFs), confirmed, not a weighted average.
+- **Domain interaction:** partially resolved by the CAS/short-range-anti-air channel (§8.6.8) — an air-heavy TF's
+  CAS still needs theater air superiority and is attrited by short-range anti-air; the general land/sea/air
   cross-domain engagement model beyond that is still open.
 - **Restructure timing: resolved by §8.5.3** — composition edits are reconfiguration-lagged (not instant),
   which already prevents dodging losses by reshaping a TF mid-contact.
 
-### 8.3.1 Contextual weapon-effectiveness multipliers  *(new — structure resolved, exact values TBD)*
+### 8.3.1 Contextual weapon effectiveness — short/long-range values and active roles  *(structure
+resolved via the Epoch 2 implementation pass — corrected from an earlier "multiplier" framing; exact values
+TBD)*
 
 **Problem:** the effectiveness matrix (§8.3) captures archetype-vs-archetype matchups and §8.5.1 covers
 saturation/throughput, but neither captures that the **same weapon behaves differently by context** —
@@ -1181,21 +1194,33 @@ grounded in real A2/AD lessons (directed-energy/short-range defense is cheap and
 limited by range/atmospherics; long-range standoff strike is expensive but decisive at distance and used to
 degrade defenses before an assault).
 
-**Resolved structure: two independent multipliers per weapon archetype**, applied at resolution time on top of
-the existing formula — **effectiveness = archetype-matchup × saturation/throughput × range-context ×
-role**:
-- **Range-context** — Standoff (§8.5) vs. Invasion (§8.6).
-- **Role** — attacker vs. defender in that specific engagement. *(A new, distinct concept from the existing
-  Concentrated/Dispersed posture toggle, §8.6.1 — kept terminologically separate to avoid collision.)*
+**Corrected structure: this is not a separate multiplier applied on top of the effectiveness matrix — it's
+the same short-range/long-range `X(Y)` notation already established for the combat vector (Epoch 2 doc §3.2,
+§5.2), and which** *roles* **are active is what actually changes by context, not a scaling factor on a
+single value:**
+- **A pure standoff/long-range-fires exchange activates only the Deep Strike/Air Superiority role** —
+  every value in play is the parenthetical (long-range) one; a unit with no parenthetical value for the
+  relevant matchup simply cannot participate at all (§5.2's hard-exclusion rule).
+- **A full invasion activates all three roles simultaneously** — Front Line combat using plain (short-range)
+  values, CAS operating through its own separately-gated anti-ground modules, and long-range fires
+  continuing to operate *as support* using parenthetical values, exactly matching this section's original
+  framing of standoff assets "used to degrade defenses before an assault."
+- **Role (attacker vs. defender in a specific engagement) remains a genuinely separate concept from the
+  above**, distinct from the Concentrated/Dispersed posture toggle (§8.6.1) — kept terminologically separate
+  to avoid collision, and not resolved further here.
 
-**Qualitative profiles for the three Crash Military Modernization lines (§10.2.2), exact numbers TBD for the
+**Qualitative profiles for the three Crash Military Modernization lines (§10.2.2), now understood as
+describing actual `X(Y)` values rather than a separate multiplier curve — exact numbers still TBD for the
 balance sandbox, §12.10:**
-- **Hypersonics** — highest supply/production cost. **Flat across range** (equally effective standoff or
-  invasion). **Offense-favoring.**
-- **Rail Guns** — medium cost. **Decent standoff, better invasion** (accuracy/LOS/spotting at close range).
-  **Balanced** offense/defense.
-- **Lasers** — cheapest cost. **Near-zero standoff, sharply better invasion.** **Defense-favoring.**
-  **Degraded by weather** (see below).
+- **Hypersonics** — highest supply/production cost. **Flat across range** — plain and parenthetical values
+  approximately equal. **Offense-favoring.**
+- **Rail Guns** — medium cost. **Decent standoff, better invasion** — both values present, plain (invasion)
+  somewhat higher than parenthetical (standoff), accuracy/LOS/spotting favoring close range. **Balanced**
+  offense/defense.
+- **Lasers** — cheapest cost. **Near-zero standoff, sharply better invasion** — high plain value, little or
+  no parenthetical value. **Depending on how low the parenthetical actually lands, Lasers may not qualify
+  for the long-range fires role at all**, not merely perform weakly there — the hard-exclusion rule (§5.2)
+  applies the same way here as everywhere else. **Defense-favoring. Degraded by weather** (see below).
 
 **Weather (new region property, generalizes the Maelstrom).** Regions carry a **weather state**
 (seasonal/climate-driven baseline, event-modifiable) that degrades **laser effectiveness**. The Maelstrom
@@ -1204,9 +1229,11 @@ bespoke one-off mechanic — a region's normal climate could mildly favor or dis
 special event forcing it.
 
 **Emergent consequence (free, not separately designed): a real counter to laser-heavy defense.** Since lasers
-are nearly toothless at range, an attacker fielding hypersonics/rail guns can simply **decline to invade** and
-instead grind the defender down from standoff via the existing **siege loop** (§8.6.4) — bombard until weak,
-then close. A genuine tactical lesson falling directly out of the archetype numbers, not bolted on separately.
+are nearly toothless at range — and, depending on the actual numbers, potentially structurally unable to
+participate in the long-range fires role at all, not just weak there — an attacker fielding hypersonics/rail
+guns can simply **decline to invade** and instead grind the defender down from standoff via the existing
+**siege loop** (§8.6.4) — bombard until weak, then close. A genuine tactical lesson falling directly out of
+the archetype numbers, not bolted on separately.
 
 ### 8.3.2 Biased damage distribution within a TF  *(new — structure resolved, exact weighting TBD)*
 
@@ -1235,7 +1262,8 @@ Because military power is gated on a **manpower pool** drawn from Population, th
 needing recruits (and stops caring about the popularity/peacetime recruitment caps). This is a strong,
 on-theme axis: Mankind United stays manpower-bound; the Red Queen, LaserWard, and the Hive can trade
 flesh for autonomy. **Confirmed & sharpened:** the **AI/automation tech branch is unavailable to Mankind United** — they get parallel **human-focused** techs instead. Factions therefore run **divergent tech trees**, not just different modifiers (see §9). Canon: by the end, US (via LaserWard platforms) and China fight a near-autonomous Taiwan war; MU stays a manpower force.
-### 8.5 Standoff combat: long-range fires  *(in progress)*
+### 8.5 Standoff combat: long-range fires  *(in progress — Air Superiority mechanism corrected in the Epoch
+2 implementation pass; Maritime superiority unchanged, still deferred)*
 Two **adjacent, at-war** Task Forces may exchange **long-range fires** without either moving — the
 alternative to invasion (§8.7, next). Fires draw on a **subset** of a TF's elements: long-range
 artillery, railguns, ballistic & cruise missiles, air strikes, naval gunfire, one-way attack (OWA)
@@ -1244,17 +1272,42 @@ drones. The attacker chooses a target mode:
 - **Counter-value** — damage the enemy region's **GDP / Population / buildings** (couples straight to
   §7; note the tension: don't wreck a region you intend to capture and profit from).
 
-**Domain-control layer (resolves first, gates everything).** Two parallel contests, each a per-region
-**%**, each side holding its own value over each region (home turf is easier — e.g. US 80% over its own
-region, 40% over MU's):
-- **Air superiority** — from both TFs' fighter composition + aggregated air defenses (incl. regional
-  air-defense buildings, §6.2) + modifiers (stealth, radar, EW).
+**Domain-control layer (resolves first, gates everything).** Two parallel contests, each a per-region **%**:
+
+**Air superiority — corrected, a genuine architectural departure from an earlier direct-formula framing, not
+just a rename.** It is **not** computed directly from fighter composition, aggregated air defenses, and
+modifiers. It **emerges from the outcome of actually resolving Deep Strike/Air Superiority and CAS combat**
+(Epoch 2 doc §5.2–5.3) — winning engagements swings the percentage (+8% per successful long-range/air-
+superiority engagement that tick, ±5% per successful CAS-line engagement during an active invasion), with a
+100%/0% anchor at rest (fully controlled/uncontested vs. fully hostile/uncontested) and full bilateral
+symmetry (one side's % over a region always equals 100% minus the other's). **ISR and Radar are Task-Force-
+wide bonuses to the underlying engagement rolls themselves** — Radar boosting anti-air rolls, ISR boosting
+anti-ground rolls, both scaling with relative advantage over the opposing TF — not direct inputs to a
+separate Air Superiority formula. A real advantage in either makes winning the engagements that *produce*
+Air Superiority more likely; it doesn't set the percentage by itself. **Recomputed fresh every tick once
+combat is active, deliberately volatile** rather than smoothed or accumulated — a lucky tick can swing a
+contested region's Air Superiority sharply, an unlucky one can swing it right back, until one side's
+advantage becomes consistent enough to settle the number down. Full mechanism, worked formula, and a
+validated worked example: Epoch 2 doc §1.2–1.5.
+
+*(The earlier "US 80% over its own region, 40% over MU's" example describes mid-active-combat friction
+specifically — two adjacent, at-war TFs already exchanging fire — not the general ambient anchor, which is
+the clean 100%/0% above. Worth keeping that scope distinction in mind if this example is read in isolation.)*
+
 - **Maritime superiority** — a **surface/attrition** contest *plus* a distinct **subsurface** contest
   (ASW vs. subs), which is really a **detection/stealth** problem, not raw force — which is why cheap
-  submerged/《sneak》 attackers can still leak at high surface superiority.
+  submerged/《sneak》 attackers can still leak at high surface superiority. **Still deferred, structurally
+  unchanged** — when naval combat is eventually designed, whether Maritime superiority follows the same
+  emergent, combat-outcome-driven pattern now established for Air Superiority (rather than a direct formula)
+  is an open question worth asking explicitly, not assuming either way.
 
-Higher control ⇒ more enemy attrition per pulse in that domain **and** a larger *delivered* fraction of
-your fires. Maritime superiority specifically makes it harder for the enemy to **sneak assets into your
+**Higher domain control enhances your whole combat effectiveness via scaling bonuses — corrected from an
+earlier, more specific "larger delivered fraction of fires" framing that implied a distinct mechanic never
+actually built.** The concrete version of this is the freedom-of-maneuver bonus (Epoch 2 doc §1.4): summing
+a faction's Air Superiority across both regions in a conflict, every 20 points above the 100% baseline grants
++1 to every nonzero combat vector value, faction-wide — genuine, earned battlefield freedom translating
+directly into better rolls, not a separate fires-delivery multiplier layered on top. Maritime superiority
+specifically makes it harder for the enemy to **sneak assets into your
 TF**. **Sea denial (the naval "quantity" path):** cheap asymmetric assets — midget subs, USV kamikazes —
 mean that even at 95% enemy maritime superiority, one effective hit in twenty can be net-value-positive.
 Same saturation/value engine (§8.5.1), naval flavor.
@@ -1269,29 +1322,41 @@ ground combat if then invaded; **[proposed]** re-concentrating takes a lag, so d
 who then invades is a real gamble, not a free toggle) · **Invade** (if it likes its ground matchup) ·
 **Tank it**.
 
-### 8.5.1 "Quantity has a quality of its own" — the engine that makes it work  *(proposed)*
+### 8.5.1 "Quantity has a quality of its own" — the engine that makes it work  *(proposed; saturation
+mechanic corrected in the Epoch 2 implementation pass to reflect what was actually built)*
 Central theme: **cheap mass must be viable but not dominant**, co-equal with tech-superiority. Two
 mechanics deliver it:
 1. **Score combat in value, not bodies.** You are winning if *value destroyed > value lost*, even at a
    100:1 body count. The resolver must track a **resource/value exchange**, and the UI must **surface**
    it — "losing units, winning value" — or players can't perceive (and therefore can't choose) the
    cheap-mass path. Ties to the legibility rule: the player must be able to see *why*.
-2. **Saturation thresholds on defenses.** Each defensive archetype (point-defense laser, autocannon,
-   SAM…) has a **per-pulse interception capacity** and a **cost-per-intercept**. Below capacity it eats
-   cheap mass almost for free (cheap PD vs. $-cheap OWA drones = the flipped exchange); **above capacity
-   it leaks**. This creates the loop: **cheap mass → cost-efficient area defense → saturation (exceed
-   throughput) or penetrators (stealth/hypersonic the defense can't engage) → …**
+2. **Saturation, corrected: not a per-unit numeric interception capacity — an emergent property of the
+   pairing and attrition system built for Task Force combat (Epoch 2 doc §5.1–5.3).** Deep Strike/Air
+   Superiority and CAS both pair attackers against defenders **1-for-1 per tick**, sorted by relevant
+   vector value, with a SEAD reordering pass on top (§5.2). **Below capacity** — enough defenders to pair
+   against every attacker — each attack faces a real, opposed roll, the defender's own vector value working
+   against it. **Above capacity** — more attackers than available defenders, whether from the start or
+   because defenders have been progressively knocked off the line as the battle wears on (§5.1's
+   Organization/survival mechanics) — the excess attackers get **fully unopposed rolls**, the mechanical
+   form "it leaks" actually takes. **Worth being precise about a real difference from this section's original
+   framing: a single defender can't intercept several cheap attackers within one tick** — pairing is strictly
+   one-to-one per tick, not "one unit absorbs many." The "eats cheap mass" and "leaks above capacity"
+   dynamics emerge across a **multi-tick battle** instead, as a strong defender wins its single engagement
+   reliably tick after tick while cheaper attackers accumulate losses — an aggregate effect, not a literal
+   per-tick capacity number. No separate "cost-per-intercept" stat is needed either — a defender's own build
+   cost and Organization contribution already make it a finite, attritable resource without a second number
+   tracking the same thing.
 
-So effectiveness is **type-matrix × throughput/saturation × cost**, not a flat type matrix — the RPS is
-measured **per resource**. This is why an MU OWA-drone swarm that only 20% penetrates can still win:
-enough leaks past saturation to degrade air defense, trade cheaply against exquisite platforms, or hit
-GDP for more than the drones cost. The counters (cheap per-kill defense; saturation; penetrators) are
-what keep either extreme from dominating.
+So effectiveness is **type-matrix × pairing/attrition outcome × cost**, not a flat type matrix — the RPS is
+measured **per resource**. This is why an MU OWA-drone swarm that only partially penetrates can still win:
+enough leaks past the defending pairing capacity to degrade air defense, trade cheaply against exquisite
+platforms, or hit GDP for more than the drones cost. The counters (a defender's own vector strength; running
+out of pairing capacity; genuinely unmatched archetypes) are what keep either extreme from dominating.
 
-**Reconciled with §8.3.1 (added later): this is not two competing formulas.** The full effectiveness
-calculation is **type-matrix × throughput/saturation × cost × range-context × role** — this section supplies
-the first three terms (the mass/quality engine), §8.3.1 supplies the last two (context-dependence by
-engagement type and attacker/defender role). One canonical formula, built in two passes.
+**Reconciled with §8.3.1: this is not two competing formulas.** The full effectiveness calculation is
+**type-matrix × pairing/attrition outcome × cost × range-context (role-participation, §8.3.1) × role** — this
+section supplies the mass/quality engine, §8.3.1 supplies the context-dependence by engagement type and
+attacker/defender role. One canonical set of mechanics, resolved in two passes.
 
 ### 8.5.2 Submarine warfare & detection  *(new — fully specified, structure resolved; a few genuine
 architecture questions flagged, not glossed over)*
@@ -1427,15 +1492,15 @@ here (Stability, partisans) have no naval or air equivalent at all.
 - **Cross-domain / general (applies to any TF regardless of domain, just first specified here):** §8.6.1
   (Posture), §8.6.2 (Shock — confirmed: a coordinated mass maritime strike gets the same early-advantage
   window and probing dynamics as a land invasion), §8.6.6/§8.6.6.1 (Organization & TF legibility — Org is
-  already used everywhere, submarines included), §8.6.8 (CAS & small-unit AA — see the naval-equivalent note
+  already used everywhere, submarines included), §8.6.8 (CAS & short-range anti-air — see the naval-equivalent note
   below), §8.6.9 (Special attacks: EW/EMP/cyber — already used in naval contexts elsewhere).
 
 **Piercing vs. armor (first piece).** A HOI4-style penetration breakpoint layered on archetype effectiveness
 (§8.3):
 - **Small arms** do light damage that **scales with numbers** — mass light infantry shred other infantry.
-- Against **armor** (tanks, mech, heavy robots), *unpierced* damage craters to a **floor (~10%)**.
+- Against **armor** (tanks, mech, heavy robots), *unpierced* damage craters toward a floor.
 - **Anti-armor tech** raises infantry piercing — ATGMs, shaped-charge IEDs, kamikaze drones — lifting that
-  matchup toward **~80%** of full.
+  matchup toward a much higher ceiling.
 - **Armor tech** (materials, reactive armor, countermeasures) re-steepens the differential for armor-heavy
   builds. An ongoing **arms race** across the tree.
 - **RPS + cost:** heavy platforms and **air power** are the clean answers to mechanized forces — but armor is
@@ -1443,9 +1508,21 @@ here (Stability, partisans) have no naval or air equivalent at all.
   (the value/saturation theme, ground-side — very Mankind United). Air-as-armor-counter is itself nested
   under the domain-control layer (§8.5) — win the air, enable CAS against armor.
 
-**Breakpoint shape (resolved): a smooth curve** from the ~10% floor toward full as piercing approaches/
-exceeds armor — steep near the crossover (so a tech that finally out-pierces enemy armor swings the matchup)
-but no brutal cliff where one armor point flips a battle.
+**Breakpoint shape — resolved with an actual formula in the Epoch 2 implementation pass, corrected from an
+earlier "~10% floor" estimate and a qualitative-only "smooth curve" description:**
+- **Guard clause, resolved: if the target's Armor is exactly 0, the piercing calculation is skipped
+  entirely — 100% of damage applies, straight into the existing destruction formula** (damage ÷ (damage +
+  health), §8.6.6). This is the *common* case, not a rare edge one — most current platforms (Infantry
+  included) have zero Armor, so this guard fires far more often than the formula below does.
+- **Where the target's Armor is nonzero: `damage multiplier = 20% + 60% × min(1, Piercing ÷ Armor)`.**
+  Floor of **20%** at zero Piercing (corrected from the earlier "~10%" estimate), ceiling of **80%** once
+  Piercing meets or exceeds Armor — no further benefit from over-piercing. Linear in between, so a tech that
+  incrementally raises Piercing produces a smooth, proportional swing rather than a cliff at any single
+  breakpoint. Worked example: 10 raw damage, 5 Armor, 25 Health — 0 Piercing → 2 damage → 2/(2+25) ≈ 7.4%
+  destruction chance; 10 Piercing (exceeds Armor, capped) → 8 damage → 8/(8+25) ≈ 24.2%.
+- **This is a multiplier applied to the attacker's damage value before it enters the existing survival
+  formula** (§8.6.6) — not a separate destruction mechanic, just an adjustment to what damage number that
+  formula actually receives.
 
 ### 8.6.1 Posture: concentrated vs. dispersed  *(resolved)*
 A TF toggles **concentrated** (full damage from long-range fires; strong on defense in an invasion) vs.
@@ -1456,13 +1533,58 @@ whether the enemy will *shell* or *storm*, and because posture changes are subje
 lag (§8.5.3) — worse under poor domain control — you can't cheaply flip once they commit. The attacker's art
 is to exploit the mismatch.
 
-### 8.6.2 Shock (the invasion attack bonus)  *(resolved + one addition)*
-Every attacking TF gets a **shock bonus** for the first few pulses — a shock-and-awe wave that hits hard and
-briefly paralyzes the defender. **Magnitude scales with speed, firepower, air superiority, and combined-arms**
-(mostly-infantry-in-trucks = small; a combined-arms fist = large). A **dispersed defender amplifies the
-attacker's shock** (overrunning scattered positions). **Cooldown:** ~4 pulses to reset shock, preventing
-attack-bail-reattack; the intended play is a **probe** — hit with shock, then press only if you have the edge,
-else withdraw and wait. **Counterattack — a pre-committed defensive stance (resolved).** No cooldown; the **extra manpower/equipment
+### 8.6.2 Shock (the invasion attack bonus)  *(resolved — revised in the Epoch 2 implementation pass now
+that Tick/Pulse are locked at 1 hour/1 week; the original "first few pulses" language predates that lock and
+implied a duration roughly 100× longer than intended)*
+Every attacking TF gets a **shock bonus** — a prepared, well-planned strike meant to inflict confusion and
+disruption right away, putting the defender on the back foot, whether followed up as a full assault, a
+limited damaging strike, or a probe that keeps the option to continue open. **Duration: active for 24 ticks
+(one day) from the start of invasion combat** — a tight, planning-intensive window, not a sustained
+multi-week advantage. A **dispersed defender amplifies the attacker's shock** (overrunning scattered
+positions).
+
+**Magnitude — resolved with an actual formula, replacing the qualitative "scales with speed, firepower, air
+superiority, combined-arms" description:** firepower, air superiority, and combined-arms are already captured
+by the underlying combat vectors themselves (a strong, well-rounded Task Force naturally wins more broadly
+across Front Line, CAS, and long-range fires simultaneously) — the one factor not already baked in is speed,
+so that's what actually drives Shock's magnitude:
+
+**`Shock Multiplier = Average Combat Speed of the attacker's Front-Line units × 0.3`**
+
+Applied identically to both the attack vector and damage — confirmed no situation currently requires
+splitting the two. Worked example: an Infantry-only front line (5 mph Combat Speed) → 1.5×; a hypothetical
+10 mph front line → 3.0×, reflecting genuine overrunning/bypassing/encircling capability rather than just a
+flat bonus. **Tech modifiers apply as multiplicative layers on top of this speed-derived base**, not a
+replacement for it — an offensive tech might grant e.g. a further ×1.05, a defensive tech might mitigate an
+attacker's Shock by e.g. ×0.95 — exact values deferred to the Tech epoch, but the architecture (one base
+value, multiplicative modifiers stacking on top) is confirmed now and consistent with how every other scaling
+system in this design already works (Production Facility's efficiency multiplier, Fortification's
+Defensibility multiplier).
+
+**Availability — resolved via a Planning/Ready state machine, replacing the earlier flat "~4 pulses to reset"
+cooldown estimate with something state-based rather than a fixed timer:**
+- **Ready is the default state**, and it's what allows a Task Force to gain Shock when it initiates an
+  invasion. Every Task Force starts Ready.
+- **Entering invasion combat (not a long-range fires exchange alone) puts the *attacking* Task Force into
+  Planning.** A pure defender never enters Planning — defending doesn't cost planning capacity the way
+  mounting an invasion does, since Shock itself is exclusively an attacker's bonus.
+- **Clearing Planning requires one full, uninterrupted Pulse with zero invasion combat involving that Task
+  Force** — neither attacking nor defending. Long-range fires during that Pulse don't prevent clearing.
+- **Re-entering invasion combat while still in Planning — whether by choosing to attack again or by being
+  attacked and forced to defend — resets the clock.** Since the Pulse in which the original invasion happened
+  doesn't count (it already contained invasion combat), realistic minimum recovery is the remainder of that
+  Pulse plus one full subsequent Pulse — in practice, close to the original ~4-pulse estimate's ballpark for
+  a single clean cycle, but now emerging from a real state condition rather than a fixed countdown, and
+  capable of taking much longer if combat keeps recurring.
+- **While in Planning, a Task Force cannot gain Shock on a new invasion.** Once Planning clears, the "Ready"
+  flag is restored, signaling to the player that their next invasion will carry the Shock bonus.
+- **A genuine emergent interaction with the counterattack stances below, not a separate mechanic:** because a
+  defender who has never itself invaded stays Ready indefinitely, the exact moment an attacker's Shock
+  culminates and they pull back (entering Planning) is precisely when the *defender* can invade back with a
+  fresh Shock bonus of their own — giving the **Spring a Trap** stance real mechanical teeth rather than just
+  a flavor description of "waiting for the right moment."
+
+**Counterattack — a pre-committed defensive stance (resolved).** No cooldown; the **extra manpower/equipment
 losses self-limit** it. **Pre-committed** (set in advance) so the player needn't watch for the moment. Three
 land-TF counterattack stances:
 1. **Immediate Counterattack** — hit back at once; punishes weak **probes**.
@@ -1606,26 +1728,43 @@ lock, using only the Organization-recovery piece since there's no Stability comp
 water. Same purpose as the land rule: give a retreating, weakened TF genuine room to recover or relocate
 rather than being run down turn after turn.
 
-### 8.6.8 CAS & small-unit AA  *(resolved — cross-domain, confirmed)*
+### 8.6.8 CAS & short-range anti-air  *(resolved — cross-domain, confirmed; terminology updated, Epoch 2)*
 A distinct **close-combat-only** damage channel, separate from both the ground/naval exchange **and** theater
 fires. **Confirmed to apply identically on land or at sea** — this is the maritime-strike/SUCAP scenario Eric
 flagged from the start (attack helicopters and A-10-equivalents attacking ships, not just ground targets):
 - **CAS** — rotary-wing, drones, and multirole aircraft in CAS config (JDAM-equivalent) add damage **on top of**
   the ground *or naval* fight.
-- **Small-unit AA — domain-flavored, same role either way.** On land: SHORAD + MANPADS (a Stinger vs. an
+- **Short-range anti-air — domain-flavored, same role either way.** On land: SHORAD + MANPADS (a Stinger vs. an
   attack helo; a Humvee anti-drone system vs. an FPV drone). **At sea: ship-mounted point defense** — CIWS,
   short-range missiles, point-defense lasers — the naval equivalent filling the exact same countering role.
-- **Ground-based SHORAD riding in a Naval TF's cargo holds doesn't participate** — this isn't a new rule, it's
-  the existing §8.1.1 embarked-ground-forces-don't-fight restriction applying here specifically: land-based
-  small-unit AA assets stuck as cargo during a sea battle are passengers, same as any other embarked ground
-  unit. Only the ship's own mounted point-defense systems count as small-unit AA in a naval engagement.
+- **Ground-based short-range anti-air riding in a Naval TF's cargo holds doesn't participate** — this isn't a
+  new rule, it's the existing §8.1.1 embarked-ground-forces-don't-fight restriction applying here specifically:
+  land-based short-range anti-air assets stuck as cargo during a sea battle are passengers, same as any other
+  embarked ground unit. Only the ship's own mounted point-defense systems count as short-range anti-air in a
+  naval engagement.
 
-**Two air-defense tiers, kept distinct:** *strategic/theater* AD (S-400, Patriot, THAAD + air-superiority
-fighters at altitude) feeds the **air-superiority %** (§8.5, gating standoff fires); *small-unit AA* is
-**organic point-defense** countering **CAS only**. They don't cross — small-unit AA can't touch high-altitude
-fighters, and those fighters don't do CAS damage to close-in units. **CAS is doubly gated:** it needs
-**theater air superiority** to reach the battlefield (a multiplier) *and* is **attrited by small-unit AA**
-once there.
+**Two air-defense tiers, kept distinct — terminology updated in the Epoch 2 implementation pass, rule
+unchanged:** what this section originally called *strategic/theater AD* (S-400, Patriot, THAAD + air-
+superiority fighters at altitude) and *small-unit AA* are now understood as **one Anti-Air vector column
+with a short-range/long-range split** (Epoch 2 doc §3.2/§5.2), not two separate platform-based categories —
+a Patriot and an F-22 both simply carry a **long-range** anti-air value, on whatever platform each happens
+to be; there's no dedicated "strategic-tier platform" distinct from "a Vehicle or aircraft with a long-range-
+capable module." **The underlying rule is exactly as it always was, just restated in the new vocabulary:**
+long-range anti-air is what a unit **rolls with when contesting the Deep Strike/Air Superiority line whose
+outcome produces the air-superiority %** (§8.5, §8.5's Epoch 2 update) — a corrected, less direct phrasing
+than "feeds," since the percentage now emerges from engagement outcomes rather than being read straight off
+a stat; **short-range** anti-air is **organic point-defense** countering **CAS only**. They still don't cross
+— a unit with only a short-range value can't touch high-altitude aircraft, and long-range-capable air-
+superiority assets don't do CAS damage to close-in units (CAS damage requires the separate anti-ground-
+capable aircraft modules those assets never carry). **CAS is no longer a hard system gate — corrected in the
+Epoch 2 implementation pass to a player-managed risk instead.** The original idea (CAS categorically cannot
+engage without first winning theater air superiority) is superseded by the actual mechanics built: CAS
+*always* attempts to engage, but a Task Force that fails to balance its own Deep Strike/Air Superiority line
+against what the enemy is fielding exposes its CAS aircraft to real disadvantage against capable enemy air
+defenses once they're pulled into that fight. **The player carries the decision, not the system** — a player
+who judges they can't win the air fight can hold CAS in Reserves or transfer it to a different Task Force
+rather than commit it into a fight they'll lose; nothing mechanically stops them from flying it anyway and
+accepting the risk.
 
 **Platform roles are a tradespace.** The designer allocates a platform across **air-superiority / long-range
 strike / CAS** — pure A-10 (CAS), pure F-22 (air-sup), or hybrids (F-35, F-16; a B-1 flexing JASSM-in-standoff
@@ -2055,13 +2194,13 @@ as narrative flavor inside Combat (§8), not yet given their own numeric spec.
    outnumber-25:1, not 1000:1, proposition against armor). A continuous function, not a tiered system —
    heavier anti-armor weapons simply sit further up the same curve, closer to full effectiveness against a
    given armor class.
-3. **Man-portable Anti-Air** — *stub.* Tier 1 of small-unit AA: the cheapest, weakest, most proliferable —
+3. **Man-portable Anti-Air** — *stub.* Tier 1 of short-range anti-air: the cheapest, weakest, most proliferable —
    the low-tech faction's niche (Mankind United specifically). Mountable on infantry, vehicles, tanks, or
    small boats (for swarm tactics); a wasted module on a ship.
 4. **Cannons** — fully specified (Legacy line).
-   - 4.1 **Short Range Air Defense** — *stub.* Tier 2 of small-unit AA: vehicle-mounted, more capable than
-     man-portable, still within the same CAS-countering combat bucket (§8.6.8) — a further step up the
-     small-unit-AA proliferation ladder, not a separate strategic layer.
+   - 4.1 **Short Range Air Defense** — *stub.* Tier 2 of short-range anti-air: vehicle-mounted, more capable
+     than man-portable, still within the same CAS-countering combat bucket (§8.6.8) — a further step up the
+     short-range-anti-air proliferation ladder, not a separate category.
 5. **Artillery** — fully specified (Legacy line).
    - 5.1 **Rocket Artillery** — *stub.*
    - 5.2 **Ballistic Missiles** — *stub.*
@@ -2069,9 +2208,10 @@ as narrative flavor inside Combat (§8), not yet given their own numeric spec.
      session, §8.5.2, never given its own tech-tree number until now).
    - 5.4 **One-way Attack Drones** — *stub* (already referenced narratively as "OWA drones" throughout
      Combat's cheap-mass examples, §8.5.1).
-   - 5.5 **Surface-to-Air Missiles** — *stub.* Tier 3 of air defense — the genuinely separate strategic/
-     theater layer (S-400/Patriot/THAAD-equivalent) feeding the air-superiority % that gates standoff fires
-     generally (§8.5), distinct from the small-unit-AA bucket above.
+   - 5.5 **Surface-to-Air Missiles** — *stub.* The long-range end of the same Anti-Air vector column
+     (S-400/Patriot/THAAD-equivalent, §8.6.8/Epoch 2 doc §3.2) — not a categorically separate bucket from
+     short-range anti-air above, just the long-range (parenthetical) value on the same column, feeding the
+     air-superiority % that gates standoff fires generally (§8.5).
 6. **Air-to-Ground Munition (CAS)** — fully specified (Legacy line).
 7. **Air-to-Ground Missile (Standoff)** — fully specified (Legacy line).
 8. **Air-to-Air Missile** — *stub.*
