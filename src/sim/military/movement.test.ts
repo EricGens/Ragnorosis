@@ -112,9 +112,13 @@ describe('redirect cost (§4.4)', () => {
     let s = produce(base, (d) => void orderMove(d, 1, 'n-land'))
     s = ticks(s, 4) // 120 mi toward N Land
     s = produce(s, (d) => void orderMove(d, 1, 'w-land'))
-    expect(tf(s).movement).toEqual({ legs: ['w-land'], progress: 0, backtrack: 120 })
+    expect(tf(s).movement).toEqual({ legs: ['w-land'], progress: 0, backtrack: 120, returnFrom: 'n-land' })
     expect(etaTicks(s, tf(s))).toBe(24 + 10)
-    s = ticks(s, 33)
+    s = ticks(s, 23)
+    expect(tf(s).movement?.returnFrom).toBe('n-land')
+    s = ticks(s, 1)
+    expect(tf(s).movement).toEqual({ legs: ['w-land'], progress: 0, backtrack: 0 }) // home; walk-back forgotten
+    s = ticks(s, 9)
     expect(tf(s).regionId).toBe('nw-land')
     s = ticks(s, 1)
     expect(tf(s).regionId).toBe('w-land')
@@ -128,7 +132,10 @@ describe('redirect cost (§4.4)', () => {
     expect(tf(s).movement).toEqual({ legs: ['w-land'], progress: 0, backtrack: 0 })
     let s2 = ticks(s, 2)
     s2 = produce(s2, (d) => void orderMove(d, 1, 'nw-land'))
-    expect(tf(s2).movement).toEqual({ legs: [], progress: 0, backtrack: 60 })
+    expect(tf(s2).movement).toEqual({ legs: [], progress: 0, backtrack: 60, returnFrom: 'w-land' })
+    // A second redirect mid-walk-back keeps walking back from the same place.
+    const s3 = produce(s2, (d) => void orderMove(d, 1, 'n-land'))
+    expect(tf(s3).movement).toEqual({ legs: ['n-land'], progress: 0, backtrack: 60, returnFrom: 'w-land' })
     s2 = ticks(s2, 12)
     expect(tf(s2).movement).toBeNull()
     expect(tf(s2).regionId).toBe('nw-land')

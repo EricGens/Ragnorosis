@@ -145,6 +145,8 @@ export interface Movement {
   progress: number
   /** Miles still to walk back (at Combat Speed) to the occupied region after a redirect (§4.4). */
   backtrack: number
+  /** The abandoned leg's destination while backtracking — where the map shows the walk back from. */
+  returnFrom?: RegionId
 }
 
 export interface TaskForce {

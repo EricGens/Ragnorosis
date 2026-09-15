@@ -7,6 +7,7 @@ import { FACTION_IDS, isLand } from '../sim/types'
 import { useGameStore } from '../store/gameStore'
 import { useUIStore, type EntityRef } from '../store/uiStore'
 import { factionColor } from './factionColors'
+import { cubicPoint, cubicsPath, cubicsThrough, splitCubic, type Cubic, type Pt } from './mapCurves'
 import { OilPlatformIcon, WeatherIcon } from './panels/overlayIcons'
 
 // Map space is a 1000×1000 square: a 3×3 land grid of 200-unit cells inset by 200 on each side,
@@ -189,6 +190,9 @@ export function MapView() {
             <path d="M0,0 L10,5 L0,10 z" fill={factionColor(id)} />
           </marker>
         ))}
+        <marker id="arrow-back" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--color-ink-400)" />
+        </marker>
       </defs>
       {regionOrder.map((id) => (
         <RegionShape
@@ -201,20 +205,14 @@ export function MapView() {
           onClick={onRegionClick}
         />
       ))}
-      {taskForces.map((tf) =>
-        tf.movement && tf.movement.legs.length > 0 ? (
-          <OrderArrow
-            key={`arrow-${tf.id}`}
-            tf={tf}
-            centers={centers}
-            legDistance={distances[pairKey(tf.regionId, tf.movement.legs[0])] ?? 1}
-          />
-        ) : null,
-      )}
+      {taskForces.map((tf) => {
+        const travel = travelGeometry(tf, centers, distances)
+        return travel ? <OrderArrow key={`arrow-${tf.id}`} tf={tf} travel={travel} /> : null
+      })}
       {regionOrder.map((id) => (
         <TaskForceMarkers
           key={`tfs-${id}`}
-          taskForces={taskForces.filter((t) => t.regionId === id)}
+          taskForces={taskForces.filter((t) => t.regionId === id && !travelGeometry(t, centers, distances))}
           center={centers[id]}
           hovered={hovered}
           pinned={pinned}
@@ -223,6 +221,22 @@ export function MapView() {
           onClick={(ref) => togglePin(ref)}
         />
       ))}
+      {taskForces.map((tf) => {
+        const travel = travelGeometry(tf, centers, distances)
+        return travel ? (
+          <Marker
+            key={`moving-${tf.id}`}
+            tf={tf}
+            x={travel.position.x - MARKER_W / 2}
+            y={travel.position.y - MARKER_H / 2}
+            hovered={hovered}
+            pinned={pinned}
+            activeFaction={activeFaction}
+            onHover={setHovered}
+            onClick={(ref) => togglePin(ref)}
+          />
+        ) : null
+      })}
       {flash && (
         <g key={flash.key} pointerEvents="none" className="animate-pulse" data-order-flash={flash.reason}>
           <line
@@ -337,116 +351,152 @@ const MARKER_GAP = 6
 /** Markers sit in the lower part of the region, clear of the name and country labels. */
 const MARKER_DY = 58
 
-/** Board-game-piece Task Force icons, colour-coded by faction (§6), laid out in a row per region. */
-function TaskForceMarkers({
-  taskForces,
-  center,
-  hovered,
-  pinned,
-  activeFaction,
-  onHover,
-  onClick,
-}: {
-  taskForces: TaskForce[]
-  center: { cx: number; cy: number }
+interface MarkerProps {
+  tf: TaskForce
+  x: number
+  y: number
   hovered: EntityRef | null
   pinned: EntityRef | null
   activeFaction: FactionId
   onHover: (ref: EntityRef | null) => void
   onClick: (ref: EntityRef) => void
-}) {
+}
+
+/** One board-game-piece Task Force icon, colour-coded by faction (§6). */
+function Marker({ tf, x, y, hovered, pinned, activeFaction, onHover, onClick }: MarkerProps) {
+  const ref: EntityRef = { kind: 'taskForce', id: String(tf.id) }
+  const isPinned = pinned?.kind === 'taskForce' && pinned.id === ref.id
+  const isHovered = hovered?.kind === 'taskForce' && hovered.id === ref.id
+  const own = tf.faction === activeFaction
+  return (
+    <g
+      className="cursor-pointer"
+      data-task-force={tf.id}
+      onMouseEnter={() => onHover(ref)}
+      onMouseLeave={() => onHover(null)}
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick(ref)
+      }}
+    >
+      <rect
+        x={x}
+        y={y}
+        width={MARKER_W}
+        height={MARKER_H}
+        rx={4}
+        fill={factionColor(tf.faction)}
+        fillOpacity={isHovered || isPinned ? 1 : 0.85}
+        stroke={isPinned ? 'var(--color-signal)' : 'var(--color-ink-950)'}
+        strokeWidth={isPinned ? 3 : 2}
+      />
+      <text
+        x={x + MARKER_W / 2}
+        y={y + MARKER_H / 2 + 1}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fill="#0b0f14"
+        fontSize={11}
+        fontWeight={own ? 700 : 400}
+        pointerEvents="none"
+      >
+        {tf.name.length > 10 ? `${tf.name.slice(0, 9)}…` : tf.name}
+      </text>
+    </g>
+  )
+}
+
+/** Task Forces holding in a region, laid out in a row below its labels. */
+function TaskForceMarkers({
+  taskForces,
+  center,
+  ...rest
+}: Omit<MarkerProps, 'tf' | 'x' | 'y'> & { taskForces: TaskForce[]; center: { cx: number; cy: number } }) {
   if (taskForces.length === 0) return null
   const total = taskForces.length * MARKER_W + (taskForces.length - 1) * MARKER_GAP
   const x0 = center.cx - total / 2
   return (
     <>
-      {taskForces.map((tf, i) => {
-        const ref: EntityRef = { kind: 'taskForce', id: String(tf.id) }
-        const isPinned = pinned?.kind === 'taskForce' && pinned.id === ref.id
-        const isHovered = hovered?.kind === 'taskForce' && hovered.id === ref.id
-        const x = x0 + i * (MARKER_W + MARKER_GAP)
-        const y = center.cy + MARKER_DY
-        const own = tf.faction === activeFaction
-        return (
-          <g
-            key={tf.id}
-            className="cursor-pointer"
-            data-task-force={tf.id}
-            onMouseEnter={() => onHover(ref)}
-            onMouseLeave={() => onHover(null)}
-            onClick={(e) => {
-              e.stopPropagation()
-              onClick(ref)
-            }}
-          >
-            <rect
-              x={x}
-              y={y}
-              width={MARKER_W}
-              height={MARKER_H}
-              rx={4}
-              fill={factionColor(tf.faction)}
-              fillOpacity={isHovered || isPinned ? 1 : 0.85}
-              stroke={isPinned ? 'var(--color-signal)' : 'var(--color-ink-950)'}
-              strokeWidth={isPinned ? 3 : 2}
-            />
-            <text
-              x={x + MARKER_W / 2}
-              y={y + MARKER_H / 2 + 1}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fill="#0b0f14"
-              fontSize={11}
-              fontWeight={own ? 700 : 400}
-              pointerEvents="none"
-            >
-              {tf.name.length > 10 ? `${tf.name.slice(0, 9)}…` : tf.name}
-            </text>
-          </g>
-        )
-      })}
+      {taskForces.map((tf, i) => (
+        <Marker key={tf.id} tf={tf} x={x0 + i * (MARKER_W + MARKER_GAP)} y={center.cy + MARKER_DY} {...rest} />
+      ))}
     </>
   )
 }
 
-/** The order arrow: solid for the progress made on the current leg, dashed for what remains (§4.2). */
-function OrderArrow({
-  tf,
-  centers,
-  legDistance,
-}: {
-  tf: TaskForce
-  centers: Record<RegionId, { cx: number; cy: number }>
-  legDistance: number
-}) {
-  const m = tf.movement!
-  const color = factionColor(tf.faction)
-  const from = centers[tf.regionId]
-  const chain = [from, ...m.legs.map((id) => centers[id])]
-  const points = chain.map((c) => `${c.cx},${c.cy}`).join(' ')
-  const next = chain[1]
+interface Travel {
+  /** The curve of the standing order, origin through every remaining leg; null while only walking back. */
+  forward: Cubic[] | null
+  /** Fraction of the current leg covered (0 while walking back). */
+  f: number
+  /** The gray walk-back curve, from the abandoned leg's destination home; null unless backtracking. */
+  back: Cubic[] | null
+  /** Fraction of the walk-back still to go — the icon sits here, sliding home. */
+  g: number
+  /** Where the icon is drawn. */
+  position: Pt
+}
+
+/** Curve geometry for a Task Force on the move; null when it's holding (rendered in its region's row). */
+function travelGeometry(
+  tf: TaskForce,
+  centers: Record<RegionId, { cx: number; cy: number }>,
+  distances: Record<string, number>,
+): Travel | null {
+  const m = tf.movement
+  if (!m || (m.legs.length === 0 && !(m.backtrack > 0 && m.returnFrom))) return null
+  const pt = (id: RegionId): Pt => ({ x: centers[id].cx, y: centers[id].cy })
+  const origin = pt(tf.regionId)
+  const forward = m.legs.length > 0 ? cubicsThrough([origin, ...m.legs.map(pt)]) : null
+  const legDistance = m.legs.length > 0 ? (distances[pairKey(tf.regionId, m.legs[0])] ?? 1) : 1
   const f = m.backtrack > 0 ? 0 : Math.min(1, m.progress / legDistance)
+  const back = m.backtrack > 0 && m.returnFrom ? cubicsThrough([pt(m.returnFrom), origin]) : null
+  const g = back ? Math.min(1, m.backtrack / (distances[pairKey(tf.regionId, m.returnFrom!)] ?? 1)) : 0
+  // The walk-back curve runs destination → home, so the icon sits at (1 − g) along it.
+  const position = back ? cubicPoint(back[0], 1 - g) : cubicPoint(forward![0], f)
+  return { forward, f, back, g, position }
+}
+
+/**
+ * The order arrow (§4.2): a curve through every region centre on the route — solid for the progress
+ * made on the current leg, dashed for what remains — plus a gray arrow home while walking back a
+ * redirect (§4.4).
+ */
+function OrderArrow({ tf, travel }: { tf: TaskForce; travel: Travel }) {
+  const color = factionColor(tf.faction)
+  const { forward, f, back } = travel
+  let done: Cubic[] = []
+  let remaining: Cubic[] = forward ?? []
+  if (forward && f > 0) {
+    const [a, b] = splitCubic(forward[0], f)
+    done = [a]
+    remaining = [b, ...forward.slice(1)]
+  }
   return (
-    <g pointerEvents="none" data-order-arrow={tf.id}>
-      <polyline
-        points={points}
-        fill="none"
-        stroke={color}
-        strokeWidth={4}
-        strokeOpacity={0.9}
-        strokeDasharray="12 8"
-        markerEnd={`url(#arrow-${tf.faction})`}
-      />
-      {f > 0 && (
-        <line
-          x1={from.cx}
-          y1={from.cy}
-          x2={from.cx + (next.cx - from.cx) * f}
-          y2={from.cy + (next.cy - from.cy) * f}
-          stroke={color}
-          strokeWidth={6}
-          strokeLinecap="round"
+    <g pointerEvents="none" data-order-arrow={tf.id} fill="none">
+      {back && (
+        <path
+          d={cubicsPath(back)}
+          stroke="var(--color-ink-400)"
+          strokeWidth={4}
+          strokeOpacity={0.9}
+          strokeDasharray="6 6"
+          markerEnd="url(#arrow-back)"
+          data-walk-back
         />
+      )}
+      {remaining.length > 0 && (
+        <path
+          d={cubicsPath(remaining)}
+          stroke={color}
+          strokeWidth={4}
+          strokeOpacity={0.9}
+          strokeDasharray="12 8"
+          markerEnd={`url(#arrow-${tf.faction})`}
+        />
+      )}
+      {done.length > 0 && (
+        <path d={cubicsPath(done)} stroke={color} strokeWidth={6} strokeLinecap="round" data-progress />
       )}
     </g>
   )

@@ -129,6 +129,23 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 - **Map orders:** a pinned own Task Force is Active; clicking a region then issues the order instead of
   pinning the region. Invalid destinations show a red X with the reason at the click point; the sound the
   skeleton mentions waits for an audio pass.
+- **Arrows are curves through the region centres** (Catmull-Rom, with the end tangents bent so a lone leg
+  is a battle-map arc), the icon travels along the curve with its progress, and a redirect shows a gray
+  arrow home with the icon sliding back along it (Eric, 2026-09-15). `Movement.returnFrom` exists only so
+  the map knows where the walk-back starts; the sim ignores it.
+- **Speed tuning pending:** Eric's first impression (2026-09-15) is that 5(30) mph feels 3–5× too fast on
+  the dummy map; to be revisited once combat testing gives a feel for pacing. Speeds are platform data,
+  so it's a numbers change.
+
+## Combat rulings ahead of the combat slice (Eric, 2026-09-15)
+
+- **Organization regeneration out of contact: 0.5% of max per tick** (a worn-down Task Force takes about a
+  week to reconstitute), uncapped until the Supply system exists.
+- **Equipment seizure — 25% of the loser's Equipment, only on surrender** (nowhere to retreat to, Task
+  Force eliminated). A Task Force that retreats on defeat keeps its Equipment. Seized Equipment is
+  converted into the victor's designs by module multiset.
+- **Consolidation lock after capture:** the capturing Task Force can't move on until its Organization is
+  back to full and the region's Stability is ≥ 50.
 
 ## Source-doc fixes needed
 

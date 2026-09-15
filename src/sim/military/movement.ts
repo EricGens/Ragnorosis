@@ -113,7 +113,9 @@ export function orderMove(state: GameState, tfId: number, destination: RegionId,
     tf.movement = null
     return { ok: true }
   }
-  tf.movement = { legs: path, progress: 0, backtrack }
+  // Keep walking back from wherever the walk-back already started; otherwise from the leg just dropped.
+  const returnFrom = tf.movement?.returnFrom ?? tf.movement?.legs[0]
+  tf.movement = { legs: path, progress: 0, backtrack, ...(backtrack > 0 && returnFrom ? { returnFrom } : {}) }
   log(
     state,
     'military',
@@ -151,7 +153,10 @@ export function moveTaskForces(state: GameState): void {
     }
     if (m.backtrack > 0) {
       m.backtrack = Math.max(0, m.backtrack - speed.combat)
-      if (m.backtrack === 0 && m.legs.length === 0) tf.movement = null
+      if (m.backtrack === 0) {
+        delete m.returnFrom
+        if (m.legs.length === 0) tf.movement = null
+      }
       continue
     }
     const dest = m.legs[0]
