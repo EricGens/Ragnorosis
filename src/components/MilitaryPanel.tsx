@@ -42,7 +42,9 @@ export function MilitaryPanel() {
   const cap = manpowerCap(game, faction.id)
   // Same rule as the top bar: on a boundary the coming pulse isn't locked yet, so preview it.
   const allocation = tickInPulse(game.tick) === 0 ? computeAllocation(game, faction.id) : faction.allocation
-  const equipmentIncoming = Math.floor(allocation.equipment * factionFacilityMultiplier(game, faction.id, 'production-facility'))
+  const equipmentIncoming = Math.floor(
+    allocation.equipment * factionFacilityMultiplier(game, faction.id, 'production-facility'),
+  )
   const manpowerIncoming = Math.min(
     Math.floor(allocation.manpower * factionFacilityMultiplier(game, faction.id, 'training-facility')),
     Math.max(0, cap - faction.manpower),

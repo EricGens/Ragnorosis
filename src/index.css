@@ -49,8 +49,7 @@ body {
 ::-webkit-scrollbar-track {
   background:
     radial-gradient(circle 4px at 50% 10px, var(--color-signal) 45%, transparent 80%),
-    radial-gradient(circle 4px at 50% calc(100% - 10px), var(--color-signal) 45%, transparent 80%),
-    var(--color-ink-950);
+    radial-gradient(circle 4px at 50% calc(100% - 10px), var(--color-signal) 45%, transparent 80%), var(--color-ink-950);
 }
 
 ::-webkit-scrollbar-thumb {

@@ -37,7 +37,12 @@ export function triangleWave(n: number, range: number): number {
  * top→bottom within a column, so it still fills the same way a fixed grid would when nothing is
  * reserved.
  */
-export function findOpenSpace(existing: Rect[], size: Size, area: Size, reserved: Rect[] = []): { x: number; y: number } {
+export function findOpenSpace(
+  existing: Rect[],
+  size: Size,
+  area: Size,
+  reserved: Rect[] = [],
+): { x: number; y: number } {
   const blocked = [...existing, ...reserved]
 
   const xs = [...new Set([MARGIN, ...blocked.map((r) => r.x + r.width + MARGIN)])]

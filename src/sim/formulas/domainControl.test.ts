@@ -6,7 +6,8 @@ import { createInitialState } from '../state'
 import { domainControl } from './domainControl'
 
 const base = createInitialState(DUMMY_MAP)
-const at = (s: typeof base, faction: Parameters<typeof domainControl>[1], id: string) => domainControl(s, faction, s.regions[id])
+const at = (s: typeof base, faction: Parameters<typeof domainControl>[1], id: string) =>
+  domainControl(s, faction, s.regions[id])
 
 describe('ambient access', () => {
   it('is 100% over your own region and over a Neutral controller', () => {

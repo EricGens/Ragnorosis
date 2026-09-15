@@ -31,11 +31,23 @@ function shapeFor(layout: MapLayout): { points: string; cx: number; cy: number }
     case 'nw':
       return { points: `0,0 ${half},0 ${half},${INSET} ${INSET},${INSET} ${INSET},${half} 0,${half}`, cx: 100, cy: 100 }
     case 'ne':
-      return { points: `${half},0 ${SIZE},0 ${SIZE},${half} ${far},${half} ${far},${INSET} ${half},${INSET}`, cx: 900, cy: 100 }
+      return {
+        points: `${half},0 ${SIZE},0 ${SIZE},${half} ${far},${half} ${far},${INSET} ${half},${INSET}`,
+        cx: 900,
+        cy: 100,
+      }
     case 'sw':
-      return { points: `0,${half} ${INSET},${half} ${INSET},${far} ${half},${far} ${half},${SIZE} 0,${SIZE}`, cx: 100, cy: 900 }
+      return {
+        points: `0,${half} ${INSET},${half} ${INSET},${far} ${half},${far} ${half},${SIZE} 0,${SIZE}`,
+        cx: 100,
+        cy: 900,
+      }
     case 'se':
-      return { points: `${half},${far} ${far},${far} ${far},${half} ${SIZE},${half} ${SIZE},${SIZE} ${half},${SIZE}`, cx: 900, cy: 900 }
+      return {
+        points: `${half},${far} ${far},${far} ${far},${half} ${SIZE},${half} ${SIZE},${SIZE} ${half},${SIZE}`,
+        cx: 900,
+        cy: 900,
+      }
   }
 }
 
@@ -61,13 +73,32 @@ export function MapView() {
       const pan = (dx: number, dy: number) => setView((v) => ({ ...v, x: v.x + dx / v.zoom, y: v.y + dy / v.zoom }))
       const zoom = (f: number) => setView((v) => ({ ...v, zoom: clamp(v.zoom * f, MIN_ZOOM, MAX_ZOOM) }))
       switch (e.key) {
-        case 'w': case 'W': pan(0, -PAN_STEP); break
-        case 's': case 'S': pan(0, PAN_STEP); break
-        case 'a': case 'A': pan(-PAN_STEP, 0); break
-        case 'd': case 'D': pan(PAN_STEP, 0); break
-        case '+': case '=': zoom(ZOOM_STEP); break
-        case '-': case '_': zoom(1 / ZOOM_STEP); break
-        default: return
+        case 'w':
+        case 'W':
+          pan(0, -PAN_STEP)
+          break
+        case 's':
+        case 'S':
+          pan(0, PAN_STEP)
+          break
+        case 'a':
+        case 'A':
+          pan(-PAN_STEP, 0)
+          break
+        case 'd':
+        case 'D':
+          pan(PAN_STEP, 0)
+          break
+        case '+':
+        case '=':
+          zoom(ZOOM_STEP)
+          break
+        case '-':
+        case '_':
+          zoom(1 / ZOOM_STEP)
+          break
+        default:
+          return
       }
       e.preventDefault()
     }
@@ -133,8 +164,12 @@ function RegionShape({
   const land = isLand(region)
   const lit = hovered || pinned
   const fill = land
-    ? lit ? 'var(--color-land-hover)' : 'var(--color-land)'
-    : lit ? 'var(--color-sea-hover)' : 'var(--color-sea)'
+    ? lit
+      ? 'var(--color-land-hover)'
+      : 'var(--color-land)'
+    : lit
+      ? 'var(--color-sea-hover)'
+      : 'var(--color-sea)'
   const controller = land ? region.controller : null
 
   return (

@@ -21,13 +21,21 @@ describe('saving designs', () => {
   it('adds a valid design with a sequential id', () => {
     const [s, r] = save(base, { name: 'AT Infantry', platform: 'infantry', modules: [SA, AT] })
     expect(r).toEqual({ ok: true, id: 1 })
-    expect(s.factions['united-states'].designs).toEqual([{ id: 1, name: 'AT Infantry', platform: 'infantry', modules: [SA, AT] }])
+    expect(s.factions['united-states'].designs).toEqual([
+      { id: 1, name: 'AT Infantry', platform: 'infantry', modules: [SA, AT] },
+    ])
     expect(s.factions.china.designs).toEqual([])
   })
 
   it('rejects invalid module sets and blank names', () => {
-    expect(save(base, { name: 'x', platform: 'infantry', modules: [] })[1]).toEqual({ ok: false, reason: 'Infantry requires 1 weapon module' })
-    expect(save(base, { name: '  ', platform: 'infantry', modules: [SA] })[1]).toEqual({ ok: false, reason: 'Give the unit a name.' })
+    expect(save(base, { name: 'x', platform: 'infantry', modules: [] })[1]).toEqual({
+      ok: false,
+      reason: 'Infantry requires 1 weapon module',
+    })
+    expect(save(base, { name: '  ', platform: 'infantry', modules: [SA] })[1]).toEqual({
+      ok: false,
+      reason: 'Give the unit a name.',
+    })
   })
 
   it('enforces name uniqueness, case-insensitively, except against itself', () => {
@@ -36,7 +44,10 @@ describe('saving designs', () => {
       ok: false,
       reason: 'A unit named "light infantry" already exists.',
     })
-    expect(save(s, { id: 1, name: 'Light Infantry', platform: 'infantry', modules: [SA, AT] })[1]).toEqual({ ok: true, id: 1 })
+    expect(save(s, { id: 1, name: 'Light Infantry', platform: 'infantry', modules: [SA, AT] })[1]).toEqual({
+      ok: true,
+      id: 1,
+    })
   })
 
   it('updates an existing design in place and locks its platform', () => {

@@ -13,7 +13,12 @@ import type { GameState, LandRegion } from './types'
 const base = createInitialState(DUMMY_MAP)
 const US = 'united-states'
 
-function withQueued(state: GameState, regionId: string, building: Parameters<typeof queueBuild>[3], focus = state.factions[US].focus) {
+function withQueued(
+  state: GameState,
+  regionId: string,
+  building: Parameters<typeof queueBuild>[3],
+  focus = state.factions[US].focus,
+) {
   return produce(state, (d) => {
     d.factions[US].focus = focus
     const r = queueBuild(d, US, regionId, building)
@@ -23,7 +28,11 @@ function withQueued(state: GameState, regionId: string, building: Parameters<typ
 
 describe('queue rules', () => {
   it('lists only buildings not already on the grid, only for controlled regions', () => {
-    expect(availableBuildings(base, US, 'w-land').sort()).toEqual(['fortification', 'production-facility', 'training-facility'])
+    expect(availableBuildings(base, US, 'w-land').sort()).toEqual([
+      'fortification',
+      'production-facility',
+      'training-facility',
+    ])
     expect(availableBuildings(base, US, 'c-land')).toEqual([])
     expect(availableBuildings(base, 'hive', 'c-land')).toEqual(['training-facility'])
   })
@@ -43,7 +52,10 @@ describe('queue rules', () => {
   })
 
   it('enforces the Fortification cap and the 4-project limit', () => {
-    expect(canQueueBuild(base, 'hive', 'c-land', 'fortification')).toEqual({ ok: false, reason: 'Fortification is capped at level 10.' })
+    expect(canQueueBuild(base, 'hive', 'c-land', 'fortification')).toEqual({
+      ok: false,
+      reason: 'Fortification is capped at level 10.',
+    })
     let s = base
     for (const [region, type] of [
       ['nw-land', 'fortification'],
@@ -96,7 +108,9 @@ describe('construction streaming', () => {
       s = advanceTick(s).state
       ticks++
     }
-    expect(s.interrupts).toEqual([{ kind: 'construction-complete', faction: US, regionId: 'w-land', building: 'training-facility', level: 1 }])
+    expect(s.interrupts).toEqual([
+      { kind: 'construction-complete', faction: US, regionId: 'w-land', building: 'training-facility', level: 1 },
+    ])
     expect(tickInPulse(s.tick)).not.toBe(0)
     expect((s.regions['w-land'] as LandRegion).buildings['training-facility']).toBe(1)
     const p = s.factions[US].projects[0]
@@ -130,8 +144,14 @@ describe('pulse-end conversions', () => {
   it('credits Manpower under the 2% cap and draws it from Population', () => {
     expect(f.manpower).toBeGreaterThan(0)
     expect(f.manpower).toBeLessThanOrEqual(manpowerCap(after, US))
-    const popBefore = ['nw-land', 'n-land', 'w-land'].reduce((s, id) => s + (base.regions[id] as LandRegion).population, 0)
-    const popAfter = ['nw-land', 'n-land', 'w-land'].reduce((s, id) => s + (after.regions[id] as LandRegion).population, 0)
+    const popBefore = ['nw-land', 'n-land', 'w-land'].reduce(
+      (s, id) => s + (base.regions[id] as LandRegion).population,
+      0,
+    )
+    const popAfter = ['nw-land', 'n-land', 'w-land'].reduce(
+      (s, id) => s + (after.regions[id] as LandRegion).population,
+      0,
+    )
     // Growth adds ~5,769; training removes f.manpower; immigration adds a little from SW Land.
     expect(popAfter).toBeLessThan(popBefore + 5769 + 30_000 - f.manpower + 1)
   })

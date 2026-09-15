@@ -1,8 +1,7 @@
 import { PLAYABLE_FACTIONS } from '../sim/data/factions'
 import { useGameStore } from '../store/gameStore'
 
-const buttonBase =
-  'w-64 rounded border px-6 py-3 text-sm uppercase tracking-[0.25em] transition-colors'
+const buttonBase = 'w-64 rounded border px-6 py-3 text-sm uppercase tracking-[0.25em] transition-colors'
 const enabled = `${buttonBase} border-signal-dim text-signal hover:bg-signal/10 hover:border-signal`
 const disabled = `${buttonBase} border-ink-700 text-ink-400 cursor-not-allowed`
 

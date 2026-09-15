@@ -3,14 +3,7 @@
 export type RegionId = string
 
 export type FactionId =
-  | 'mankind-united'
-  | 'china'
-  | 'united-states'
-  | 'widows'
-  | 'laserward'
-  | 'hive'
-  | 'gamer'
-  | 'red-queen'
+  'mankind-united' | 'china' | 'united-states' | 'widows' | 'laserward' | 'hive' | 'gamer' | 'red-queen'
 
 export const FACTION_IDS: readonly FactionId[] = [
   'mankind-united',
@@ -30,11 +23,7 @@ export type RegionType = 'land' | 'maritime'
 export type TerrainTrait = 'rugged' | 'mountainous'
 
 export type BuildingType =
-  | 'fossil-fuel-plant'
-  | 'renewable-plant'
-  | 'production-facility'
-  | 'training-facility'
-  | 'fortification'
+  'fossil-fuel-plant' | 'renewable-plant' | 'production-facility' | 'training-facility' | 'fortification'
 
 export type Focus = 'balanced' | 'equipment' | 'manpower' | 'construction'
 
@@ -96,7 +85,13 @@ export interface ProductionAllocation {
   warning: boolean
 }
 
-export const ZERO_ALLOCATION: ProductionAllocation = { total: 0, equipment: 0, manpower: 0, construction: 0, warning: false }
+export const ZERO_ALLOCATION: ProductionAllocation = {
+  total: 0,
+  equipment: 0,
+  manpower: 0,
+  construction: 0,
+  warning: false,
+}
 
 /** One grid square under construction. Only one level receives progress at a time. */
 export interface ConstructionProject {

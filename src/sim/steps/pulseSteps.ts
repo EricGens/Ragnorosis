@@ -64,7 +64,11 @@ export function driftAllStability(state: GameState): void {
     const anchor = stabilityAnchor(r)
     const next = driftStability(r.stability, anchor)
     if (next !== r.stability) {
-      log(state, 'stability', `${r.name} Stability ${r.stability.toFixed(1)} → ${next.toFixed(1)} (anchor ${anchor.toFixed(1)})`)
+      log(
+        state,
+        'stability',
+        `${r.name} Stability ${r.stability.toFixed(1)} → ${next.toFixed(1)} (anchor ${anchor.toFixed(1)})`,
+      )
       r.stability = next
     }
   }

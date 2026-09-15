@@ -30,7 +30,8 @@ export function InterruptNotice() {
                   type="button"
                   className="underline decoration-ink-600 hover:text-signal"
                   onClick={() => {
-                    if (!(pinned?.kind === 'region' && pinned.id === it.regionId)) togglePin({ kind: 'region', id: it.regionId })
+                    if (!(pinned?.kind === 'region' && pinned.id === it.regionId))
+                      togglePin({ kind: 'region', id: it.regionId })
                   }}
                 >
                   {regions[it.regionId].name}
@@ -48,9 +49,17 @@ export function InterruptNotice() {
         </div>
       )}
       {notice && (
-        <div role="status" className="flex items-center justify-between rounded border border-warn/60 bg-ink-900/95 px-3 py-2 text-xs text-warn">
+        <div
+          role="status"
+          className="flex items-center justify-between rounded border border-warn/60 bg-ink-900/95 px-3 py-2 text-xs text-warn"
+        >
           <span>{notice}</span>
-          <button type="button" onClick={clearNotice} aria-label="Dismiss" className="ml-3 text-ink-400 hover:text-ink-100">
+          <button
+            type="button"
+            onClick={clearNotice}
+            aria-label="Dismiss"
+            className="ml-3 text-ink-400 hover:text-ink-100"
+          >
             ×
           </button>
         </div>

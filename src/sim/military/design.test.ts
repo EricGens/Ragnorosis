@@ -49,7 +49,9 @@ describe('validation', () => {
   })
 
   it('rejects modules outside the platform catalog', () => {
-    expect(designProblems('infantry', [SA, 'veh-reactive-armor'])).toContain('veh-reactive-armor is not available on Infantry')
+    expect(designProblems('infantry', [SA, 'veh-reactive-armor'])).toContain(
+      'veh-reactive-armor is not available on Infantry',
+    )
     expect(INFANTRY.modules.map((m) => m.id)).toEqual([SA, AT, AA])
   })
 })

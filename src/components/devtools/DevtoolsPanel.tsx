@@ -2,8 +2,23 @@ import { useState } from 'react'
 import { BUILDINGS, BUILDING_TYPES } from '../../sim/data/buildings'
 import { FACTIONS } from '../../sim/data/factions'
 import { FOCUSES } from '../../sim/formulas/allocation'
-import { countries, countryRelation, factionRelation, setCountryRelation, setFactionRelation } from '../../sim/relations'
-import type { CountryRelation, FactionId, FactionRelation, Focus, LandRegion, LogCategory, Region, TerrainTrait } from '../../sim/types'
+import {
+  countries,
+  countryRelation,
+  factionRelation,
+  setCountryRelation,
+  setFactionRelation,
+} from '../../sim/relations'
+import type {
+  CountryRelation,
+  FactionId,
+  FactionRelation,
+  Focus,
+  LandRegion,
+  LogCategory,
+  Region,
+  TerrainTrait,
+} from '../../sim/types'
 import { FACTION_IDS, isLand } from '../../sim/types'
 import { useGameStore } from '../../store/gameStore'
 import { useUIStore } from '../../store/uiStore'
@@ -12,7 +27,16 @@ import { NumberField, Section, SelectField, TextField, Toggle } from './fields'
 const FACTION_OPTIONS = FACTION_IDS.map((id) => ({ value: id, label: FACTIONS[id].name }))
 const CONTROLLER_OPTIONS = [{ value: 'none', label: 'Unaffiliated' }, ...FACTION_OPTIONS]
 const TRAITS: TerrainTrait[] = ['rugged', 'mountainous']
-const LOG_CATEGORIES: (LogCategory | 'all')[] = ['all', 'time', 'economy', 'energy', 'construction', 'stability', 'weather', 'dev']
+const LOG_CATEGORIES: (LogCategory | 'all')[] = [
+  'all',
+  'time',
+  'economy',
+  'energy',
+  'construction',
+  'stability',
+  'weather',
+  'dev',
+]
 const FACTION_RELATIONS: FactionRelation[] = ['friendly', 'neutral', 'hostile']
 const COUNTRY_RELATIONS: CountryRelation[] = ['peace', 'war']
 
@@ -66,7 +90,14 @@ function TimeSection() {
   return (
     <Section title="Time">
       <div className="flex gap-2">
-        <DevButton onClick={() => { pause(); stepTick() }}>Step tick</DevButton>
+        <DevButton
+          onClick={() => {
+            pause()
+            stepTick()
+          }}
+        >
+          Step tick
+        </DevButton>
         <DevButton onClick={stepPulse}>Step pulse</DevButton>
       </div>
     </Section>
@@ -80,7 +111,12 @@ function GlobalSection() {
   const setActiveFaction = useGameStore((s) => s.setActiveFaction)
   return (
     <Section title="Global">
-      <NumberField label="Global Tension" value={game.globalTension} onCommit={(v) => mutate((d) => void (d.globalTension = v))} min={0} />
+      <NumberField
+        label="Global Tension"
+        value={game.globalTension}
+        onCommit={(v) => mutate((d) => void (d.globalTension = v))}
+        min={0}
+      />
       <SelectField label="Perspective" value={activeFaction} options={FACTION_OPTIONS} onChange={setActiveFaction} />
       <NumberField
         label="Weather chance / tick"
@@ -154,7 +190,8 @@ function RelationsSection() {
         ))}
         {countryEntries.map(([k, v]) => (
           <li key={k}>
-            {k.replace('|', ' ↔ ')}: <span className={v === 'war' ? 'text-alert' : 'text-ink-200'}>{v === 'war' ? 'at war' : 'at peace'}</span>
+            {k.replace('|', ' ↔ ')}:{' '}
+            <span className={v === 'war' ? 'text-alert' : 'text-ink-200'}>{v === 'war' ? 'at war' : 'at peace'}</span>
           </li>
         ))}
       </ul>
@@ -169,11 +206,37 @@ function FactionSection() {
   const edit = (fn: (f: typeof faction) => void) => mutate((d) => fn(d.factions[activeFaction]))
   return (
     <Section title={`Faction — ${FACTIONS[activeFaction].name}`}>
-      <NumberField label="Money" value={faction.money} onCommit={(v) => edit((f) => void (f.money = v))} scale={1e9} suffix="B" />
-      <NumberField label="Research" value={faction.research} onCommit={(v) => edit((f) => void (f.research = v))} min={0} />
-      <NumberField label="Legitimacy" value={faction.legitimacy} onCommit={(v) => edit((f) => void (f.legitimacy = v))} min={0} />
-      <NumberField label="Equipment" value={faction.equipment} onCommit={(v) => edit((f) => void (f.equipment = Math.round(v)))} min={0} />
-      <NumberField label="Manpower" value={faction.manpower} onCommit={(v) => edit((f) => void (f.manpower = Math.round(v)))} min={0} />
+      <NumberField
+        label="Money"
+        value={faction.money}
+        onCommit={(v) => edit((f) => void (f.money = v))}
+        scale={1e9}
+        suffix="B"
+      />
+      <NumberField
+        label="Research"
+        value={faction.research}
+        onCommit={(v) => edit((f) => void (f.research = v))}
+        min={0}
+      />
+      <NumberField
+        label="Legitimacy"
+        value={faction.legitimacy}
+        onCommit={(v) => edit((f) => void (f.legitimacy = v))}
+        min={0}
+      />
+      <NumberField
+        label="Equipment"
+        value={faction.equipment}
+        onCommit={(v) => edit((f) => void (f.equipment = Math.round(v)))}
+        min={0}
+      />
+      <NumberField
+        label="Manpower"
+        value={faction.manpower}
+        onCommit={(v) => edit((f) => void (f.manpower = Math.round(v)))}
+        min={0}
+      />
       <SelectField<Focus>
         label="Focus"
         value={faction.focus}
@@ -203,7 +266,12 @@ function MaritimeRegionFields({ region }: { region: Region }) {
   const mutate = useGameStore((s) => s.mutate)
   return (
     <Section title={`Region — ${region.name}`}>
-      <NumberField label="Energy reserve" value={region.energyReserve} onCommit={(v) => mutate((d) => void (d.regions[region.id].energyReserve = v))} min={0} />
+      <NumberField
+        label="Energy reserve"
+        value={region.energyReserve}
+        onCommit={(v) => mutate((d) => void (d.regions[region.id].energyReserve = v))}
+        min={0}
+      />
       <WeatherToggle region={region} />
     </Section>
   )
@@ -239,17 +307,45 @@ function LandRegionFields({ region }: { region: LandRegion }) {
         onChange={(v) => edit((r) => void (r.controller = v === 'none' ? null : (v as FactionId)))}
       />
       <TextField label="Country" value={region.country} onCommit={(v) => edit((r) => void (r.country = v))} />
-      <NumberField label="Population" value={region.population} onCommit={(v) => edit((r) => void (r.population = Math.round(v)))} min={0} scale={1e6} suffix="M" />
-      <NumberField label="GDP" value={region.gdp} onCommit={(v) => edit((r) => void (r.gdp = v))} min={0} scale={1e9} suffix="B" />
-      <NumberField label="Stability" value={region.stability} onCommit={(v) => edit((r) => void (r.stability = v))} min={0} max={100} step={0.1} />
-      <NumberField label="Energy reserve" value={region.energyReserve} onCommit={(v) => edit((r) => void (r.energyReserve = v))} min={0} />
+      <NumberField
+        label="Population"
+        value={region.population}
+        onCommit={(v) => edit((r) => void (r.population = Math.round(v)))}
+        min={0}
+        scale={1e6}
+        suffix="M"
+      />
+      <NumberField
+        label="GDP"
+        value={region.gdp}
+        onCommit={(v) => edit((r) => void (r.gdp = v))}
+        min={0}
+        scale={1e9}
+        suffix="B"
+      />
+      <NumberField
+        label="Stability"
+        value={region.stability}
+        onCommit={(v) => edit((r) => void (r.stability = v))}
+        min={0}
+        max={100}
+        step={0.1}
+      />
+      <NumberField
+        label="Energy reserve"
+        value={region.energyReserve}
+        onCommit={(v) => edit((r) => void (r.energyReserve = v))}
+        min={0}
+      />
       <WeatherToggle region={region} />
       {TRAITS.map((t) => (
         <Toggle
           key={t}
           label={`Trait: ${t}`}
           value={region.traits.includes(t)}
-          onChange={(v) => edit((r) => void (r.traits = v ? [...r.traits.filter((x) => x !== t), t] : r.traits.filter((x) => x !== t)))}
+          onChange={(v) =>
+            edit((r) => void (r.traits = v ? [...r.traits.filter((x) => x !== t), t] : r.traits.filter((x) => x !== t)))
+          }
         />
       ))}
 

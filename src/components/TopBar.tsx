@@ -42,7 +42,9 @@ export function TopBar() {
             onClick={cycleFocus}
             title={`Equipment ${formatInt(allocation.equipment)} · Manpower ${formatInt(allocation.manpower)} · Construction ${formatInt(allocation.construction)}. Click to change focus.`}
             className={`rounded border px-2 py-0.5 text-[11px] tracking-[0.15em] uppercase ${
-              allocation.warning ? 'border-warn text-warn' : 'border-ink-600 text-ink-200 hover:border-signal-dim hover:text-signal'
+              allocation.warning
+                ? 'border-warn text-warn'
+                : 'border-ink-600 text-ink-200 hover:border-signal-dim hover:text-signal'
             }`}
           >
             {FOCUS_LABEL[faction.focus]}

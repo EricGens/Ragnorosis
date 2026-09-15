@@ -13,5 +13,9 @@ export function computePulseSnapshot(state: GameState): PulseSnapshot {
 /** A region's Production this pulse, using the pulse-start Energy and Weather snapshot. */
 export function productionFor(state: GameState, region: LandRegion): ProductionBreakdown {
   const energy = state.pulse.energy[region.id]
-  return regionProduction(region, energy ? energy.fulfillment : 1, state.pulse.weather[region.id] ?? region.weatherActive)
+  return regionProduction(
+    region,
+    energy ? energy.fulfillment : 1,
+    state.pulse.weather[region.id] ?? region.weatherActive,
+  )
 }

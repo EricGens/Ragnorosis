@@ -51,7 +51,12 @@ export function RegionPanel({
             </div>
           </div>
           {pinned ? (
-            <button type="button" onClick={onClose} aria-label="Unpin panel" className="text-ink-400 hover:text-ink-100">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Unpin panel"
+              className="text-ink-400 hover:text-ink-100"
+            >
               ×
             </button>
           ) : (

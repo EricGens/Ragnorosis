@@ -33,7 +33,11 @@ describe('findOpenSpace', () => {
     const third = findOpenSpace([at(first.x, first.y), at(second.x, second.y)], WINDOW_SIZE, area)
     expect(third).toEqual({ x: MARGIN, y: MARGIN + 2 * (WINDOW_SIZE.height + MARGIN) })
     // A 4th no longer fits in the first column (3 × 196 + 16 > 600), so it moves right.
-    const fourth = findOpenSpace([first, second, third].map((p) => at(p.x, p.y)), WINDOW_SIZE, area)
+    const fourth = findOpenSpace(
+      [first, second, third].map((p) => at(p.x, p.y)),
+      WINDOW_SIZE,
+      area,
+    )
     expect(fourth).toEqual({ x: MARGIN + WINDOW_SIZE.width + MARGIN, y: MARGIN })
   })
 

@@ -15,13 +15,15 @@ export const BUILDINGS: Record<BuildingType, BuildingDef> = {
     id: 'fossil-fuel-plant',
     name: 'Fossil Fuel Plant',
     baseCost: 1000,
-    description: 'Converts Energy into Production: 100 per level, consuming 100 Energy per level. Output is curtailed 1:1 by any Energy shortfall.',
+    description:
+      'Converts Energy into Production: 100 per level, consuming 100 Energy per level. Output is curtailed 1:1 by any Energy shortfall.',
   },
   'renewable-plant': {
     id: 'renewable-plant',
     name: 'Renewable Plant',
     baseCost: 1700,
-    description: 'Self-contained Production: 100 per level, halved while Weather is active. Needs no Energy and is immune to blockade.',
+    description:
+      'Self-contained Production: 100 per level, halved while Weather is active. Needs no Energy and is immune to blockade.',
   },
   'production-facility': {
     id: 'production-facility',

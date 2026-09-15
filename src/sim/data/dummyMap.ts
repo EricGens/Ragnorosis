@@ -12,7 +12,8 @@ export interface MapDefinition {
 }
 
 /** Where a region sits on the rendered map. Land regions occupy grid cells; maritime regions wrap a corner. */
-export type MapLayout = { kind: 'grid'; col: number; row: number } | { kind: 'corner'; corner: 'nw' | 'ne' | 'sw' | 'se' }
+export type MapLayout =
+  { kind: 'grid'; col: number; row: number } | { kind: 'corner'; corner: 'nw' | 'ne' | 'sw' | 'se' }
 
 const DEFAULT_POPULARITY = 75
 

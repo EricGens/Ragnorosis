@@ -23,7 +23,11 @@ export function fossilEnergyDemand(region: LandRegion): number {
  * Region Production per Pulse, computed fresh. `energyFulfillment` is the fraction of Fossil demand
  * actually delivered this Pulse (0–1); `weatherActive` is the pulse-start snapshot.
  */
-export function regionProduction(region: LandRegion, energyFulfillment = 1, weatherActive = region.weatherActive): ProductionBreakdown {
+export function regionProduction(
+  region: LandRegion,
+  energyFulfillment = 1,
+  weatherActive = region.weatherActive,
+): ProductionBreakdown {
   const population = Math.floor(region.population / POPULATION_PER_PRODUCTION)
   const fossil = (region.buildings['fossil-fuel-plant'] ?? 0) * PLANT_OUTPUT_PER_LEVEL * energyFulfillment
   const renewable =

@@ -114,6 +114,11 @@ export function sameModules(a: ModuleId[], b: ModuleId[]): boolean {
 }
 
 /** An existing design with the same platform and module multiset, if any. */
-export function findDuplicate(designs: UnitDesign[], platform: PlatformId, modules: ModuleId[], exceptId?: number): UnitDesign | undefined {
+export function findDuplicate(
+  designs: UnitDesign[],
+  platform: PlatformId,
+  modules: ModuleId[],
+  exceptId?: number,
+): UnitDesign | undefined {
   return designs.find((d) => d.id !== exceptId && d.platform === platform && sameModules(d.modules, modules))
 }

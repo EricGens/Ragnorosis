@@ -68,7 +68,13 @@ function completeLevel(state: GameState, faction: FactionId, p: ConstructionProj
   const f = state.factions[faction]
   const region = state.regions[p.regionId] as LandRegion
   region.buildings[p.building] = p.level
-  state.interrupts.push({ kind: 'construction-complete', faction, regionId: p.regionId, building: p.building, level: p.level })
+  state.interrupts.push({
+    kind: 'construction-complete',
+    faction,
+    regionId: p.regionId,
+    building: p.building,
+    level: p.level,
+  })
   log(state, 'construction', `${BUILDINGS[p.building].name} level ${p.level} completed in ${region.name}`)
 
   const excess = p.progress - p.cost
@@ -101,14 +107,22 @@ export function creditPulseOutputs(state: GameState): void {
     }
 
     if (equipmentPoints > 0) {
-      const r = convertWithRemainder(equipmentPoints, factionFacilityMultiplier(state, id, 'production-facility'), f.equipmentRemainder)
+      const r = convertWithRemainder(
+        equipmentPoints,
+        factionFacilityMultiplier(state, id, 'production-facility'),
+        f.equipmentRemainder,
+      )
       f.equipment += r.units
       f.equipmentRemainder = r.remainder
       if (r.units > 0) log(state, 'economy', `${id} produces ${formatInt(r.units)} Small Arms`)
     }
 
     if (manpowerPoints > 0) {
-      const r = convertWithRemainder(manpowerPoints, factionFacilityMultiplier(state, id, 'training-facility'), f.manpowerRemainder)
+      const r = convertWithRemainder(
+        manpowerPoints,
+        factionFacilityMultiplier(state, id, 'training-facility'),
+        f.manpowerRemainder,
+      )
       const room = Math.max(0, manpowerCap(state, id) - f.manpower)
       const trained = Math.min(r.units, room)
       f.manpower += trained

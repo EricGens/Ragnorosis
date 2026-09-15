@@ -26,7 +26,11 @@ export function HoverHintWindow() {
     const area = gameArea()
     const width = ref.current.offsetWidth
     const height = ref.current.offsetHeight
-    const x = clamp(hint.anchor.x + hint.anchor.width / 2 - width / 2, MARGIN, Math.max(MARGIN, area.width - width - MARGIN))
+    const x = clamp(
+      hint.anchor.x + hint.anchor.width / 2 - width / 2,
+      MARGIN,
+      Math.max(MARGIN, area.width - width - MARGIN),
+    )
     const above = hint.anchor.y - height - 8
     const y = above >= MARGIN ? above : hint.anchor.y + hint.anchor.height + 8
     setPos({ x, y })

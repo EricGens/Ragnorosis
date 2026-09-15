@@ -104,14 +104,19 @@ function OccupiedSquare({ square, canBuild, onUpgrade }: { square: Square; canBu
       <span className="text-[11px] text-ink-200">L{square.level}</span>
       {p && (
         <div className="absolute inset-x-1 bottom-1 h-1 rounded bg-ink-700" aria-label="construction progress">
-          <div className="h-full rounded bg-signal" style={{ width: `${Math.min(100, (p.progress / p.cost) * 100)}%` }} />
+          <div
+            className="h-full rounded bg-signal"
+            style={{ width: `${Math.min(100, (p.progress / p.cost) * 100)}%` }}
+          />
         </div>
       )}
       {p && p.queuedLevels > 0 && (
         <span className="absolute top-0.5 right-1 text-[9px] text-ink-400">+{p.queuedLevels}</span>
       )}
       {hover && upgradable && (
-        <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">+</span>
+        <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">
+          +
+        </span>
       )}
     </button>
   )
@@ -143,7 +148,9 @@ function EmptySquare({ buildable, onClick }: { buildable: boolean; onClick: () =
       aria-label={buildable ? 'New Building' : 'Empty square'}
     >
       {hover && buildable && (
-        <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">+</span>
+        <span className="absolute inset-0 flex items-center justify-center rounded bg-signal/15 text-2xl text-signal/80">
+          +
+        </span>
       )}
     </button>
   )

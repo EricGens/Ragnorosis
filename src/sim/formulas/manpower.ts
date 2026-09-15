@@ -5,7 +5,9 @@ import { isLand } from '../types'
 export const MANPOWER_CAP_FRACTION = 0.02
 
 export function controlledRegions(state: GameState, faction: FactionId): LandRegion[] {
-  return state.regionOrder.map((id) => state.regions[id]).filter((r): r is LandRegion => isLand(r) && r.controller === faction)
+  return state.regionOrder
+    .map((id) => state.regions[id])
+    .filter((r): r is LandRegion => isLand(r) && r.controller === faction)
 }
 
 export function controlledPopulation(state: GameState, faction: FactionId): number {

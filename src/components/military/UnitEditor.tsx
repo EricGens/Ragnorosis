@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatInt } from '../../sim/format'
 import { autoName, designProblems, designStats, findDuplicate } from '../../sim/military/design'
-import { PLATFORMS, PLATFORM_IDS, VECTOR_COLUMNS, type ModuleDef, type ModuleId, type PlatformId, type SlotKind } from '../../sim/military/platforms'
+import {
+  PLATFORMS,
+  PLATFORM_IDS,
+  VECTOR_COLUMNS,
+  type ModuleDef,
+  type ModuleId,
+  type PlatformId,
+  type SlotKind,
+} from '../../sim/military/platforms'
 import { useGameStore } from '../../store/gameStore'
 import { useUIStore } from '../../store/uiStore'
 
@@ -27,7 +35,10 @@ function initialModules(platform: PlatformId): ModuleId[] {
   return out
 }
 
-function draftFor(designId: number | null, designs: { id: number; name: string; platform: PlatformId; modules: string[] }[]): Draft {
+function draftFor(
+  designId: number | null,
+  designs: { id: number; name: string; platform: PlatformId; modules: string[] }[],
+): Draft {
   const existing = designId === null ? undefined : designs.find((d) => d.id === designId)
   if (existing) {
     return {
@@ -88,10 +99,13 @@ export function UnitEditor() {
     setDraft((d) => ({ ...d, modules, name: d.nameEdited ? d.name : autoName(d.platform, modules) }))
 
   /** Modules equipped in a given slot kind, in equip order. */
-  const inSlot = (slot: SlotKind) => draft.modules.filter((id) => platform.modules.find((m) => m.id === id)?.slot === slot)
+  const inSlot = (slot: SlotKind) =>
+    draft.modules.filter((id) => platform.modules.find((m) => m.id === id)?.slot === slot)
 
   const optionsFor = (slot: SlotKind): ModuleDef[] =>
-    platform.modules.filter((m) => m.slot === slot && (platform.weaponDuplicates && slot === 'weapon' ? true : !draft.modules.includes(m.id)))
+    platform.modules.filter(
+      (m) => m.slot === slot && (platform.weaponDuplicates && slot === 'weapon' ? true : !draft.modules.includes(m.id)),
+    )
 
   const equip = (id: ModuleId) => {
     setModules([...draft.modules, id])
@@ -122,7 +136,12 @@ export function UnitEditor() {
       })
       return
     }
-    const r = save({ id: draft.designId ?? undefined, name: draft.name, platform: draft.platform, modules: draft.modules })
+    const r = save({
+      id: draft.designId ?? undefined,
+      name: draft.name,
+      platform: draft.platform,
+      modules: draft.modules,
+    })
     if (!r.ok) setNotice(r.reason)
     else openOn(r.id)
   }
@@ -233,7 +252,9 @@ export function UnitEditor() {
                           </button>
                           {isPicking && (
                             <ul className="absolute top-full left-0 z-10 mt-1 w-56 rounded border border-ink-600 bg-ink-900 p-1 shadow-xl">
-                              {optionsFor(slot).length === 0 && <li className="px-2 py-1 text-[11px] text-ink-400">Nothing available</li>}
+                              {optionsFor(slot).length === 0 && (
+                                <li className="px-2 py-1 text-[11px] text-ink-400">Nothing available</li>
+                              )}
                               {optionsFor(slot).map((m) => (
                                 <li key={m.id}>
                                   <button
@@ -264,7 +285,11 @@ export function UnitEditor() {
           <div className="flex items-center justify-between gap-3 rounded border border-warn/60 bg-ink-950 px-3 py-2 text-xs text-ink-100">
             <span>{confirm.message}</span>
             <span className="flex gap-2">
-              <button type="button" onClick={() => setConfirm(null)} className="rounded border border-ink-600 px-2 py-0.5 text-[10px] tracking-[0.15em] text-ink-200 uppercase">
+              <button
+                type="button"
+                onClick={() => setConfirm(null)}
+                className="rounded border border-ink-600 px-2 py-0.5 text-[10px] tracking-[0.15em] text-ink-200 uppercase"
+              >
                 Cancel
               </button>
               <button
@@ -324,7 +349,9 @@ function StatsPanel({ stats }: { stats: ReturnType<typeof designStats> }) {
         {VECTOR_COLUMNS.map((col, i) => (
           <Row key={col} label={`vs ${col}`} value={vec(i)} />
         ))}
-        <p className="mt-1 text-[10px] text-ink-400">{stats.standoffCapable ? 'Standoff-capable — eligible for Deep Strike.' : 'No standoff capability.'}</p>
+        <p className="mt-1 text-[10px] text-ink-400">
+          {stats.standoffCapable ? 'Standoff-capable — eligible for Deep Strike.' : 'No standoff capability.'}
+        </p>
       </div>
       <Row label="Piercing" value={`${stats.piercing}`} />
       <Row label="Damage" value={`${stats.damage}`} />

@@ -10,7 +10,12 @@ export const MAX_ACTIVE_PROJECTS = 4
 
 export type QueueResult = { ok: true } | { ok: false; reason: string }
 
-export function findProject(state: GameState, faction: FactionId, regionId: RegionId, building: BuildingType): ConstructionProject | undefined {
+export function findProject(
+  state: GameState,
+  faction: FactionId,
+  regionId: RegionId,
+  building: BuildingType,
+): ConstructionProject | undefined {
   return state.factions[faction].projects.find((p) => p.regionId === regionId && p.building === building)
 }
 
@@ -23,7 +28,12 @@ export function availableBuildings(state: GameState, faction: FactionId, regionI
   )
 }
 
-export function canQueueBuild(state: GameState, faction: FactionId, regionId: RegionId, building: BuildingType): QueueResult {
+export function canQueueBuild(
+  state: GameState,
+  faction: FactionId,
+  regionId: RegionId,
+  building: BuildingType,
+): QueueResult {
   const region = state.regions[regionId]
   if (!isLand(region)) return { ok: false, reason: 'Buildings can only be placed in land regions.' }
   if (region.controller !== faction) return { ok: false, reason: 'You do not control this region.' }
@@ -42,7 +52,12 @@ export function canQueueBuild(state: GameState, faction: FactionId, regionId: Re
 }
 
 /** Queue a new building or the next level of an existing one. Call on an Immer draft. */
-export function queueBuild(state: GameState, faction: FactionId, regionId: RegionId, building: BuildingType): QueueResult {
+export function queueBuild(
+  state: GameState,
+  faction: FactionId,
+  regionId: RegionId,
+  building: BuildingType,
+): QueueResult {
   const check = canQueueBuild(state, faction, regionId, building)
   if (!check.ok) return check
 

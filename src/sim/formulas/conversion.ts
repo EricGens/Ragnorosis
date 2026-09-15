@@ -33,7 +33,11 @@ export function factionFacilityMultiplier(
 }
 
 /** Floor to whole units, carrying the fraction forward. */
-export function convertWithRemainder(points: number, multiplier: number, remainder: number): { units: number; remainder: number } {
+export function convertWithRemainder(
+  points: number,
+  multiplier: number,
+  remainder: number,
+): { units: number; remainder: number } {
   const raw = points * multiplier + remainder
   const units = Math.floor(raw + 1e-9)
   return { units, remainder: raw - units }

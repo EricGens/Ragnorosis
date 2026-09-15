@@ -68,9 +68,15 @@ describe('advancePulse', () => {
     // so check per-capita on a region with no immigration partners: E Land vs its C/NE/SE neighbors
     // all differ — use the aggregate instead.
     const totalPop = (s: typeof s0) =>
-      s.regionOrder.reduce((sum, id) => (s.regions[id].type === 'land' ? sum + (s.regions[id] as LandRegion).population : sum), 0)
+      s.regionOrder.reduce(
+        (sum, id) => (s.regions[id].type === 'land' ? sum + (s.regions[id] as LandRegion).population : sum),
+        0,
+      )
     const totalGdp = (s: typeof s0) =>
-      s.regionOrder.reduce((sum, id) => (s.regions[id].type === 'land' ? sum + (s.regions[id] as LandRegion).gdp : sum), 0)
+      s.regionOrder.reduce(
+        (sum, id) => (s.regions[id].type === 'land' ? sum + (s.regions[id] as LandRegion).gdp : sum),
+        0,
+      )
     // Growth and immigration preserve per-capita exactly; Manpower training removes a few thousand
     // people without moving GDP, so allow a small upward drift.
     const pcBefore = totalGdp(s0) / totalPop(s0)
