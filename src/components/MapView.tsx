@@ -64,7 +64,9 @@ export function MapView() {
   const regionOrder = useGameStore((s) => s.game.regionOrder)
   const regions = useGameStore((s) => s.game.regions)
   const taskForces = useGameStore((s) => s.game.taskForces)
+  const battles = useGameStore((s) => s.game.battles)
   const distances = useGameStore((s) => s.game.distances)
+  const openBattleLogs = useUIStore((s) => s.openBattleLogs)
   const activeFaction = useGameStore((s) => s.activeFaction)
   const orderMove = useGameStore((s) => s.orderMove)
   const hovered = useUIStore((s) => s.hovered)
@@ -237,6 +239,41 @@ export function MapView() {
           />
         ) : null
       })}
+      {battles
+        .filter((b) => b.endedAt === null)
+        .map((b) => {
+          const c = centers[b.regionId]
+          return (
+            <g
+              key={`battle-${b.id}`}
+              className="cursor-pointer"
+              data-battle={b.id}
+              transform={`translate(${c.cx} ${c.cy - 62})`}
+              onClick={(e) => {
+                e.stopPropagation()
+                openBattleLogs(b.id)
+              }}
+            >
+              <title>Battle — click for the live log</title>
+              <circle
+                r={18}
+                fill="var(--color-ink-950)"
+                fillOpacity={0.85}
+                stroke="var(--color-alert)"
+                strokeWidth={2}
+              />
+              <text
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={20}
+                fill="var(--color-alert)"
+                pointerEvents="none"
+              >
+                ⚔
+              </text>
+            </g>
+          )
+        })}
       {flash && (
         <g key={flash.key} pointerEvents="none" className="animate-pulse" data-order-flash={flash.reason}>
           <line

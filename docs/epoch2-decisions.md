@@ -137,6 +137,44 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   the dummy map; to be revisited once combat testing gives a feel for pacing. Speeds are platform data,
   so it's a numbers change.
 
+## Front Line combat & transit combat (skeleton §4.6, §5.1; slice 4)
+
+- **One attacker vs one defender per battle.** A second hostile Task Force in the destination is fought
+  in a fresh battle (its own log) once the first ends; a second attacker against a defender already
+  fighting waits at the border. "Attacked while attacking" penalties are deferred, as the skeleton says.
+- **A battle starts the first tick a leg advances toward a region a hostile Task Force is in**, and the
+  first round resolves that same tick. The transit clock runs at Combat Speed for an invasion leg even
+  into ground we control (§4.6 defines it as distance ÷ Combat Speed) and waits at the far end for the
+  fight; the pathfinder treats a defended intermediate region as 3× slower so it only fights when told to.
+- **The roll is one partitioned d100** per pair: [0, attacker %) attacker hits, then defender %, remainder
+  push. A side with no relevant vector value is excluded but the other side's gap still counts (0 vs 5
+  → defender 10%).
+- **Manpower fill scales a unit linearly** (§3.10): vector, damage and its Organization contribution all
+  multiply by `manpower ÷ (equipment × per-unit Manpower)`. A destroyed unit takes that share of Manpower
+  as casualties and one Equipment.
+- **Organization is stored as a deficit** (`organizationLost`) against the computed maximum, so units that
+  arrive from the pipeline come organized, a destroyed unit shrinks the maximum (its contribution leaves
+  with it, not double-counted), and a unit pushed to Reserves adds its contribution to the deficit.
+- **Both sides breaking on the same tick: the defender holds.**
+- **Shock speed source:** the average Combat Speed of the attacker's *initial* Front Line, per the GDD; if
+  the line plan is empty (the force relies on reinforcement rolls) the average is over every unit in the
+  force instead, and a force with no units gets no Shock. Found live: an empty initial line produced a
+  ×0 multiplier that muted the attacker's rolls entirely.
+- **Beaten defender retreat target:** adjacent land it can enter (permissive, no hostile Task Force), own
+  territory first, then Friendly, then anything else; it relocates immediately, at zero Organization. The
+  GDD's "retreat into neutral territory" decision node (harm relations / buy off / seize) waits for the
+  diplomacy epoch. No option → surrender: the Task Force is eliminated and the victor converts 25% of its
+  surviving Equipment (floored, per SKU) into matching designs.
+- **Attacker beaten or withdrawing** (a plain redirect, halt, or any order that drops the contested leg)
+  walks the transit clock's progress back at Combat Speed — the existing backtrack, with the gray arrow.
+- **Consolidation lock** is set on capture and lifts when the deficit is 0 and Stability ≥ 50. Note the
+  Stability anchor can sit below 50 (C Land's does), in which case the lock never lifts on its own until
+  the force-occupation mechanics (suppress dissent) exist; devtools can edit Stability meanwhile.
+- **Planning clears at pulse end** if the whole pulse (168 ticks) saw no invasion combat for that Task
+  Force; the tick a battle starts or runs counts, on both sides.
+- **Battle Logs:** every battle stays on `GameState.battles`; the browser lists live ones first and values
+  losses at today's costs when opened (§6). The crossed-swords map indicator opens the live log.
+
 ## Combat rulings ahead of the combat slice (Eric, 2026-09-15)
 
 - **Organization regeneration out of contact: 0.5% of max per tick** (a worn-down Task Force takes about a

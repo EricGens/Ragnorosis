@@ -84,25 +84,23 @@ describe('pathing (§4.2)', () => {
     expect(etaTicks(s2, tf(s2))).toBe(140)
   })
 
-  it('refuses the sea, a defended region, and appends shift-click legs by pathing from the last leg', () => {
-    const s = produce(base, (d) => {
-      createTaskForce(d, 'china', 'e-land')
-      setTarget(d, 2, 1, 1) // China has no designs → nothing; give it one
-    })
-    const withDefender = produce(hostile(s, 'china'), (d) => {
+  it('refuses the sea, routes around a defended region, and appends shift-click legs from the last leg', () => {
+    const withDefender = produce(hostile(base, 'china'), (d) => {
       saveDesign(d, 'china', { name: 'Light Infantry', platform: 'infantry', modules: ['inf-small-arms-1'] })
+      createTaskForce(d, 'china', 'e-land')
       setTarget(d, 2, 1, 1)
     })
     produce(withDefender, (d) => {
       expect(orderMove(d, 1, 'nw-maritime')).toEqual({ ok: false, reason: "Land forces can't put to sea yet." })
-      expect(orderMove(d, 1, 'e-land')).toMatchObject({ ok: false, reason: expect.stringContaining('Defended') })
       expect(orderMove(d, 1, 'n-land')).toEqual({ ok: true })
       expect(orderMove(d, 1, 'ne-land', true)).toEqual({ ok: true })
       expect(d.taskForces[0].movement?.legs).toEqual(['n-land', 'ne-land'])
-      // Non-adjacent append paths from the last leg; E Land is defended so SE Land is reached around it.
+      // Non-adjacent append paths from the last leg; E Land is defended so the router goes around it.
       expect(orderMove(d, 1, 'se-land', true)).toEqual({ ok: true })
       expect(d.taskForces[0].movement?.legs.slice(0, 2)).toEqual(['n-land', 'ne-land'])
       expect(d.taskForces[0].movement?.legs).not.toContain('e-land')
+      // Ordering *into* the defended region itself is an invasion, and allowed.
+      expect(orderMove(d, 1, 'e-land')).toEqual({ ok: true })
     })
   })
 })
@@ -143,7 +141,7 @@ describe('redirect cost (§4.4)', () => {
 })
 
 describe('tick step', () => {
-  it('holds a leg whose destination a hostile Task Force reached first', () => {
+  it('starts an invasion when the leg advances toward a defended region, transit clock still running', () => {
     const s = produce(hostile(base, 'china'), (d) => {
       saveDesign(d, 'china', { name: 'Light Infantry', platform: 'infantry', modules: ['inf-small-arms-1'] })
       createTaskForce(d, 'china', 'e-land')
@@ -152,6 +150,12 @@ describe('tick step', () => {
       d.taskForces[1].regionId = 'n-land' // teleported in ahead of us
       moveTaskForces(d)
     })
-    expect(tf(s).movement?.progress).toBe(0)
+    expect(tf(s).movement?.progress).toBe(5) // an invasion leg runs at Combat Speed even into our own N Land
+    expect(s.battles).toHaveLength(1)
+    expect(s.battles[0]).toMatchObject({
+      regionId: 'n-land',
+      attacker: { taskForceId: 1 },
+      defender: { taskForceId: 2 },
+    })
   })
 })

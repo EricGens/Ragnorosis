@@ -7,6 +7,7 @@ import { log } from '../log'
 import { factionRelation, pairKey } from '../relations'
 import type { FactionId, GameState, LandRegion, Region, RegionId, TaskForce } from '../types'
 import { isLand } from '../types'
+import { battleFor, startBattle } from './battle'
 import { designStats } from './design'
 import { findDesign, findTaskForce } from './taskForce'
 
@@ -40,18 +41,24 @@ export function hostileTaskForceIn(state: GameState, faction: FactionId, regionI
   )
 }
 
-/** Miles per tick while entering `region` (§4.5: the *entered* region's permissiveness decides). */
+/**
+ * Miles per tick while entering `region` (§4.5: the *entered* region's permissiveness decides). An
+ * invasion leg — a hostile Task Force is in the region — always runs the transit clock at Combat
+ * Speed (§4.6), whoever controls the ground.
+ */
 export function legRate(state: GameState, tf: TaskForce, region: Region, speed: { combat: number; transit: number }) {
+  if (hostileTaskForceIn(state, tf.faction, region.id)) return speed.combat
   return isPermissive(state, tf.faction, region) ? speed.transit : speed.combat
 }
 
-/** Why a Task Force can't be sent into a region, if anything. */
-export function enterProblem(state: GameState, tf: TaskForce, region: Region): string | null {
+/** Why a Task Force can't be sent into a region, if anything. Entering a defended region is invasion (§6). */
+export function enterProblem(_state: GameState, _tf: TaskForce, region: Region): string | null {
   if (!isLand(region)) return "Land forces can't put to sea yet."
-  if (hostileTaskForceIn(state, tf.faction, region.id))
-    return 'Defended by a hostile Task Force — invasion arrives with combat.'
   return null
 }
+
+/** Pathing treats a defended region as this many times slower, so the router only fights when asked to. */
+const DEFENDED_PATH_PENALTY = 3
 
 /** Shortest path by time-distance over enterable land regions (§4.2); excludes `from`, includes `to`. */
 export function findPath(state: GameState, tf: TaskForce, from: RegionId, to: RegionId): RegionId[] | null {
@@ -70,7 +77,9 @@ export function findPath(state: GameState, tf: TaskForce, from: RegionId, to: Re
     for (const next of state.adjacency[current]) {
       const region = state.regions[next]
       if (done.has(next) || enterProblem(state, tf, region)) continue
-      const t = time.get(current)! + distanceBetween(state, current, next) / legRate(state, tf, region, speed)
+      const penalty = next !== to && hostileTaskForceIn(state, tf.faction, next) ? DEFENDED_PATH_PENALTY : 1
+      const t =
+        time.get(current)! + (penalty * distanceBetween(state, current, next)) / legRate(state, tf, region, speed)
       if (t < (time.get(next) ?? Infinity)) {
         time.set(next, t)
         prev.set(next, current)
@@ -91,6 +100,7 @@ export function orderMove(state: GameState, tfId: number, destination: RegionId,
   const tf = findTaskForce(state, tfId)
   if (!tf) return { ok: false, reason: 'That Task Force no longer exists.' }
   if (!taskForceSpeed(state, tf)) return { ok: false, reason: 'Nothing to move — add units first.' }
+  if (tf.consolidating) return { ok: false, reason: 'Consolidating — needs full Organization and Stability ≥ 50.' }
   const region = state.regions[destination]
   if (!region) return { ok: false, reason: 'No such region.' }
   const problem = destination === tf.regionId ? null : enterProblem(state, tf, region)
@@ -161,10 +171,16 @@ export function moveTaskForces(state: GameState): void {
     }
     const dest = m.legs[0]
     const region = state.regions[dest]
-    // A hostile Task Force that arrived first blocks the leg: the invasion mechanics live in the combat slice.
-    if (hostileTaskForceIn(state, tf.faction, dest)) continue
+    const distance = distanceBetween(state, tf.regionId, dest)
+    const defender = hostileTaskForceIn(state, tf.faction, dest)
+    if (defender) {
+      // Invasion (§4.6): the transit clock runs alongside the fight and waits at the far end for it.
+      m.progress = Math.min(distance, m.progress + legRate(state, tf, region, speed))
+      if (!battleFor(state, tf.id) && !battleFor(state, defender.id)) startBattle(state, tf, defender)
+      continue
+    }
     m.progress += legRate(state, tf, region, speed)
-    if (m.progress + 1e-9 >= distanceBetween(state, tf.regionId, dest)) {
+    if (m.progress + 1e-9 >= distance) {
       arrive(state, tf, region)
       m.legs.shift()
       m.progress = 0
@@ -184,6 +200,9 @@ function capture(state: GameState, tf: TaskForce, region: LandRegion): void {
   const previous = region.controller
   region.controller = tf.faction
   region.stability = Math.max(0, region.stability - CAPTURE_STABILITY_HIT)
+  // Consolidation lock (GDD §8.6.7): no further orders until Organization is full and Stability ≥ 50.
+  tf.consolidating = true
+  if (tf.movement && tf.movement.legs.length > 1) tf.movement.legs = tf.movement.legs.slice(0, 1)
   log(
     state,
     'military',

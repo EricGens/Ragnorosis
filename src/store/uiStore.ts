@@ -54,6 +54,8 @@ interface UIStore {
   unitEditor: { open: boolean; designId: number | null }
   /** Task Force Editor: closed, or open on a Task Force id. */
   taskForceEditor: { open: boolean; id: number | null }
+  /** Battle Logs browser: closed, or open (optionally focused on one battle). */
+  battleLogs: { open: boolean; battleId: number | null }
 
   openSelector: (regionId: string) => void
   closeSelector: () => void
@@ -63,6 +65,8 @@ interface UIStore {
   closeUnitEditor: () => void
   openTaskForceEditor: (id: number) => void
   closeTaskForceEditor: () => void
+  openBattleLogs: (battleId?: number | null) => void
+  closeBattleLogs: () => void
   setHovered: (ref: EntityRef | null) => void
   /** Left-click: pin this entity, or unpin it if it is already pinned. */
   togglePin: (ref: EntityRef) => void
@@ -92,6 +96,7 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   devtoolsOpen: false,
   unitEditor: { open: false, designId: null },
   taskForceEditor: { open: false, id: null },
+  battleLogs: { open: false, battleId: null },
 
   openSelector: (regionId) => set({ selectorRegion: regionId }),
   closeSelector: () => set({ selectorRegion: null }),
@@ -101,6 +106,8 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   closeUnitEditor: () => set({ unitEditor: { open: false, designId: null } }),
   openTaskForceEditor: (id) => set({ taskForceEditor: { open: true, id } }),
   closeTaskForceEditor: () => set({ taskForceEditor: { open: false, id: null } }),
+  openBattleLogs: (battleId = null) => set({ battleLogs: { open: true, battleId } }),
+  closeBattleLogs: () => set({ battleLogs: { open: false, battleId: null } }),
 
   setHovered: (ref) => set({ hovered: ref }),
 

@@ -309,6 +309,20 @@ function TaskForceSection() {
           />
           <div className="mt-1 flex flex-wrap gap-2">
             <DevButton onClick={() => mutate((d) => fillTaskForce(d, tf.id))}>Fill to target</DevButton>
+            <DevButton
+              onClick={() =>
+                mutate((d) => {
+                  const t = d.taskForces.find((x) => x.id === tf.id)
+                  if (t) {
+                    t.organizationLost = 0
+                    t.shock = 'ready'
+                    t.consolidating = false
+                  }
+                })
+              }
+            >
+              Restore Org
+            </DevButton>
             <DevButton onClick={() => openTaskForceEditor(tf.id)}>Open editor</DevButton>
             <DevButton onClick={() => mutate((d) => deleteTaskForce(d, tf.id))}>Disband</DevButton>
           </div>

@@ -1,5 +1,7 @@
 import { FACTIONS } from '../../sim/data/factions'
 import { formatInt } from '../../sim/format'
+import { battleFor } from '../../sim/military/battle'
+import { maxOrganization, organization } from '../../sim/military/combat'
 import { etaTicks, taskForceSpeed } from '../../sim/military/movement'
 import { findDesign, unitManpower } from '../../sim/military/taskForce'
 import { pairKey } from '../../sim/relations'
@@ -29,11 +31,17 @@ export function TaskForcePanel({
   const game = useGameStore((s) => s.game)
   const orderMove = useGameStore((s) => s.orderMove)
   const openEditor = useUIStore((s) => s.openTaskForceEditor)
+  const openBattleLogs = useUIStore((s) => s.openBattleLogs)
   const own = tf.faction === perspective
   const region = game.regions[tf.regionId]
   const speed = taskForceSpeed(game, tf)
   const eta = etaTicks(game, tf)
   const m = tf.movement
+  const battle = battleFor(game, tf.id)
+  const orgMax = maxOrganization(game, tf)
+  const org = organization(game, tf)
+  const unitsTarget = tf.composition.reduce((s, l) => s + l.target, 0)
+  const unitsFilled = tf.composition.reduce((s, l) => s + l.equipment, 0)
 
   return (
     <aside
@@ -62,6 +70,32 @@ export function TaskForcePanel({
             </button>
           ) : (
             <span className="text-[10px] tracking-[0.15em] text-ink-400 uppercase">Preview</span>
+          )}
+        </div>
+
+        {/* HOI4-style two-bar readout (GDD §8.6.6.1): green Organization, amber Strength. */}
+        <div className="mb-3 text-xs">
+          <Bar label="Organization" value={org} max={orgMax} color="var(--color-signal)" />
+          <Bar label="Strength" value={unitsFilled} max={unitsTarget} color="var(--color-warn)" />
+          <div className="mt-1 flex justify-between text-[10px] text-ink-400">
+            <span>
+              Shock:{' '}
+              <span className={tf.shock === 'ready' ? 'text-signal' : 'text-ink-200'}>
+                {tf.shock === 'ready' ? 'Ready' : 'Planning'}
+              </span>
+            </span>
+            {tf.consolidating && <span className="text-warn">Consolidating — needs full Org & Stability ≥ 50</span>}
+          </div>
+          {battle && (
+            <button
+              type="button"
+              onClick={() => openBattleLogs(battle.id)}
+              className="mt-1 w-full rounded border border-alert/60 px-2 py-1 text-left text-[11px] text-alert hover:bg-alert/10"
+              data-battle-status
+            >
+              ⚔ {battle.attacker.taskForceId === tf.id ? 'Attacking' : 'Defending'} {game.regions[battle.regionId].name}{' '}
+              vs {battle.attacker.taskForceId === tf.id ? battle.defender.name : battle.attacker.name} — open log
+            </button>
           )}
         </div>
 
@@ -157,5 +191,22 @@ export function TaskForcePanel({
         )}
       </div>
     </aside>
+  )
+}
+
+function Bar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0
+  return (
+    <div className="mb-1" title={`${label} ${Math.round(value)} / ${Math.round(max)}`}>
+      <div className="flex justify-between text-[10px] tracking-[0.15em] text-ink-400 uppercase">
+        <span>{label}</span>
+        <span className="text-ink-200">
+          {Math.round(value)}/{Math.round(max)}
+        </span>
+      </div>
+      <div className="h-1.5 w-full rounded bg-ink-800">
+        <div className="h-full rounded" style={{ width: `${pct}%`, backgroundColor: color }} />
+      </div>
+    </div>
   )
 }

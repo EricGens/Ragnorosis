@@ -79,6 +79,8 @@ export function createInitialState(map: MapDefinition, seed = 1): GameState {
     relations: { factions: {}, countries: {} },
     taskForces: [],
     nextTaskForceId: 1,
+    battles: [],
+    nextBattleId: 1,
     globalTension: 0,
     rngSeed: seed,
     settings: { ...DEFAULT_SETTINGS },

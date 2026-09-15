@@ -41,7 +41,9 @@ export function MilitaryPanel() {
   const open = useUIStore((s) => s.militaryOpen)
   const openUnitEditor = useUIStore((s) => s.openUnitEditor)
   const openTaskForceEditor = useUIStore((s) => s.openTaskForceEditor)
+  const openBattleLogs = useUIStore((s) => s.openBattleLogs)
   const game = useDisplayGame()
+  const liveBattles = game.battles.filter((b) => b.endedAt === null).length
   const activeFaction = useGameStore((s) => s.activeFaction)
   const createTaskForce = useGameStore((s) => s.createTaskForce)
   const [filter, setFilter] = useState('')
@@ -95,13 +97,22 @@ export function MilitaryPanel() {
     >
       <div className="flex items-center justify-between border-b border-ink-700 px-4 py-2">
         <h2 className="text-xs tracking-[0.2em] text-signal uppercase">Military</h2>
-        <button
-          type="button"
-          onClick={() => openUnitEditor(null)}
-          className="rounded border border-signal-dim px-2 py-0.5 text-[10px] tracking-[0.15em] text-signal uppercase hover:bg-signal/10"
-        >
-          Unit editor
-        </button>
+        <span className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => openBattleLogs()}
+            className="rounded border border-ink-600 px-2 py-0.5 text-[10px] tracking-[0.15em] text-ink-200 uppercase hover:border-signal hover:text-signal"
+          >
+            Battle logs{liveBattles > 0 && <span className="ml-1 text-alert">({liveBattles})</span>}
+          </button>
+          <button
+            type="button"
+            onClick={() => openUnitEditor(null)}
+            className="rounded border border-signal-dim px-2 py-0.5 text-[10px] tracking-[0.15em] text-signal uppercase hover:bg-signal/10"
+          >
+            Unit editor
+          </button>
+        </span>
       </div>
 
       <div className="overflow-y-auto p-4">

@@ -159,6 +159,52 @@ export interface TaskForce {
   /** Per role, the design id in each slot (null = empty). */
   lines: Record<LineRole, (number | null)[]>
   movement: Movement | null
+  /**
+   * Organization is tracked as a deficit from the computed maximum (GDD §8.6.6): new units arrive
+   * organized, destroyed units shrink the maximum, retreated-off-the-line units add to the deficit.
+   */
+  organizationLost: number
+  /** Shock availability (GDD §8.6.2): Ready by default; attacking puts a Task Force into Planning. */
+  shock: 'ready' | 'planning'
+  /** Last tick this Task Force was in invasion combat (either side); −1 = never. Clears Planning. */
+  lastInvasionCombatTick: number
+  /** Consolidation lock after a capture (GDD §8.6.7): no orders until Org is full and Stability ≥ 50. */
+  consolidating: boolean
+}
+
+export type BattleOutcome =
+  'attacker-won' | 'defender-won' | 'attacker-withdrew' | 'defender-withdrew' | 'defender-surrendered'
+
+/** One side of a battle: live line state while it runs, and the loss record that outlives it. */
+export interface BattleSide {
+  taskForceId: number
+  faction: FactionId
+  /** Snapshotted at the start so the log still reads once the Task Force is gone. */
+  name: string
+  /** Design id per Front Line slot (null = empty). */
+  frontLine: (number | null)[]
+  /** Units held off the line, per design id. */
+  reserves: Record<string, number>
+  /** Units destroyed, per design id. */
+  unitsLost: Record<string, number>
+  manpowerLost: number
+  hitsLanded: number
+}
+
+/** An invasion fight (Epoch 2 skeleton §4.6, §5.1). Kept after it ends as the Battle Log. */
+export interface Battle {
+  id: number
+  /** The contested (defender's) region. */
+  regionId: RegionId
+  startedAt: number
+  endedAt: number | null
+  outcome: BattleOutcome | null
+  attacker: BattleSide
+  defender: BattleSide
+  /** Shock window for the attacker: multiplier and the tick it expires (GDD §8.6.2); null if Planning. */
+  shock: { multiplier: number; until: number } | null
+  /** Production cost per "faction|designId", frozen for targeting weights (§5.1). */
+  costs: Record<string, number>
 }
 
 export interface FactionState {
@@ -250,6 +296,8 @@ export interface GameState {
   relations: RelationState
   taskForces: TaskForce[]
   nextTaskForceId: number
+  battles: Battle[]
+  nextBattleId: number
   globalTension: number
   rngSeed: number
   settings: SimSettings
