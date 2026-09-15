@@ -15,6 +15,7 @@ import type {
 } from '../types'
 import { isLand, LINE_ROLES, LINE_SLOTS } from '../types'
 import { designStats, findDuplicate } from './design'
+import { PLATFORMS } from './platforms'
 
 export type TaskForceResult = { ok: true; id: number } | { ok: false; reason: string }
 
@@ -130,12 +131,14 @@ export function setTarget(state: GameState, tfId: number, designId: number, targ
 }
 
 /**
- * New units take empty Front Line slots by themselves (Eric, 2026-09-15): a Task Force should never
- * sit with everything in Reserves relying on reinforcement rolls. The player can still rearrange.
+ * New units take empty slots on their first eligible line by themselves (Eric, 2026-09-15): a Task
+ * Force should never sit with everything in Reserves relying on reinforcement rolls. Front Line for
+ * ground units, Long-Range Fires for artillery, CAS for aircraft. The player can still rearrange.
  */
 function autoPlace(tf: TaskForce, design: UnitDesign, target: number): void {
-  if (!eligibleRoles(design).includes('frontLine')) return
-  const line = tf.lines.frontLine
+  const role = eligibleRoles(design)[0]
+  if (!role) return
+  const line = tf.lines[role]
   for (let i = 0; i < line.length && assignedCount(tf, design.id) < target; i++) {
     if (line[i] === null) line[i] = design.id
   }
@@ -149,12 +152,17 @@ export function cyclePriority(state: GameState, tfId: number, designId: number):
   line.priority = order[(order.indexOf(line.priority) + 1) % order.length]
 }
 
-/** Which roles a design may be assigned to (§5.1–5.3). Land platforms hold the line; standoff weapons reach. */
+/**
+ * Which roles a design may be assigned to (§5.1–5.3): the platform says who can hold the line or fly
+ * CAS; any long-range vector value opens Long-Range Fires. Artillery is Long-Range only (§1.5).
+ */
 export function eligibleRoles(design: UnitDesign): LineRole[] {
+  const platform = PLATFORMS[design.platform]
   const stats = designStats(design.platform, design.modules)
-  const roles: LineRole[] = ['frontLine']
+  const roles: LineRole[] = []
+  if (platform.roles.frontLine) roles.push('frontLine')
   if (stats.standoffCapable) roles.push('longRange')
-  // CAS needs an aircraft platform; none exists yet (Light Aircraft arrives with its own slice).
+  if (platform.roles.cas) roles.push('cas')
   return roles
 }
 

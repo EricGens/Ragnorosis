@@ -9,6 +9,7 @@ import type { FactionId, GameState, LandRegion, Region, RegionId, TaskForce } fr
 import { isLand } from '../types'
 import { battleFor, startBattle } from './battle'
 import { designStats } from './design'
+import { PLATFORMS } from './platforms'
 import { findDesign, findTaskForce } from './taskForce'
 
 export type MoveResult = { ok: true } | { ok: false; reason: string }
@@ -22,12 +23,15 @@ export function distanceBetween(state: GameState, a: RegionId, b: RegionId): num
   return d
 }
 
-/** Combat(Transit) mph — the slowest ground component (§4.5); null when there is nothing to move. */
+/**
+ * Combat(Transit) mph — the slowest ground component (§4.5); aircraft never enter the calculation,
+ * so a force with no ground element has no speed and can't be ordered anywhere.
+ */
 export function taskForceSpeed(state: GameState, tf: TaskForce): { combat: number; transit: number } | null {
   let speed: { combat: number; transit: number } | null = null
   for (const line of tf.composition) {
     const design = findDesign(state, tf.faction, line.designId)
-    if (!design) continue
+    if (!design || PLATFORMS[design.platform].kind !== 'ground') continue
     const s = designStats(design.platform, design.modules).speed
     speed = speed ? { combat: Math.min(speed.combat, s.combat), transit: Math.min(speed.transit, s.transit) } : { ...s }
   }

@@ -4,7 +4,7 @@
 import { defensibility } from '../formulas/defensibility'
 import type { CompositionLine, GameState, LandRegion, TaskForce, UnitDesign } from '../types'
 import { designStats, type DesignStats } from './design'
-import type { PlatformId } from './platforms'
+import { PLATFORMS, type PlatformId } from './platforms'
 import { findDesign } from './taskForce'
 
 /** Baseline chance of a successful engagement for a side with any nonzero relevant vector value. */
@@ -23,12 +23,9 @@ export const SURRENDER_EQUIPMENT_SHARE = 0.25
 /** Stability a captured region must reach before its captor may move on (Eric, 2026-09-15). */
 export const CONSOLIDATION_STABILITY = 50
 
-/** Which vector column a platform is read against (§3.6): Infantry / Vehicle / Tank / Anti-Air. */
+/** Which vector column a platform is read against (§3.6; Artillery reads against Vehicle's, §3.3). */
 export function columnFor(platform: PlatformId): number {
-  switch (platform) {
-    case 'infantry':
-      return 0
-  }
+  return PLATFORMS[platform].column
 }
 
 /**

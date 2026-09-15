@@ -41,6 +41,100 @@ describe('Infantry equipment types (skeleton §3.1 table)', () => {
   })
 })
 
+describe('Vehicle (§3.2)', () => {
+  it("names and prices the skeleton's worked builds", () => {
+    // Air-defense build: Autocannon + Diesel, Crew-Served AA + Targeting Computer + Radar.
+    const ad = ['veh-autocannon-1', 'veh-diesel-1', 'veh-cs-aa', 'veh-targeting-1', 'veh-radar-1']
+    expect(autoName('vehicle', ad)).toBe('Recon Vehicle (SHORAD/AFCS/Radar)')
+    expect(designStats('vehicle', ad).vector.map((e) => e.short)).toEqual([10, 10, 5, 18])
+    expect(designStats('vehicle', ad).radar).toBe(1)
+    expect(autoName('vehicle', ['veh-csw-1', 'veh-diesel-1', 'veh-reactive-armor'])).toBe('Light APC')
+    expect(autoName('vehicle', ['veh-autocannon-1', 'veh-diesel-1', 'veh-cs-at', 'veh-targeting-1'])).toBe(
+      'Recon Vehicle (AT/AFCS)',
+    )
+    expect(autoName('vehicle', ['veh-autocannon-1', 'veh-diesel-1', 'veh-reactive-armor'])).toBe('APC')
+  })
+
+  it('costs 100 for a base build and trades speed for Reactive Armor', () => {
+    const base = designStats('vehicle', ['veh-csw-1', 'veh-diesel-1'])
+    expect(base).toMatchObject({
+      cost: 100,
+      supply: 3.5,
+      organization: 10,
+      health: 15,
+      manpower: 20,
+      weight: 5,
+      armor: 0,
+    })
+    expect(base.speed).toEqual({ combat: 10, transit: 30 })
+    const apc = designStats('vehicle', ['veh-csw-1', 'veh-diesel-1', 'veh-reactive-armor'])
+    expect(apc.armor).toBe(5)
+    expect(apc.speed).toEqual({ combat: 8, transit: 25 })
+    expect(designProblems('vehicle', ['veh-csw-1'])).toEqual(['Vehicle requires 1 engine module'])
+  })
+})
+
+describe('Artillery (§3.3)', () => {
+  it('is towed at 5(30), self-propelled at 10(30), and reads long-range values in X(Y) form', () => {
+    expect(autoName('artillery', ['art-tube'])).toBe('Towed Artillery')
+    expect(autoName('artillery', ['art-tube', 'art-diesel-1'])).toBe('Self-Propelled Gun')
+    expect(autoName('artillery', ['art-rocket'])).toBe('MLRS')
+    expect(autoName('artillery', ['art-rocket', 'art-diesel-1', 'art-targeting-1'])).toBe(
+      'Transporter Erector Launcher (TEL/AFCS)',
+    )
+    const towed = designStats('artillery', ['art-tube'])
+    expect(towed).toMatchObject({ cost: 100, organization: 5, health: 15, manpower: 15, standoffCapable: true })
+    expect(towed.speed).toEqual({ combat: 5, transit: 30 })
+    expect(designStats('artillery', ['art-tube', 'art-diesel-1']).speed).toEqual({ combat: 10, transit: 30 })
+    const mlrs = designStats('artillery', ['art-rocket'])
+    expect(mlrs.vector).toEqual([
+      { short: 5, long: 10 },
+      { short: 5, long: 10 },
+      { short: 3, long: 8 },
+      { short: 0, long: null },
+    ])
+    expect(mlrs.piercing).toBe(8)
+    expect(mlrs.damage).toBe(15)
+  })
+})
+
+describe('Tank (§3.4)', () => {
+  it('a Main Battle Tank is 200 Production with Armor 5, and Gas Turbine is the first real speed bonus', () => {
+    const mbt = designStats('tank', ['tank-cannon-1', 'tank-diesel-1'])
+    expect(autoName('tank', ['tank-cannon-1', 'tank-diesel-1'])).toBe('Main Battle Tank')
+    expect(mbt).toMatchObject({ cost: 200, armor: 5, health: 25, manpower: 16, weight: 10, piercing: 10, damage: 15 })
+    expect(mbt.vector.map((e) => e.short)).toEqual([10, 10, 8, 0])
+    expect(mbt.speed).toEqual({ combat: 8, transit: 30 })
+    expect(designStats('tank', ['tank-autocannon-1', 'tank-turbine-1']).speed).toEqual({ combat: 10, transit: 30 })
+    expect(autoName('tank', ['tank-autocannon-1', 'tank-turbine-1', 'tank-cs-aa', 'tank-targeting-1'])).toBe(
+      'Infantry Fighting Vehicle (SHORAD/AFCS)',
+    )
+    expect(autoName('tank', ['tank-cannon-1', 'tank-diesel-1', 'tank-reactive-armor'])).toBe('Main Battle Tank (AOA)')
+    // Tank's Targeting Computer carries 0 Anti-Air, unlike Vehicle's +5 — a deliberate lever.
+    expect(moduleDef('tank', 'tank-targeting-1').vector[3].short).toBe(0)
+    expect(moduleDef('vehicle', 'veh-targeting-1').vector[3].short).toBe(5)
+  })
+})
+
+describe('Light Aircraft (§3.5)', () => {
+  it('allows 1–3 weapons with duplicates, names by weapon category, and only AGM has standoff reach', () => {
+    const cas = ['la-pgm', 'la-turbofan']
+    expect(autoName('light-aircraft', cas)).toBe('CAS Aircraft')
+    expect(designStats('light-aircraft', cas)).toMatchObject({ cost: 200, manpower: 5, health: 20, armor: 0 })
+    expect(designProblems('light-aircraft', ['la-pgm', 'la-pgm', 'la-autocannon', 'la-turbofan'])).toEqual([])
+    expect(designProblems('light-aircraft', ['la-pgm', 'la-pgm', 'la-pgm', 'la-pgm', 'la-turbofan'])).toEqual([
+      'Light Aircraft allows at most 3 weapon modules',
+    ])
+    expect(designStats('light-aircraft', ['la-pgm', 'la-pgm', 'la-turbofan']).damage).toBe(30) // both weapons count
+    expect(designStats('light-aircraft', cas).standoffCapable).toBe(false)
+    expect(designStats('light-aircraft', ['la-agm', 'la-turbofan']).standoffCapable).toBe(true)
+    expect(autoName('light-aircraft', ['la-agm', 'la-turbofan', 'la-targeting-pod', 'la-ssr'])).toBe(
+      'CAS Aircraft (Targeting Pod/SAR)',
+    )
+    expect(designStats('light-aircraft', ['la-agm', 'la-turbofan', 'la-ssr']).isr).toBe(1)
+  })
+})
+
 describe('validation', () => {
   it('requires exactly one Main Weapon and at most two Misc modules', () => {
     expect(designProblems('infantry', [SA])).toEqual([])

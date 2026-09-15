@@ -63,6 +63,26 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   the new name instead of creating a second copy, then switches to that design. Cancelling leaves the
   draft untouched.
 
+## The other four platforms (skeleton §3.2–3.5; slice 5)
+
+- **Pure catalog data** — each platform carries its own module table (ids prefixed `veh-`, `art-`, `tank-`,
+  `la-`), so same-named modules with different numbers (Tank's Targeting Computer at 0 AA vs Vehicle's +5)
+  are simply different rows. Long-range values use the skeleton's own `X(Y)` notation in the source.
+- **Roles are platform data:** Infantry, Vehicle and Tank may hold the Front Line; Artillery never (§1.5
+  "Artillery and CAS aircraft can't"), it goes to Long-Range Fires by its standoff values; Light Aircraft is
+  CAS-only unless it carries AGM (the one weapon with standoff reach). Auto-placement on adding units
+  therefore fills the first eligible line: Front Line, else Long-Range, else CAS.
+- **Artillery is read against the Vehicle column** (§3.3); Light Aircraft against the Anti-Air column.
+- **Aircraft never enter the speed calculation** (§4.5); a force with no ground element has no speed and
+  can't be ordered anywhere until it gets one. Aircraft-only movement waits for air basing rules.
+- **Light Aircraft naming** applies the general category rule (all anti-ground → CAS Aircraft, all anti-air →
+  Air Superiority Fighter, mixed → Multirole Fighter) by tagging each weapon module with its target domain;
+  only CAS Aircraft is reachable this epoch, as the skeleton intends.
+- **"Transporter Erector Launcher (TEL)"** with a Targeting Computer renders as "Transporter Erector
+  Launcher (TEL/AFCS)" — the TEL tag joins the suffix list rather than nesting parentheses.
+- **Deep Strike and CAS mechanics arrive in slice 6**; until then Artillery and aircraft sit on their lines
+  without firing, and Front Line resolution is unchanged.
+
 ## Task Forces & the production pipeline (skeleton §3.7–3.10, §6, §7)
 
 - **Task Forces live on `GameState.taskForces`** (not per faction) so devtools reassignment is a field

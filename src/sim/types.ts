@@ -107,12 +107,15 @@ export interface ConstructionProject {
   queuedLevels: number
 }
 
+/** The five platforms of Epoch 2 (skeleton §3.1–3.5). Catalog data lives in military/platforms.ts. */
+export type PlatformId = 'infantry' | 'vehicle' | 'artillery' | 'tank' | 'light-aircraft'
+
 /** A saved unit design: a platform plus its equipped module multiset (Epoch 2 skeleton §3, §6). */
 export interface UnitDesign {
   id: number
   /** Player-facing name; unique within a faction's roster. */
   name: string
-  platform: 'infantry'
+  platform: PlatformId
   modules: string[]
 }
 
