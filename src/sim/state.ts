@@ -39,6 +39,8 @@ function initialFaction(id: FactionId): FactionState {
     equipmentRemainder: 0,
     manpowerRemainder: 0,
     constructionLeftover: 0,
+    designs: [],
+    nextDesignId: 1,
   }
 }
 

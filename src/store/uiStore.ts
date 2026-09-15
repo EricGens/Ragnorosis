@@ -50,11 +50,15 @@ interface UIStore {
   selectorRegion: string | null
   militaryOpen: boolean
   devtoolsOpen: boolean
+  /** Unit Editor: closed, or open on a roster design id (null = "Create new unit"). */
+  unitEditor: { open: boolean; designId: number | null }
 
   openSelector: (regionId: string) => void
   closeSelector: () => void
   toggleMilitary: () => void
   toggleDevtools: () => void
+  openUnitEditor: (designId?: number | null) => void
+  closeUnitEditor: () => void
   setHovered: (ref: EntityRef | null) => void
   /** Left-click: pin this entity, or unpin it if it is already pinned. */
   togglePin: (ref: EntityRef) => void
@@ -82,11 +86,14 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   selectorRegion: null,
   militaryOpen: false,
   devtoolsOpen: false,
+  unitEditor: { open: false, designId: null },
 
   openSelector: (regionId) => set({ selectorRegion: regionId }),
   closeSelector: () => set({ selectorRegion: null }),
   toggleMilitary: () => set({ militaryOpen: !get().militaryOpen }),
   toggleDevtools: () => set({ devtoolsOpen: !get().devtoolsOpen }),
+  openUnitEditor: (designId = null) => set({ unitEditor: { open: true, designId } }),
+  closeUnitEditor: () => set({ unitEditor: { open: false, designId: null } }),
 
   setHovered: (ref) => set({ hovered: ref }),
 

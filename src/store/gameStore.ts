@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { advancePulse, advanceTick } from '../sim/advance'
 import { TICKS_PER_SECOND, tickInPulse, type Speed } from '../sim/clock'
 import { queueBuild, type QueueResult } from '../sim/construction'
+import { deleteDesign, renameDesign, saveDesign, type DesignInput, type RosterResult } from '../sim/military/roster'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
 import { computePulseSnapshot } from '../sim/snapshot'
 import { createInitialState } from '../sim/state'
@@ -41,6 +42,10 @@ interface GameStore {
   stepTick: () => void
   /** Devtools: advance to the next pulse boundary instantly (interrupts are collected, not honored). */
   stepPulse: () => void
+  /** Unit Editor roster actions, scoped to the active faction. */
+  saveDesign: (input: DesignInput) => RosterResult
+  renameDesign: (id: number, name: string) => RosterResult
+  deleteDesign: (id: number) => void
 
   setFocus: (focus: Focus) => void
   queueBuild: (regionId: RegionId, building: BuildingType) => QueueResult
@@ -125,6 +130,28 @@ export const useGameStore = create<GameStore>()((set, get) => {
     stepPulse: () => {
       get().pause()
       set({ game: advancePulse(get().game) })
+    },
+
+    saveDesign: (input) => {
+      const out: { result: RosterResult } = { result: { ok: false, reason: '' } }
+      const game = produce(get().game, (d) => {
+        out.result = saveDesign(d, get().activeFaction, input)
+      })
+      set({ game })
+      return out.result
+    },
+
+    renameDesign: (id, name) => {
+      const out: { result: RosterResult } = { result: { ok: false, reason: '' } }
+      const game = produce(get().game, (d) => {
+        out.result = renameDesign(d, get().activeFaction, id, name)
+      })
+      set({ game })
+      return out.result
+    },
+
+    deleteDesign: (id) => {
+      set({ game: produce(get().game, (d) => deleteDesign(d, get().activeFaction, id)) })
     },
 
     setFocus: (focus) =>

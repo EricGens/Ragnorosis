@@ -2,6 +2,7 @@ import { tickInPulse } from '../sim/clock'
 import { formatInt } from '../sim/format'
 import { factionFacilityMultiplier } from '../sim/formulas/conversion'
 import { manpowerCap } from '../sim/formulas/manpower'
+import { designStats } from '../sim/military/design'
 import { computeAllocation } from '../sim/steps/productionSteps'
 import { useDisplayGame, useGameStore } from '../store/gameStore'
 import { useUIStore } from '../store/uiStore'
@@ -32,6 +33,7 @@ export function MilitaryButton() {
 
 export function MilitaryPanel() {
   const open = useUIStore((s) => s.militaryOpen)
+  const openUnitEditor = useUIStore((s) => s.openUnitEditor)
   const game = useDisplayGame()
   const activeFaction = useGameStore((s) => s.activeFaction)
   const faction = game.factions[activeFaction]
@@ -57,6 +59,37 @@ export function MilitaryPanel() {
       <p className="mt-3 text-[10px] leading-snug text-ink-400">
         Incoming amounts land at the end of the pulse. Manpower is capped at 2% of controlled Population.
       </p>
+
+      <div className="mt-4 border-t border-ink-700 pt-3">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-[11px] tracking-[0.15em] text-ink-400 uppercase">Unit roster</span>
+          <button
+            type="button"
+            onClick={() => openUnitEditor(null)}
+            className="rounded border border-signal-dim px-2 py-0.5 text-[10px] tracking-[0.15em] text-signal uppercase hover:bg-signal/10"
+          >
+            Unit editor
+          </button>
+        </div>
+        {faction.designs.length === 0 ? (
+          <p className="text-[10px] text-ink-400">No unit designs yet.</p>
+        ) : (
+          <ul className="text-xs">
+            {faction.designs.map((d) => (
+              <li key={d.id}>
+                <button
+                  type="button"
+                  onClick={() => openUnitEditor(d.id)}
+                  className="flex w-full justify-between rounded px-1 py-0.5 text-left hover:bg-ink-100/5"
+                >
+                  <span className="text-ink-100">{d.name}</span>
+                  <span className="text-ink-400">{formatInt(designStats(d.platform, d.modules).cost)} Prod</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </aside>
   )
 }

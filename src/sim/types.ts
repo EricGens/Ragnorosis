@@ -112,6 +112,15 @@ export interface ConstructionProject {
   queuedLevels: number
 }
 
+/** A saved unit design: a platform plus its equipped module multiset (Epoch 2 skeleton §3, §6). */
+export interface UnitDesign {
+  id: number
+  /** Player-facing name; unique within a faction's roster. */
+  name: string
+  platform: 'infantry'
+  modules: string[]
+}
+
 export interface FactionState {
   id: FactionId
   money: number
@@ -129,6 +138,9 @@ export interface FactionState {
   manpowerRemainder: number
   /** Construction stream with no project to flow into; rerouted at pulse end. */
   constructionLeftover: number
+  /** The Unit Editor roster (Epoch 2 skeleton §6). */
+  designs: UnitDesign[]
+  nextDesignId: number
 }
 
 /** Something that auto-pauses the game and needs the player's attention. */

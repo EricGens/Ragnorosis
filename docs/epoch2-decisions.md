@@ -46,6 +46,23 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   Hostile with the United States and China (the controllers of C Land's four neighbors) instead of zeroing
   a stored number.
 
+## Unit designs and the Unit Editor (skeleton §2, §6)
+
+- **Designs are per-faction data on `FactionState.designs`**, each `{ id, name, platform, modules[] }`. Every
+  stat is derived on demand (`designStats`) from the platform base plus the module list — nothing derived
+  is stored, per "compute, don't store".
+- **Name uniqueness is case-insensitive** within a faction ("Light Infantry" and "light infantry" clash).
+  The skeleton only says names must be unique; treating case as insignificant avoids two visually
+  identical roster rows.
+- **Supply is displayed to 0.1**; the sum of module supply values is rounded to one decimal so additive
+  floating point (1.1 + 0.1) shows as the skeleton's 1.2.
+- **Delete, before Task Forces exist,** only removes the design from the roster. The skeleton's warning text
+  (units removed from all Task Forces, Equipment lost, Manpower returned) is shown verbatim already so the
+  player-facing contract doesn't change when slice 2b attaches the cleanup.
+- **Duplicate loadout on Save (same module multiset):** the editor offers to rename the existing design to
+  the new name instead of creating a second copy, then switches to that design. Cancelling leaves the
+  draft untouched.
+
 ## Source-doc fixes needed
 
 - **Skeleton §5.1:** replace the "~90-point advantage gap" caveat paragraph with the universal
