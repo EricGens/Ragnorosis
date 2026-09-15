@@ -215,6 +215,12 @@ export function TaskForceEditor() {
           {own && faction.designs.length === 0 && (
             <p className="mt-2 text-[10px] text-ink-400">Design a unit in the Unit Editor first.</p>
           )}
+          {!own && (
+            <p className="mt-2 text-[10px] text-warn">
+              Viewing as {activeFaction}. To edit {faction.id}'s Task Force, switch Perspective to it (Devtools →
+              Global) — the devtools "Open editor" button does that for you.
+            </p>
+          )}
         </div>
 
         {notice && <p className="text-xs text-warn">{notice}</p>}

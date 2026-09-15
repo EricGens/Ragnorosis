@@ -184,10 +184,16 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   force instead, and a force with no units gets no Shock. Found live: an empty initial line produced a
   ×0 multiplier that muted the attacker's rolls entirely.
 - **Beaten defender retreat target:** adjacent land it can enter (permissive, no hostile Task Force), own
-  territory first, then Friendly, then anything else; it relocates immediately, at zero Organization. The
-  GDD's "retreat into neutral territory" decision node (harm relations / buy off / seize) waits for the
-  diplomacy epoch. No option → surrender: the Task Force is eliminated and the victor converts 25% of its
-  surviving Equipment (floored, per SKU) into matching designs.
+  territory first, then Friendly, then anything else. **The rout is a real move (Eric, 2026-09-15):** the
+  Task Force gets a normal move order to that region, walked at Combat Speed with the usual arrow, at
+  zero Organization. While `retreating` it no longer defends the region it is leaving (so the winner's
+  arrival isn't blocked and it can't be re-engaged), can't be ordered, and clears the region only on
+  arrival ("regroups"). The GDD's "retreat into neutral territory" decision node (harm relations / buy off
+  / seize) waits for the diplomacy epoch. No option → surrender: the Task Force is eliminated and the
+  victor converts 25% of its surviving Equipment (floored, per SKU) into matching designs.
+- **Controlling another faction's Task Force** (skeleton §7) means switching Perspective to that faction;
+  the devtools "Open editor" button does the switch itself, and a "Copy roster" button hands the
+  perspective faction's designs to the other side so a test opponent needn't be designed twice.
 - **Attacker beaten or withdrawing** (a plain redirect, halt, or any order that drops the contested leg)
   walks the transit clock's progress back at Combat Speed — the existing backtrack, with the gray arrow.
 - **Consolidation lock** is set on capture and lifts when the deficit is 0 and Stability ≥ 50. Note the

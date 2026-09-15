@@ -188,6 +188,7 @@ export function startStandoffs(state: GameState): void {
     const target = state.taskForces.find(
       (t) =>
         t.regionId === tf.standoffTarget &&
+        !t.retreating &&
         factionRelation(state, tf.faction, t.faction) === 'hostile' &&
         !battleFor(state, t.id),
     )
@@ -776,12 +777,15 @@ function endBattle(state: GameState, battle: Battle, outcome: BattleOutcome): vo
     case 'attacker-won': {
       const to = defender ? defenderRetreatTarget(state, defender) : null
       if (defender && to) {
-        defender.regionId = to
-        defender.movement = null
+        // A rout is a real move (Eric, 2026-09-15): plotted like any order, walked at Combat Speed,
+        // untargetable on the way; the region only clears when it arrives.
+        defender.movement = { legs: [to], progress: 0, backtrack: 0 }
+        defender.retreating = true
+        defender.standoffTarget = null
         log(
           state,
           'military',
-          `${battle.defender.name} breaks and retreats from ${region.name} to ${state.regions[to].name}`,
+          `${battle.defender.name} breaks and retreats from ${region.name} toward ${state.regions[to].name}`,
         )
       }
       break

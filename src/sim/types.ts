@@ -175,6 +175,8 @@ export interface TaskForce {
   consolidating: boolean
   /** Standoff fire (§6): the adjacent hostile region this side has personally engaged, if any. */
   standoffTarget: RegionId | null
+  /** Routed and withdrawing (GDD §8.6.6): moving at Combat Speed, untargetable, unorderable until it arrives. */
+  retreating: boolean
 }
 
 export type BattleOutcome =

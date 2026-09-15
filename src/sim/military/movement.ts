@@ -38,10 +38,14 @@ export function taskForceSpeed(state: GameState, tf: TaskForce): { combat: numbe
   return speed
 }
 
-/** A hostile Task Force is "in" a region (its regionId) until its own move completes (§4.3). */
+/** A hostile Task Force is "in" a region (its regionId) until its own move completes (§4.3); a routed one no longer defends it. */
 export function hostileTaskForceIn(state: GameState, faction: FactionId, regionId: RegionId): TaskForce | undefined {
   return state.taskForces.find(
-    (t) => t.regionId === regionId && t.faction !== faction && factionRelation(state, faction, t.faction) === 'hostile',
+    (t) =>
+      t.regionId === regionId &&
+      !t.retreating &&
+      t.faction !== faction &&
+      factionRelation(state, faction, t.faction) === 'hostile',
   )
 }
 
@@ -51,6 +55,7 @@ export function hostileTaskForceIn(state: GameState, faction: FactionId, regionI
  * Speed (§4.6), whoever controls the ground.
  */
 export function legRate(state: GameState, tf: TaskForce, region: Region, speed: { combat: number; transit: number }) {
+  if (tf.retreating) return speed.combat // a rout is walked at Combat Speed (§4.6, GDD §8.6.6)
   if (hostileTaskForceIn(state, tf.faction, region.id)) return speed.combat
   return isPermissive(state, tf.faction, region) ? speed.transit : speed.combat
 }
@@ -105,6 +110,7 @@ export function orderMove(state: GameState, tfId: number, destination: RegionId,
   if (!tf) return { ok: false, reason: 'That Task Force no longer exists.' }
   if (!taskForceSpeed(state, tf)) return { ok: false, reason: 'Nothing to move — add units first.' }
   if (tf.consolidating) return { ok: false, reason: 'Consolidating — needs full Organization and Stability ≥ 50.' }
+  if (tf.retreating) return { ok: false, reason: 'Retreating — no orders until it regroups.' }
   const region = state.regions[destination]
   if (!region) return { ok: false, reason: 'No such region.' }
   const problem = destination === tf.regionId ? null : enterProblem(state, tf, region)
@@ -176,7 +182,7 @@ export function moveTaskForces(state: GameState): void {
     const dest = m.legs[0]
     const region = state.regions[dest]
     const distance = distanceBetween(state, tf.regionId, dest)
-    const defender = hostileTaskForceIn(state, tf.faction, dest)
+    const defender = tf.retreating ? undefined : hostileTaskForceIn(state, tf.faction, dest)
     if (defender) {
       // Invasion (§4.6): the transit clock runs alongside the fight and waits at the far end for it.
       m.progress = Math.min(distance, m.progress + legRate(state, tf, region, speed))
@@ -196,6 +202,11 @@ export function moveTaskForces(state: GameState): void {
 /** Repositioning is a hard flip (§4.3). Undefended hostile land is captured on arrival (GDD §8.6.7). */
 function arrive(state: GameState, tf: TaskForce, region: Region): void {
   tf.regionId = region.id
+  if (tf.retreating) {
+    tf.retreating = false
+    log(state, 'military', `${tf.name} regroups in ${region.name}`)
+    return
+  }
   if (isLand(region) && !isPermissive(state, tf.faction, region)) capture(state, tf, region)
   else log(state, 'military', `${tf.name} arrives in ${region.name}`)
 }

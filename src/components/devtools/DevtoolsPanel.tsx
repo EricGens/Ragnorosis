@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BUILDINGS, BUILDING_TYPES } from '../../sim/data/buildings'
 import { FACTIONS } from '../../sim/data/factions'
 import { FOCUSES } from '../../sim/formulas/allocation'
+import { findDuplicate } from '../../sim/military/design'
 import { teleportTaskForce } from '../../sim/military/movement'
 import { createTaskForce, deleteTaskForce, fillTaskForce, setTaskForceFaction } from '../../sim/military/taskForce'
 import {
@@ -249,6 +250,8 @@ function FactionSection() {
 function TaskForceSection() {
   const game = useGameStore((s) => s.game)
   const mutate = useGameStore((s) => s.mutate)
+  const activeFaction = useGameStore((s) => s.activeFaction)
+  const setActiveFaction = useGameStore((s) => s.setActiveFaction)
   const openTaskForceEditor = useUIStore((s) => s.openTaskForceEditor)
   const [spawnFaction, setSpawnFaction] = useState<FactionId>('united-states')
   const [spawnRegion, setSpawnRegion] = useState('')
@@ -323,7 +326,40 @@ function TaskForceSection() {
             >
               Restore Org
             </DevButton>
-            <DevButton onClick={() => openTaskForceEditor(tf.id)}>Open editor</DevButton>
+            <DevButton
+              onClick={() => {
+                // Controlling another faction's Task Force means looking through its eyes (skeleton §7).
+                setActiveFaction(tf.faction)
+                openTaskForceEditor(tf.id)
+              }}
+            >
+              Open editor
+            </DevButton>
+            {tf.faction !== activeFaction && (
+              <DevButton
+                onClick={() =>
+                  mutate((d) => {
+                    // Test-setup shortcut: give this faction the perspective faction's designs (matched by multiset).
+                    const from = d.factions[activeFaction]
+                    const to = d.factions[tf.faction]
+                    for (const design of from.designs) {
+                      if (findDuplicate(to.designs, design.platform, design.modules)) continue
+                      let name = design.name
+                      for (let n = 2; to.designs.some((x) => x.name.toLowerCase() === name.toLowerCase()); n++)
+                        name = `${design.name} (${n})`
+                      to.designs.push({
+                        id: to.nextDesignId++,
+                        name,
+                        platform: design.platform,
+                        modules: [...design.modules],
+                      })
+                    }
+                  })
+                }
+              >
+                Copy {FACTIONS[activeFaction].name}'s roster to {FACTIONS[tf.faction].name}
+              </DevButton>
+            )}
             <DevButton onClick={() => mutate((d) => deleteTaskForce(d, tf.id))}>Disband</DevButton>
           </div>
         </>

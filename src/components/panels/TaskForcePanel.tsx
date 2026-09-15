@@ -86,6 +86,7 @@ export function TaskForcePanel({
               </span>
             </span>
             {tf.consolidating && <span className="text-warn">Consolidating — needs full Org & Stability ≥ 50</span>}
+            {tf.retreating && <span className="text-alert">Retreating — regroups on arrival</span>}
           </div>
           {battle && (
             <button

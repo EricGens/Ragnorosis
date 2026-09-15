@@ -142,7 +142,17 @@ describe('invasion battles (§4.6, §5.1)', () => {
     while (!s.battles[0]?.endedAt && guard++ < 400) s = ticks(s, 1)
     const b = s.battles[0]
     expect(b.outcome).toBe('attacker-won')
-    expect(['e-land', 's-land']).toContain(cn(s)!.regionId) // China's own regions, adjacent to C Land
+    // The rout is a real move (Eric): still "in" C Land, walking to a Chinese region at Combat Speed,
+    // untargetable and unorderable on the way; it clears the region only on arrival.
+    expect(cn(s)!.retreating).toBe(true)
+    expect(cn(s)!.regionId).toBe('c-land')
+    expect(['e-land', 's-land']).toContain(cn(s)!.movement?.legs[0])
+    produce(s, (d) => {
+      expect(orderMove(d, 2, 'se-land')).toMatchObject({ ok: false, reason: expect.stringContaining('Retreating') })
+    })
+    const routed = ticks(s, 60) // 300 mi at 5 mph
+    expect(routed.taskForces.find((t) => t.id === 2)!.retreating).toBe(false)
+    expect(['e-land', 's-land']).toContain(routed.taskForces.find((t) => t.id === 2)!.regionId)
     expect(organization(s, cn(s)!)).toBe(0)
     expect(b.defender.hits.frontLine + b.attacker.hits.frontLine).toBeGreaterThan(0)
     // Transit clock: 300 mi at Combat Speed is 60 ticks; capture lands once both clocks are done.
