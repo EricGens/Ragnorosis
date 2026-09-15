@@ -179,11 +179,17 @@ export function TaskForceEditor() {
                   </span>
                 </span>
                 <span className="flex items-center justify-end gap-1">
-                  <CountButton disabled={!own} onClick={() => report(setTarget(tf.id, line.designId, line.target - 1))}>
+                  <CountButton
+                    disabled={!own}
+                    onClick={(step) => report(setTarget(tf.id, line.designId, line.target - step))}
+                  >
                     −
                   </CountButton>
                   <span className="w-8 text-center text-ink-100">{line.target}</span>
-                  <CountButton disabled={!own} onClick={() => report(setTarget(tf.id, line.designId, line.target + 1))}>
+                  <CountButton
+                    disabled={!own}
+                    onClick={(step) => report(setTarget(tf.id, line.designId, line.target + step))}
+                  >
                     +
                   </CountButton>
                 </span>
@@ -252,12 +258,24 @@ export function TaskForceEditor() {
   )
 }
 
-function CountButton({ onClick, disabled, children }: { onClick: () => void; disabled: boolean; children: string }) {
+/** Shift-click steps by 5 instead of 1 (Eric, 2026-09-15). */
+const SHIFT_STEP = 5
+
+function CountButton({
+  onClick,
+  disabled,
+  children,
+}: {
+  onClick: (step: number) => void
+  disabled: boolean
+  children: string
+}) {
   return (
     <button
       type="button"
       disabled={disabled}
-      onClick={onClick}
+      title="Shift-click for ±5"
+      onClick={(e) => onClick(e.shiftKey ? SHIFT_STEP : 1)}
       className="h-6 w-6 rounded border border-ink-600 text-sm leading-none text-ink-200 hover:border-signal hover:text-signal disabled:cursor-default disabled:hover:border-ink-600 disabled:hover:text-ink-200"
     >
       {children}
