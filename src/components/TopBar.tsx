@@ -4,6 +4,10 @@ import { formatInt, formatMoney } from '../sim/format'
 import { FOCUSES } from '../sim/formulas/allocation'
 import { computeAllocation } from '../sim/steps/productionSteps'
 import { useDisplayGame, useGameStore } from '../store/gameStore'
+import { useSaveLoad } from './SaveLoad'
+
+const smallButton =
+  'rounded border border-ink-600 px-2 py-0.5 text-[10px] tracking-[0.15em] text-ink-200 uppercase hover:border-signal-dim hover:text-signal'
 
 const FOCUS_LABEL: Record<(typeof FOCUSES)[number], string> = {
   balanced: 'Balanced',
@@ -23,6 +27,7 @@ export function TopBar() {
   const setSpeed = useGameStore((s) => s.setSpeed)
   const toggleRun = useGameStore((s) => s.toggleRun)
   const setFocus = useGameStore((s) => s.setFocus)
+  const saveLoad = useSaveLoad()
 
   // While paused on a boundary the coming pulse hasn't locked its allocation yet — preview it.
   const allocation = tickInPulse(tick) === 0 ? computeAllocation(game, activeFaction) : faction.allocation
@@ -54,6 +59,26 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
+          {saveLoad.notice && (
+            <button
+              type="button"
+              onClick={saveLoad.clearNotice}
+              className="max-w-64 truncate text-[11px] text-warn"
+              title={saveLoad.notice}
+              data-save-notice
+            >
+              {saveLoad.notice}
+            </button>
+          )}
+          <button type="button" onClick={saveLoad.save} className={smallButton} title="Save the game (at rest only)">
+            Save
+          </button>
+          <button type="button" onClick={saveLoad.pickFile} className={smallButton} title="Load a save file">
+            Load
+          </button>
+          {saveLoad.input}
+        </div>
         <Stat label="Global Tension" value={globalTension.toFixed(0)} />
 
         <div className="flex flex-col items-end leading-tight">

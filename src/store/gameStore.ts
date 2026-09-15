@@ -16,6 +16,7 @@ import {
   setTarget,
   type TaskForceResult,
 } from '../sim/military/taskForce'
+import { parseSave, restoreGame, serializeSave, type SaveResult } from '../sim/save'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
 import { computePulseSnapshot } from '../sim/snapshot'
 import { createInitialState } from '../sim/state'
@@ -75,6 +76,9 @@ interface GameStore {
   clearNotice: () => void
   /** Apply an arbitrary mutation to the sim (devtools). */
   mutate: (fn: (draft: GameState) => void) => void
+  /** Save & Load (Epoch 2 skeleton §8): at rest only; loading resumes paused with fresh randomness. */
+  saveGame: () => SaveResult
+  loadGame: (json: string) => { ok: true } | { ok: false; reason: string }
 }
 
 let timer: ReturnType<typeof setInterval> | null = null
@@ -195,5 +199,24 @@ export const useGameStore = create<GameStore>()((set, get) => {
     clearNotice: () => set({ notice: null }),
 
     mutate: (fn) => set({ game: produce(get().game, fn) }),
+
+    saveGame: () => {
+      get().pause()
+      return serializeSave(get().game, get().activeFaction)
+    },
+
+    loadGame: (json) => {
+      const parsed = parseSave(json)
+      if (!parsed.ok) return parsed
+      clearTimer()
+      set({
+        game: restoreGame(parsed.save),
+        activeFaction: parsed.save.perspective,
+        screen: 'game', // the file's mode marker chooses the context; only the sandbox exists today
+        running: false,
+        notice: null,
+      })
+      return { ok: true }
+    },
   }
 })

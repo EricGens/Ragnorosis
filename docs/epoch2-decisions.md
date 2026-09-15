@@ -234,6 +234,22 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   the next region click (or disarms), the × cancels this side's flag; whichever matches the current flag
   is circled. Pinning something else drops back to move mode.
 
+## Save & Load (skeleton §8; slice 8)
+
+- **The save is the whole `GameState` as JSON** under a header `{ format: 'ragnorosis-save', version, epoch,
+  mode, savedAt, perspective }`. Everything §8 lists is inside it by construction (regions, relations,
+  pools and stockpiles, rosters, Task Forces with position, lines, priorities, standoff flags, mid-transit
+  progress, the clock) — there's no separate serializer to keep in sync.
+- **At rest only:** Save is refused while any battle is live ("a battle is in progress") rather than
+  half-capturing one, per §8's deferral of mid-combat saves. A peacefully mid-transit Task Force saves fine.
+- **Fresh randomness on load:** the RNG seed is replaced on restore; the saved seed is not reused.
+- **No compatibility promises:** the header's `epoch`/`version` must match exactly or the file is refused
+  with a plain message. **`mode` is the shared-Load dispatch marker** — only `sandbox` exists today; a
+  future campaign save gets "not supported yet" instead of opening in the wrong context.
+- **Where it lives:** Save downloads a `.json` (`ragnorosis-sandbox-<timestamp>.json`) and also writes a
+  browser quick-save (`localStorage`) so the title screen can offer **Continue**; Load is a file picker,
+  from the title screen or the top bar. Loading resumes paused, from the saved perspective.
+
 ## Combat rulings ahead of the combat slice (Eric, 2026-09-15)
 
 - **Organization regeneration out of contact: 0.5% of max per tick** (a worn-down Task Force takes about a
