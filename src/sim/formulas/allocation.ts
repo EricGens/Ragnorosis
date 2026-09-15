@@ -17,6 +17,12 @@ export const FOCUSES: readonly Focus[] = ['balanced', 'equipment', 'manpower', '
 export interface AllocationInputs {
   /** How much more Manpower the pool can hold before hitting the 2% cap. */
   manpowerCapRoom: number
+  /**
+   * How much Equipment Production has somewhere to go: unfilled Task Force demand plus stockpile
+   * room, in allocation points (Epoch 2 skeleton §3.9 — once every SKU is at cap, Equipment-focus
+   * Production reroutes exactly like a capped Manpower pool).
+   */
+  equipmentRoom: number
   /** Whether any construction project can receive progress. */
   hasProjects: boolean
 }
@@ -28,24 +34,30 @@ export function allocateProduction(total: number, focus: Focus, inputs: Allocati
     manpower: Math.floor(total * split.manpower),
     construction: Math.floor(total * split.construction),
   }
-  const capRoom = Math.max(0, Math.floor(inputs.manpowerCapRoom))
+  const manpowerRoom = Math.max(0, Math.floor(inputs.manpowerCapRoom))
+  const equipmentRoom = Math.max(0, Math.floor(inputs.equipmentRoom))
   let warning = false
 
-  // Reroute until stable: a receiver (Manpower) can itself hit its cap after receiving overflow.
-  for (let pass = 0; pass < 3; pass++) {
+  // Reroute until stable: a receiver can itself hit its cap after receiving overflow.
+  for (let pass = 0; pass < 4; pass++) {
     let pool = 0
     if (!inputs.hasProjects && shares.construction > 0) {
       pool += shares.construction
       shares.construction = 0
     }
-    if (shares.manpower > capRoom) {
-      pool += shares.manpower - capRoom
-      shares.manpower = capRoom
+    if (shares.manpower > manpowerRoom) {
+      pool += shares.manpower - manpowerRoom
+      shares.manpower = manpowerRoom
+    }
+    if (shares.equipment > equipmentRoom) {
+      pool += shares.equipment - equipmentRoom
+      shares.equipment = equipmentRoom
     }
     if (pool === 0) break
 
-    const receivers: ProductionCategory[] = ['equipment']
-    if (shares.manpower < capRoom) receivers.push('manpower')
+    const receivers: ProductionCategory[] = []
+    if (shares.equipment < equipmentRoom) receivers.push('equipment')
+    if (shares.manpower < manpowerRoom) receivers.push('manpower')
     if (inputs.hasProjects) receivers.push('construction')
     if (receivers.length === 0) {
       warning = true

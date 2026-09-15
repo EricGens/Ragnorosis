@@ -94,8 +94,11 @@ describe('construction streaming', () => {
     s = withQueued(s, 'nw-land', 'fortification')
     s = advanceTick(s).state // tick 1: allocation locked, first drop of progress
     const a = s.factions[US].allocation
-    expect(a.construction).toBe(850)
-    for (const p of s.factions[US].projects) expect(p.progress).toBeCloseTo(850 / TICKS_PER_PULSE / 2)
+    // Construction focus: 425/425/850. With no unit designs, Equipment's 425 has nowhere to go and
+    // reroutes 1:2 to Manpower/Construction, so Construction ends up with 850 + 283.
+    expect(a.equipment).toBe(0)
+    expect(a.construction).toBe(1133)
+    for (const p of s.factions[US].projects) expect(p.progress).toBeCloseTo(1133 / TICKS_PER_PULSE / 2)
   })
 
   it('completes mid-pulse, fires an interrupt, and prices the queued level fresh', () => {
@@ -126,8 +129,9 @@ describe('construction streaming', () => {
     const after = advancePulse(s)
     expect(after.factions[US].projects).toHaveLength(0)
     expect(after.factions[US].constructionLeftover).toBe(0)
-    // Nearly the whole 850 construction share ended up converted alongside the 425/425 shares.
-    expect(after.factions[US].equipment + after.factions[US].manpower).toBeGreaterThan(1500)
+    // Nearly the whole 850 construction share ended up converted alongside the 425/425 shares
+    // (with no unit designs, Equipment has nowhere to go and all of it becomes Manpower).
+    expect(after.factions[US].manpower).toBeGreaterThan(1500)
   })
 })
 
@@ -135,10 +139,10 @@ describe('pulse-end conversions', () => {
   const after = advancePulse(base)
   const f = after.factions[US]
 
-  it('credits Equipment through the summed Production Facility bonus', () => {
-    // Balanced with no projects: 566 + 283 = 849 equipment points × facilityMultiplier(7) = 2.4.
-    expect(f.equipment).toBeGreaterThan(1900)
-    expect(f.equipment).toBeLessThan(2100)
+  it('sends Equipment Production to Manpower while no design needs Equipment (Epoch 2 §3.9 overflow)', () => {
+    expect(computeAllocation(base, US).equipment).toBe(0)
+    expect(f.stockpile).toEqual({})
+    expect(f.manpower).toBeGreaterThanOrEqual(1698)
   })
 
   it('credits Manpower under the 2% cap and draws it from Population', () => {
@@ -157,7 +161,7 @@ describe('pulse-end conversions', () => {
   })
 
   it('gives zero-Control factions nothing', () => {
-    expect(after.factions.gamer.equipment).toBe(0)
+    expect(after.factions.gamer.stockpile).toEqual({})
     expect(after.factions.gamer.manpower).toBe(0)
   })
 })

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { allocateProduction } from './allocation'
 
-const open = { manpowerCapRoom: 1e9, hasProjects: true }
+const open = { manpowerCapRoom: 1e9, equipmentRoom: 1e9, hasProjects: true }
 
 describe('focus split', () => {
   it('splits balanced roughly evenly, flooring and discarding fractions', () => {
@@ -35,8 +35,16 @@ describe('overflow', () => {
     expect(a.construction).toBe(450)
   })
 
+  it('clamps Equipment to its room the same way (Epoch 2: nothing left to manufacture)', () => {
+    const a = allocateProduction(1000, 'equipment', { ...open, equipmentRoom: 100 })
+    expect(a.equipment).toBe(100)
+    expect(a.manpower).toBe(450)
+    expect(a.construction).toBe(450)
+    expect(allocateProduction(1000, 'balanced', { ...open, equipmentRoom: 0 }).equipment).toBe(0)
+  })
+
   it('sends everything to the one remaining category when two are out', () => {
-    const a = allocateProduction(1000, 'balanced', { manpowerCapRoom: 0, hasProjects: false })
+    const a = allocateProduction(1000, 'balanced', { ...open, manpowerCapRoom: 0, hasProjects: false })
     expect(a.manpower).toBe(0)
     expect(a.construction).toBe(0)
     expect(a.equipment).toBeGreaterThanOrEqual(998) // 333 + 666, minus floor loss
@@ -45,10 +53,16 @@ describe('overflow', () => {
 
   it('re-clamps Manpower after it receives overflow', () => {
     // Construction empty → its 333 would push manpower past a 400 cap; the excess must move on.
-    const a = allocateProduction(1000, 'balanced', { manpowerCapRoom: 400, hasProjects: false })
+    const a = allocateProduction(1000, 'balanced', { ...open, manpowerCapRoom: 400, hasProjects: false })
     expect(a.manpower).toBe(400)
     expect(a.construction).toBe(0)
     expect(a.equipment).toBeGreaterThanOrEqual(595)
+  })
+
+  it('warns when every destination is capped or empty', () => {
+    const a = allocateProduction(1000, 'balanced', { manpowerCapRoom: 0, equipmentRoom: 0, hasProjects: false })
+    expect([a.equipment, a.manpower, a.construction]).toEqual([0, 0, 0])
+    expect(a.warning).toBe(true)
   })
 
   it('handles zero Production without dividing by zero', () => {

@@ -116,21 +116,53 @@ export interface UnitDesign {
   modules: string[]
 }
 
+/** Resource priority of one unit type inside one Task Force (§3.8): the tier it draws from in the waterfall. */
+export type Priority = 'high' | 'normal' | 'low'
+export const PRIORITIES: readonly Priority[] = ['high', 'normal', 'low']
+
+/** One cell of a Task Force's composition grid (§6): a desired count and what's actually filled so far. */
+export interface CompositionLine {
+  designId: number
+  /** Desired unit count, set with +/−. */
+  target: number
+  priority: Priority
+  /** Whole units' worth of Equipment on hand — Equipment is binary per unit (§3.10). */
+  equipment: number
+  /** People assigned; fills linearly toward target × the design's Manpower (§3.10). */
+  manpower: number
+}
+
+export type LineRole = 'frontLine' | 'longRange' | 'cas'
+export const LINE_ROLES: readonly LineRole[] = ['frontLine', 'longRange', 'cas']
+/** Slots per combat role (§5.1–5.3); each slot holds one unit. Reserves are everything unassigned. */
+export const LINE_SLOTS: Record<LineRole, number> = { frontLine: 12, longRange: 12, cas: 6 }
+
+export interface TaskForce {
+  id: number
+  name: string
+  faction: FactionId
+  regionId: RegionId
+  composition: CompositionLine[]
+  /** Per role, the design id in each slot (null = empty). */
+  lines: Record<LineRole, (number | null)[]>
+}
+
 export interface FactionState {
   id: FactionId
   money: number
   research: number
   legitimacy: number
-  /** Small Arms — the only Equipment type in Epoch 1. */
-  equipment: number
   manpower: number
   focus: Focus
   allocation: ProductionAllocation
   projects: ConstructionProject[]
   nextProjectId: number
-  /** Banked fractional conversion progress (floor, carry forward). */
-  equipmentRemainder: number
+  /** Banked fractional Manpower conversion progress (floor, carry forward). */
   manpowerRemainder: number
+  /** Finished Equipment not assigned to any Task Force, per design id (§3.9). */
+  stockpile: Record<string, number>
+  /** Production banked toward the next whole unit of each Equipment SKU, per design id. */
+  manufacturing: Record<string, number>
   /** Construction stream with no project to flow into; rerouted at pulse end. */
   constructionLeftover: number
   /** The Unit Editor roster (Epoch 2 skeleton §6). */
@@ -147,7 +179,7 @@ export type Interrupt = {
   level: number
 }
 
-export type LogCategory = 'time' | 'economy' | 'stability' | 'energy' | 'construction' | 'weather' | 'dev'
+export type LogCategory = 'time' | 'economy' | 'stability' | 'energy' | 'construction' | 'weather' | 'military' | 'dev'
 
 export interface LogEntry {
   tick: number
@@ -200,6 +232,8 @@ export interface GameState {
   adjacency: Record<RegionId, RegionId[]>
   factions: Record<FactionId, FactionState>
   relations: RelationState
+  taskForces: TaskForce[]
+  nextTaskForceId: number
   globalTension: number
   rngSeed: number
   settings: SimSettings

@@ -52,6 +52,8 @@ interface UIStore {
   devtoolsOpen: boolean
   /** Unit Editor: closed, or open on a roster design id (null = "Create new unit"). */
   unitEditor: { open: boolean; designId: number | null }
+  /** Task Force Editor: closed, or open on a Task Force id. */
+  taskForceEditor: { open: boolean; id: number | null }
 
   openSelector: (regionId: string) => void
   closeSelector: () => void
@@ -59,6 +61,8 @@ interface UIStore {
   toggleDevtools: () => void
   openUnitEditor: (designId?: number | null) => void
   closeUnitEditor: () => void
+  openTaskForceEditor: (id: number) => void
+  closeTaskForceEditor: () => void
   setHovered: (ref: EntityRef | null) => void
   /** Left-click: pin this entity, or unpin it if it is already pinned. */
   togglePin: (ref: EntityRef) => void
@@ -87,6 +91,7 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   militaryOpen: false,
   devtoolsOpen: false,
   unitEditor: { open: false, designId: null },
+  taskForceEditor: { open: false, id: null },
 
   openSelector: (regionId) => set({ selectorRegion: regionId }),
   closeSelector: () => set({ selectorRegion: null }),
@@ -94,6 +99,8 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   toggleDevtools: () => set({ devtoolsOpen: !get().devtoolsOpen }),
   openUnitEditor: (designId = null) => set({ unitEditor: { open: true, designId } }),
   closeUnitEditor: () => set({ unitEditor: { open: false, designId: null } }),
+  openTaskForceEditor: (id) => set({ taskForceEditor: { open: true, id } }),
+  closeTaskForceEditor: () => set({ taskForceEditor: { open: false, id: null } }),
 
   setHovered: (ref) => set({ hovered: ref }),
 

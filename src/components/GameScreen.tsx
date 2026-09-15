@@ -1,6 +1,7 @@
 import { DevtoolsButton, DevtoolsPanel } from './devtools/DevtoolsPanel'
 import { InterruptNotice } from './InterruptNotice'
 import { MapView } from './MapView'
+import { TaskForceEditor } from './military/TaskForceEditor'
 import { UnitEditor } from './military/UnitEditor'
 import { MilitaryButton, MilitaryPanel } from './MilitaryPanel'
 import { BuildingSelector } from './panels/BuildingSelector'
@@ -27,6 +28,7 @@ export function GameScreen() {
         <DevtoolsButton />
         <DevtoolsPanel />
         <BuildingSelector />
+        <TaskForceEditor />
         <UnitEditor />
       </main>
     </div>

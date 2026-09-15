@@ -7,6 +7,7 @@ import { allocateProduction } from '../formulas/allocation'
 import { convertWithRemainder, factionFacilityMultiplier } from '../formulas/conversion'
 import { controlledRegions, drawPopulation, manpowerCap } from '../formulas/manpower'
 import { log } from '../log'
+import { drawdownManpower, equipmentAllocationRoom, manufactureEquipment } from '../military/pipeline'
 import { productionFor } from '../snapshot'
 import type { ConstructionProject, FactionId, GameState, LandRegion, ProductionAllocation } from '../types'
 import { FACTION_IDS } from '../types'
@@ -21,6 +22,7 @@ export function computeAllocation(state: GameState, faction: FactionId): Product
   const f = state.factions[faction]
   return allocateProduction(factionProduction(state, faction), f.focus, {
     manpowerCapRoom: manpowerCap(state, faction) - f.manpower,
+    equipmentRoom: equipmentAllocationRoom(state, faction),
     hasProjects: f.projects.length > 0,
   })
 }
@@ -90,7 +92,10 @@ function completeLevel(state: GameState, faction: FactionId, p: ConstructionProj
   return false
 }
 
-/** Pulse end: Equipment and Manpower land in the stockpiles; stranded Construction points reroute. */
+/**
+ * Pulse end: Equipment Production runs the manufacturing pipeline, Manpower is trained into the pool
+ * and then drawn down into Task Forces; stranded Construction points reroute (Epoch 2 skeleton §3.7).
+ */
 export function creditPulseOutputs(state: GameState): void {
   for (const id of FACTION_IDS) {
     const f = state.factions[id]
@@ -107,14 +112,10 @@ export function creditPulseOutputs(state: GameState): void {
     }
 
     if (equipmentPoints > 0) {
-      const r = convertWithRemainder(
-        equipmentPoints,
-        factionFacilityMultiplier(state, id, 'production-facility'),
-        f.equipmentRemainder,
-      )
-      f.equipment += r.units
-      f.equipmentRemainder = r.remainder
-      if (r.units > 0) log(state, 'economy', `${id} produces ${formatInt(r.units)} Small Arms`)
+      const multiplier = factionFacilityMultiplier(state, id, 'production-facility')
+      const leftover = manufactureEquipment(state, id, equipmentPoints * multiplier)
+      // Nothing left to build → the same overflow rule as allocation: it goes to Manpower instead (§3.9).
+      if (leftover > 0) manpowerPoints += leftover / multiplier
     }
 
     if (manpowerPoints > 0) {
@@ -130,5 +131,7 @@ export function creditPulseOutputs(state: GameState): void {
       drawPopulation(state, id, trained)
       if (trained > 0) log(state, 'economy', `${id} trains ${formatInt(trained)} Manpower`)
     }
+
+    drawdownManpower(state, id)
   }
 }

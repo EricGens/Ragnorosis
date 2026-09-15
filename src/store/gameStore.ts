@@ -5,10 +5,19 @@ import { advancePulse, advanceTick } from '../sim/advance'
 import { TICKS_PER_SECOND, tickInPulse, type Speed } from '../sim/clock'
 import { queueBuild, type QueueResult } from '../sim/construction'
 import { deleteDesign, renameDesign, saveDesign, type DesignInput, type RosterResult } from '../sim/military/roster'
+import {
+  assignSlot,
+  createTaskForce,
+  cyclePriority,
+  deleteTaskForce,
+  renameTaskForce,
+  setTarget,
+  type TaskForceResult,
+} from '../sim/military/taskForce'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
 import { computePulseSnapshot } from '../sim/snapshot'
 import { createInitialState } from '../sim/state'
-import type { BuildingType, FactionId, Focus, GameState, RegionId } from '../sim/types'
+import type { BuildingType, FactionId, Focus, GameState, LineRole, RegionId } from '../sim/types'
 
 /**
  * The game state as the UI should show it. While paused on a pulse boundary the coming pulse's
@@ -46,6 +55,13 @@ interface GameStore {
   saveDesign: (input: DesignInput) => RosterResult
   renameDesign: (id: number, name: string) => RosterResult
   deleteDesign: (id: number) => void
+  /** Task Force Editor actions (the Task Force's own faction is checked inside the sim). */
+  createTaskForce: (regionId: RegionId, name?: string) => TaskForceResult
+  deleteTaskForce: (id: number) => void
+  renameTaskForce: (id: number, name: string) => void
+  setTaskForceTarget: (tfId: number, designId: number, target: number) => TaskForceResult
+  cycleTaskForcePriority: (tfId: number, designId: number) => void
+  assignTaskForceSlot: (tfId: number, role: LineRole, index: number, designId: number | null) => TaskForceResult
 
   setFocus: (focus: Focus) => void
   queueBuild: (regionId: RegionId, building: BuildingType) => QueueResult
@@ -85,6 +101,16 @@ export const useGameStore = create<GameStore>()((set, get) => {
       owed -= steps
       while (steps-- > 0 && get().running) get().stepTick()
     }, TIMER_MS)
+  }
+
+  /** Apply a sim mutation that also reports a result. The recipe body must not return (Immer would replace the state). */
+  function run<R>(fn: (draft: GameState) => R): R {
+    const out: { result?: R } = {}
+    const game = produce(get().game, (d) => {
+      out.result = fn(d)
+    })
+    set({ game })
+    return out.result as R
   }
 
   return {
@@ -132,27 +158,16 @@ export const useGameStore = create<GameStore>()((set, get) => {
       set({ game: advancePulse(get().game) })
     },
 
-    saveDesign: (input) => {
-      const out: { result: RosterResult } = { result: { ok: false, reason: '' } }
-      const game = produce(get().game, (d) => {
-        out.result = saveDesign(d, get().activeFaction, input)
-      })
-      set({ game })
-      return out.result
-    },
+    saveDesign: (input) => run((d) => saveDesign(d, get().activeFaction, input)),
+    renameDesign: (id, name) => run((d) => renameDesign(d, get().activeFaction, id, name)),
+    deleteDesign: (id) => run((d) => deleteDesign(d, get().activeFaction, id)),
 
-    renameDesign: (id, name) => {
-      const out: { result: RosterResult } = { result: { ok: false, reason: '' } }
-      const game = produce(get().game, (d) => {
-        out.result = renameDesign(d, get().activeFaction, id, name)
-      })
-      set({ game })
-      return out.result
-    },
-
-    deleteDesign: (id) => {
-      set({ game: produce(get().game, (d) => deleteDesign(d, get().activeFaction, id)) })
-    },
+    createTaskForce: (regionId, name) => run((d) => createTaskForce(d, get().activeFaction, regionId, name)),
+    deleteTaskForce: (id) => run((d) => deleteTaskForce(d, id)),
+    renameTaskForce: (id, name) => run((d) => renameTaskForce(d, id, name)),
+    setTaskForceTarget: (tfId, designId, target) => run((d) => setTarget(d, tfId, designId, target)),
+    cycleTaskForcePriority: (tfId, designId) => run((d) => cyclePriority(d, tfId, designId)),
+    assignTaskForceSlot: (tfId, role, index, designId) => run((d) => assignSlot(d, tfId, role, index, designId)),
 
     setFocus: (focus) =>
       set({ game: produce(get().game, (d) => void (d.factions[get().activeFaction].focus = focus)) }),

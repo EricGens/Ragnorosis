@@ -5,6 +5,7 @@ import { log } from '../log'
 import type { FactionId, GameState, UnitDesign } from '../types'
 import { designProblems } from './design'
 import type { ModuleId, PlatformId } from './platforms'
+import { purgeDesign } from './taskForce'
 
 export type RosterResult = { ok: true; id: number } | { ok: false; reason: string }
 
@@ -58,11 +59,12 @@ export function renameDesign(state: GameState, faction: FactionId, id: number, n
   return { ok: true, id }
 }
 
-/** Remove a design from the roster. (Task Force cleanup attaches here once Task Forces exist.) */
+/** Remove a design from the roster and from every Task Force: Manpower returns to the pool, Equipment is lost (§6). */
 export function deleteDesign(state: GameState, faction: FactionId, id: number): void {
   const f = state.factions[faction]
   const design = f.designs.find((d) => d.id === id)
   if (!design) return
+  purgeDesign(state, faction, id)
   f.designs = f.designs.filter((d) => d.id !== id)
   log(state, 'dev', `${faction}: deleted unit design "${design.name}"`)
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BUILDINGS, BUILDING_TYPES } from '../../sim/data/buildings'
 import { FACTIONS } from '../../sim/data/factions'
 import { FOCUSES } from '../../sim/formulas/allocation'
+import { createTaskForce, deleteTaskForce, fillTaskForce, setTaskForceFaction } from '../../sim/military/taskForce'
 import {
   countries,
   countryRelation,
@@ -35,6 +36,7 @@ const LOG_CATEGORIES: (LogCategory | 'all')[] = [
   'construction',
   'stability',
   'weather',
+  'military',
   'dev',
 ]
 const FACTION_RELATIONS: FactionRelation[] = ['friendly', 'neutral', 'hostile']
@@ -76,6 +78,7 @@ export function DevtoolsPanel() {
         <GlobalSection />
         <RelationsSection />
         <FactionSection />
+        <TaskForceSection />
         <RegionSection />
         <LogSection />
       </div>
@@ -226,12 +229,6 @@ function FactionSection() {
         min={0}
       />
       <NumberField
-        label="Equipment"
-        value={faction.equipment}
-        onCommit={(v) => edit((f) => void (f.equipment = Math.round(v)))}
-        min={0}
-      />
-      <NumberField
         label="Manpower"
         value={faction.manpower}
         onCommit={(v) => edit((f) => void (f.manpower = Math.round(v)))}
@@ -243,6 +240,70 @@ function FactionSection() {
         options={FOCUSES.map((f) => ({ value: f, label: f }))}
         onChange={(v) => edit((f) => void (f.focus = v))}
       />
+    </Section>
+  )
+}
+
+/** Task Force devtools (Epoch 2 skeleton §7): spawn, fill instantly, reassign, disband. */
+function TaskForceSection() {
+  const game = useGameStore((s) => s.game)
+  const mutate = useGameStore((s) => s.mutate)
+  const openTaskForceEditor = useUIStore((s) => s.openTaskForceEditor)
+  const [spawnFaction, setSpawnFaction] = useState<FactionId>('united-states')
+  const [spawnRegion, setSpawnRegion] = useState('')
+  const [selected, setSelected] = useState<number | null>(null)
+
+  const controlled = game.regionOrder
+    .map((id) => game.regions[id])
+    .filter((r): r is LandRegion => isLand(r) && r.controller === spawnFaction)
+  const regionValue = controlled.some((r) => r.id === spawnRegion) ? spawnRegion : (controlled[0]?.id ?? '')
+  const tf = game.taskForces.find((t) => t.id === selected) ?? game.taskForces[0]
+
+  return (
+    <Section title="Task Forces">
+      <SelectField label="Spawn for" value={spawnFaction} options={FACTION_OPTIONS} onChange={setSpawnFaction} />
+      <SelectField
+        label="In region"
+        value={regionValue}
+        options={controlled.map((r) => ({ value: r.id, label: r.name }))}
+        onChange={setSpawnRegion}
+      />
+      <div className="mt-1 flex gap-2">
+        <DevButton
+          onClick={() =>
+            mutate((d) => {
+              // Block body on purpose: a returned result would replace the state in Immer.
+              createTaskForce(d, spawnFaction, regionValue)
+            })
+          }
+        >
+          Spawn Task Force
+        </DevButton>
+      </div>
+      {tf && (
+        <>
+          <SelectField
+            label="Task Force"
+            value={String(tf.id)}
+            options={game.taskForces.map((t) => ({
+              value: String(t.id),
+              label: `${t.name} (${FACTIONS[t.faction].name})`,
+            }))}
+            onChange={(v) => setSelected(Number(v))}
+          />
+          <SelectField
+            label="Faction"
+            value={tf.faction}
+            options={FACTION_OPTIONS}
+            onChange={(v) => mutate((d) => setTaskForceFaction(d, tf.id, v))}
+          />
+          <div className="mt-1 flex flex-wrap gap-2">
+            <DevButton onClick={() => mutate((d) => fillTaskForce(d, tf.id))}>Fill to target</DevButton>
+            <DevButton onClick={() => openTaskForceEditor(tf.id)}>Open editor</DevButton>
+            <DevButton onClick={() => mutate((d) => deleteTaskForce(d, tf.id))}>Disband</DevButton>
+          </div>
+        </>
+      )}
     </Section>
   )
 }

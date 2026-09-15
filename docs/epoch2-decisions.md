@@ -63,6 +63,44 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   the new name instead of creating a second copy, then switches to that design. Cancelling leaves the
   draft untouched.
 
+## Task Forces & the production pipeline (skeleton §3.7–3.10, §6, §7)
+
+- **Task Forces live on `GameState.taskForces`** (not per faction) so devtools reassignment is a field
+  change. Each holds a composition grid (`designId`, `target`, `priority`, `equipment`, `manpower`) and
+  three line arrays (Front Line 12, Long-Range Fires 12, CAS 6) of design ids — one unit per slot, per §6.
+- **Manufacturing banks progress toward whole units** — the skeleton makes Equipment binary *per unit*
+  (§3.10); Production allocated to a SKU accumulates until a unit is affordable, exactly like construction
+  progress, so a cheap allocation still builds eventually. Banks are per demand pool (design × priority)
+  plus one per design for stockpile accumulation, so one tier's Production never quietly builds units
+  for another tier's lines.
+- **Tier budgets wrap:** after the 60/30/10 sweep, whatever the Low tier leaves is offered back to anyone
+  still short, High first. The split governs contention; it never reserves Production for a tier with
+  nothing to fill (a Normal-only army would otherwise strand 10% every pulse and the stockpile would start
+  filling before demand was met, contradicting §3.9's "once every Task Force is at full target strength").
+- **Within-tier shares are weighted by Production-equivalent of each recipient's full demand** (cost ×
+  target; Manpower: target × per-unit Manpower) — the same weighting §3.9 gives for stockpile accumulation
+  (250/320 vs 70/320) — with saturated recipients recycling their surplus. The loop is bounded structurally
+  (every pass either spends the budget or drops a saturated recipient), the guard §3.8 asks for.
+- **Equipment has "room" at allocation time:** unfilled demand plus stockpile room (target + 3× target −
+  on hand) × cost, minus banked progress, divided by the Production Facility multiplier. With no room the
+  Equipment share reroutes at pulse start exactly like a capped Manpower pool (§3.9's overflow rule); the
+  little that still overshoots at pulse end (the facility bonus, a stranded Construction stream) goes to
+  Manpower training. A brand-new sandbox with no designs therefore sends all Equipment focus to Manpower
+  until the first Task Force asks for something.
+- **Sourcing happens at pulse end** (stockpile → lines, then manufacture, then pool → lines), not the
+  instant a +/− is clicked; the devtools "Fill to target" bypasses this for test setup. Lowering a target
+  *does* return the excess immediately (Equipment to the stockpile, Manpower to the pool), as does
+  disbanding.
+- **Manpower drawdown draws from the whole pool** each pulse end through the same waterfall, floored to
+  whole people; Manpower fill is independent of Equipment fill (§3.10 sources each independently).
+- **Devtools reassignment adopts designs:** designs are per-faction, so a Task Force handed to another
+  faction has each design matched into the new roster by module multiset, else copied (name suffixed
+  " (2)" on a clash). This is also the primitive captured-equipment conversion (§3.11) will want.
+- **Military Button:** stockpile is per SKU, so two priority lines of the same SKU show the same
+  `stockpile/cap` figure. Lines sort most-under-filled first with a text filter; designs no Task Force
+  wants are listed dimly as "no demand" so the Unit Editor route still exists for them. Battle Logs
+  arrives with the combat slice rather than as a dead button now.
+
 ## Source-doc fixes needed
 
 - **Skeleton §5.1:** replace the "~90-point advantage gap" caveat paragraph with the universal
