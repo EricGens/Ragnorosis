@@ -38,12 +38,6 @@ export type BuildingType =
 
 export type Focus = 'balanced' | 'equipment' | 'manpower' | 'construction'
 
-/** Per-region, per-faction domain access, 0–100. Dev-editable placeholder until real domain control exists. */
-export interface Superiority {
-  air: number
-  sea: number
-}
-
 interface RegionBase {
   id: RegionId
   name: string
@@ -51,7 +45,17 @@ interface RegionBase {
   energyReserve: number
   weatherActive: boolean
   weatherTicksRemaining: number
-  superiority: Record<FactionId, Superiority>
+}
+
+/** Faction-level relationship: symmetric, one shared state per pair. */
+export type FactionRelation = 'friendly' | 'neutral' | 'hostile'
+/** Country-level relationship: symmetric, one shared state per pair. */
+export type CountryRelation = 'peace' | 'war'
+
+/** Sorted "a|b" pair keys → state. Unstored pairs are Neutral / At Peace. */
+export interface RelationState {
+  factions: Record<string, FactionRelation>
+  countries: Record<string, CountryRelation>
 }
 
 export interface LandRegion extends RegionBase {
@@ -188,6 +192,7 @@ export interface GameState {
   /** Pure boolean topology, symmetric. */
   adjacency: Record<RegionId, RegionId[]>
   factions: Record<FactionId, FactionState>
+  relations: RelationState
   globalTension: number
   rngSeed: number
   settings: SimSettings

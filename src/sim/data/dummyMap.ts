@@ -1,16 +1,7 @@
 // The 13-region dummy map (skeleton §1.1, §1.6, §4.2.1). This is data, not a special case:
 // swapping in the full 190-region map means replacing this file, not the code that reads it.
 
-import type {
-  BuildingType,
-  FactionId,
-  LandRegion,
-  MaritimeRegion,
-  Region,
-  RegionId,
-  Superiority,
-  TerrainTrait,
-} from '../types'
+import type { BuildingType, FactionId, LandRegion, MaritimeRegion, Region, RegionId, TerrainTrait } from '../types'
 import { FACTION_IDS } from '../types'
 
 /** Authored map: regions plus each undirected edge listed once. */
@@ -24,16 +15,11 @@ export interface MapDefinition {
 export type MapLayout = { kind: 'grid'; col: number; row: number } | { kind: 'corner'; corner: 'nw' | 'ne' | 'sw' | 'se' }
 
 const DEFAULT_POPULARITY = 75
-const DEFAULT_SUPERIORITY: Superiority = { air: 100, sea: 100 }
 
 function forAllFactions<T>(value: T, overrides: Partial<Record<FactionId, T>> = {}): Record<FactionId, T> {
   const out = {} as Record<FactionId, T>
   for (const id of FACTION_IDS) out[id] = overrides[id] ?? value
   return out
-}
-
-function superiority(): Record<FactionId, Superiority> {
-  return forAllFactions<Superiority>({ ...DEFAULT_SUPERIORITY })
 }
 
 interface LandOverrides {
@@ -68,7 +54,6 @@ function land(
     buildings: o.buildings ?? {},
     weatherActive: false,
     weatherTicksRemaining: 0,
-    superiority: superiority(),
   }
 }
 
@@ -80,7 +65,6 @@ function maritime(id: RegionId, name: string, energyReserve = 0): MaritimeRegion
     energyReserve,
     weatherActive: false,
     weatherTicksRemaining: 0,
-    superiority: superiority(),
   }
 }
 

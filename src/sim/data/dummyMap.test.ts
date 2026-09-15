@@ -121,6 +121,15 @@ describe('dummy map starting values', () => {
     expect(defensibility(byId('s-land'))).toBe(10)
   })
 
+  it('keeps every country under uniform faction control (Epoch 2 skeleton §1.6 invariant)', () => {
+    const byCountry = new Map<string, Set<string | null>>()
+    for (const r of landRegions) {
+      if (!byCountry.has(r.country)) byCountry.set(r.country, new Set())
+      byCountry.get(r.country)!.add(r.controller)
+    }
+    for (const [country, controllers] of byCountry) expect(controllers.size, country).toBe(1)
+  })
+
   it('starts every faction with empty pools and Balanced focus', () => {
     for (const f of Object.values(state.factions)) {
       expect([f.money, f.research, f.legitimacy, f.equipment, f.manpower]).toEqual([0, 0, 0, 0, 0])

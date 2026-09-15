@@ -34,7 +34,8 @@ skeleton disagree, this file is the newer ruling; where either disagrees with th
   outside the Energy calculation — their output goes straight to Production and never enters the pool.
 - **Reserves are a per-Pulse supply rate**, not a depleting stock.
 - **Air/Sea Superiority is per region, per faction.** Each faction has its own value in every region,
-  representing that faction's level of access there.
+  representing that faction's level of access there. *(Epoch 1 stored this as a dev-editable
+  placeholder; as of Epoch 2 it is computed from the Relationship Matrix — see epoch2-decisions.md.)*
 - **Sourcing:** BFS over the region graph, same-country regions first, then outward. Maritime regions are
   transit nodes. A region is passable for faction F if F's Superiority there is ≥ 50% (Sea for maritime,
   Air for land).

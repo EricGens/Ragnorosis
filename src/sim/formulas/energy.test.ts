@@ -1,6 +1,7 @@
 import { produce } from 'immer'
 import { describe, expect, it } from 'vitest'
 import { DUMMY_MAP } from '../data/dummyMap'
+import { setFactionRelation } from '../relations'
 import { createInitialState } from '../state'
 import type { GameState, LandRegion } from '../types'
 import { allocateEnergy, sourcePreferences } from './energy'
@@ -8,10 +9,14 @@ import { allocateEnergy, sourcePreferences } from './energy'
 const base = createInitialState(DUMMY_MAP)
 const land = (s: GameState, id: string) => s.regions[id] as LandRegion
 
-/** Cut the Hive off from every neighbor of C Land by zeroing its Air Superiority there. */
+/**
+ * Cut the Hive off from every neighbor of C Land: those four regions are controlled by the United
+ * States (N, W) and China (E, S), so hostility with both closes every land route out.
+ */
 function blockadeCLand(s: GameState): GameState {
   return produce(s, (d) => {
-    for (const id of ['n-land', 'w-land', 'e-land', 's-land']) d.regions[id].superiority.hive.air = 0
+    setFactionRelation(d, 'hive', 'united-states', 'hostile')
+    setFactionRelation(d, 'hive', 'china', 'hostile')
   })
 }
 

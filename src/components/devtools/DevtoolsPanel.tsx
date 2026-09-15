@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { BUILDINGS, BUILDING_TYPES } from '../../sim/data/buildings'
 import { FACTIONS } from '../../sim/data/factions'
 import { FOCUSES } from '../../sim/formulas/allocation'
-import type { FactionId, Focus, LandRegion, LogCategory, Region, TerrainTrait } from '../../sim/types'
+import { countries, countryRelation, factionRelation, setCountryRelation, setFactionRelation } from '../../sim/relations'
+import type { CountryRelation, FactionId, FactionRelation, Focus, LandRegion, LogCategory, Region, TerrainTrait } from '../../sim/types'
 import { FACTION_IDS, isLand } from '../../sim/types'
 import { useGameStore } from '../../store/gameStore'
 import { useUIStore } from '../../store/uiStore'
@@ -12,6 +13,8 @@ const FACTION_OPTIONS = FACTION_IDS.map((id) => ({ value: id, label: FACTIONS[id
 const CONTROLLER_OPTIONS = [{ value: 'none', label: 'Unaffiliated' }, ...FACTION_OPTIONS]
 const TRAITS: TerrainTrait[] = ['rugged', 'mountainous']
 const LOG_CATEGORIES: (LogCategory | 'all')[] = ['all', 'time', 'economy', 'energy', 'construction', 'stability', 'weather', 'dev']
+const FACTION_RELATIONS: FactionRelation[] = ['friendly', 'neutral', 'hostile']
+const COUNTRY_RELATIONS: CountryRelation[] = ['peace', 'war']
 
 export function DevtoolsButton() {
   const open = useUIStore((s) => s.devtoolsOpen)
@@ -47,6 +50,7 @@ export function DevtoolsPanel() {
       <div className="overflow-y-auto p-3">
         <TimeSection />
         <GlobalSection />
+        <RelationsSection />
         <FactionSection />
         <RegionSection />
         <LogSection />
@@ -103,6 +107,61 @@ function GlobalSection() {
   )
 }
 
+/**
+ * The Relationship Matrix (Epoch 2 skeleton §1.6). Pick a pair, set its state; War cascades to
+ * Hostile and de-escalation cascades back to Peace inside the sim helpers, so order never matters.
+ */
+function RelationsSection() {
+  const game = useGameStore((s) => s.game)
+  const mutate = useGameStore((s) => s.mutate)
+  const countryList = countries(game)
+  const [fa, setFa] = useState<FactionId>('united-states')
+  const [fb, setFb] = useState<FactionId>('china')
+  const [ca, setCa] = useState(countryList[0] ?? '')
+  const [cb, setCb] = useState(countryList[1] ?? countryList[0] ?? '')
+  const countryOptions = countryList.map((c) => ({ value: c, label: c }))
+  const factionEntries = Object.entries(game.relations.factions)
+  const countryEntries = Object.entries(game.relations.countries)
+
+  return (
+    <Section title="Relations">
+      <SelectField label="Faction A" value={fa} options={FACTION_OPTIONS} onChange={setFa} />
+      <SelectField label="Faction B" value={fb} options={FACTION_OPTIONS} onChange={setFb} />
+      <SelectField<FactionRelation>
+        label="Relationship"
+        value={factionRelation(game, fa, fb)}
+        options={FACTION_RELATIONS.map((r) => ({ value: r, label: r }))}
+        onChange={(v) => mutate((d) => setFactionRelation(d, fa, fb, v))}
+      />
+      <SelectField label="Country A" value={ca} options={countryOptions} onChange={setCa} />
+      <SelectField label="Country B" value={cb} options={countryOptions} onChange={setCb} />
+      <SelectField<CountryRelation>
+        label="State"
+        value={countryRelation(game, ca, cb)}
+        options={COUNTRY_RELATIONS.map((r) => ({ value: r, label: r === 'war' ? 'at war' : 'at peace' }))}
+        onChange={(v) => mutate((d) => setCountryRelation(d, ca, cb, v))}
+      />
+      <ul className="mt-1 text-[10px] leading-snug text-ink-400">
+        {factionEntries.length === 0 && countryEntries.length === 0 && <li>All Neutral / At Peace.</li>}
+        {factionEntries.map(([k, v]) => (
+          <li key={k}>
+            {k
+              .split('|')
+              .map((id) => FACTIONS[id as FactionId].name)
+              .join(' ↔ ')}
+            : <span className={v === 'hostile' ? 'text-alert' : 'text-ink-200'}>{v}</span>
+          </li>
+        ))}
+        {countryEntries.map(([k, v]) => (
+          <li key={k}>
+            {k.replace('|', ' ↔ ')}: <span className={v === 'war' ? 'text-alert' : 'text-ink-200'}>{v === 'war' ? 'at war' : 'at peace'}</span>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  )
+}
+
 function FactionSection() {
   const activeFaction = useGameStore((s) => s.activeFaction)
   const faction = useGameStore((s) => s.game.factions[s.activeFaction])
@@ -140,28 +199,12 @@ function RegionSection() {
   return isLand(region) ? <LandRegionFields region={region} /> : <MaritimeRegionFields region={region} />
 }
 
-function SuperiorityFields({ region }: { region: Region }) {
-  const activeFaction = useGameStore((s) => s.activeFaction)
-  const mutate = useGameStore((s) => s.mutate)
-  const sup = region.superiority[activeFaction]
-  const edit = (key: 'air' | 'sea', v: number) =>
-    mutate((d) => void (d.regions[region.id].superiority[activeFaction][key] = Math.round(v)))
-  return (
-    <>
-      <p className="mt-1 text-[10px] text-ink-400">Superiority for {FACTIONS[activeFaction].name} (placeholder until real domain control):</p>
-      <NumberField label="Air" value={sup.air} onCommit={(v) => edit('air', v)} min={0} max={100} suffix="%" />
-      <NumberField label="Sea" value={sup.sea} onCommit={(v) => edit('sea', v)} min={0} max={100} suffix="%" />
-    </>
-  )
-}
-
 function MaritimeRegionFields({ region }: { region: Region }) {
   const mutate = useGameStore((s) => s.mutate)
   return (
     <Section title={`Region — ${region.name}`}>
       <NumberField label="Energy reserve" value={region.energyReserve} onCommit={(v) => mutate((d) => void (d.regions[region.id].energyReserve = v))} min={0} />
       <WeatherToggle region={region} />
-      <SuperiorityFields region={region} />
     </Section>
   )
 }
@@ -209,7 +252,6 @@ function LandRegionFields({ region }: { region: LandRegion }) {
           onChange={(v) => edit((r) => void (r.traits = v ? [...r.traits.filter((x) => x !== t), t] : r.traits.filter((x) => x !== t)))}
         />
       ))}
-      <SuperiorityFields region={region} />
 
       <p className="mt-2 text-[10px] tracking-[0.12em] text-ink-400 uppercase">Popularity</p>
       {FACTION_IDS.map((id) => (

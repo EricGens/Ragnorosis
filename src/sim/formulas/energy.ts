@@ -8,16 +8,16 @@
 
 import type { EnergyResult, FactionId, GameState, LandRegion, Region, RegionId } from '../types'
 import { isLand } from '../types'
+import { domainControl } from './domainControl'
 import { fossilEnergyDemand } from './production'
 
 export const ACCESS_THRESHOLD = 50
 const EPSILON = 1e-9
 
-/** Can `faction` move Energy through `region`? Air for land, Sea for maritime. Unaffiliated regions trade freely. */
-export function passable(region: Region, faction: FactionId | null): boolean {
+/** Can `faction` move Energy through `region`? Reads computed domain control. Unaffiliated consumers trade freely. */
+export function passable(state: GameState, region: Region, faction: FactionId | null): boolean {
   if (faction === null) return true
-  const s = region.superiority[faction]
-  return (isLand(region) ? s.air : s.sea) >= ACCESS_THRESHOLD
+  return domainControl(state, faction, region) >= ACCESS_THRESHOLD
 }
 
 /**
@@ -33,7 +33,7 @@ export function sourcePreferences(state: GameState, consumer: LandRegion): Regio
     const d = distance.get(id)!
     for (const n of state.adjacency[id]) {
       if (distance.has(n)) continue
-      if (!passable(state.regions[n], faction)) continue
+      if (!passable(state, state.regions[n], faction)) continue
       distance.set(n, d + 1)
       queue.push(n)
     }

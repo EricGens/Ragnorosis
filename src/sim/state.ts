@@ -61,6 +61,7 @@ export function createInitialState(map: MapDefinition, seed = 1): GameState {
     regionOrder,
     adjacency: buildAdjacency(regionOrder, map.edges),
     factions,
+    relations: { factions: {}, countries: {} },
     globalTension: 0,
     rngSeed: seed,
     settings: { ...DEFAULT_SETTINGS },

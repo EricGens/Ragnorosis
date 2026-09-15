@@ -6,6 +6,7 @@ import { BUILDINGS } from '../../sim/data/buildings'
 import { FACTIONS } from '../../sim/data/factions'
 import { formatInt, formatMoney, formatPercent, formatPopulation } from '../../sim/format'
 import { defensibility } from '../../sim/formulas/defensibility'
+import { domainControl } from '../../sim/formulas/domainControl'
 import { moneyPerPulse, perCapitaGdp, popularityCut, researchPerTick } from '../../sim/formulas/economy'
 import { fossilEnergyDemand, regionSupply } from '../../sim/formulas/production'
 import { gdpStabilityInput, stabilityAnchor } from '../../sim/formulas/stability'
@@ -51,25 +52,20 @@ export function popularityTone(value: number): Tone {
   return 'good'
 }
 
-function isCoastal(state: GameState, region: Region): boolean {
-  return state.adjacency[region.id].some((n) => !isLand(state.regions[n]))
-}
-
 export function regionDisplay(state: GameState, region: Region, perspective: FactionId): RegionDisplay {
   const tags: RegionTag[] = []
   if (region.weatherActive) tags.push({ kind: 'weather', ticksRemaining: region.weatherTicksRemaining })
   if (isLand(region)) for (const t of region.traits) tags.push({ kind: t })
 
-  const sup = region.superiority[perspective]
+  // Computed, never stored: Air for land, Sea for maritime (skeleton §1.1–1.3).
+  const control = domainControl(state, perspective, region)
   const header: RegionHeader = {
     name: region.name,
     type: region.type,
     controller: isLand(region) ? region.controller : null,
     country: isLand(region) ? region.country : undefined,
     tags,
-    superiority: isLand(region)
-      ? { air: sup.air, sea: isCoastal(state, region) ? sup.sea : undefined }
-      : { sea: sup.sea },
+    superiority: isLand(region) ? { air: control } : { sea: control },
   }
 
   const stats = isLand(region) ? landStats(state, region, perspective) : maritimeStats(region)
