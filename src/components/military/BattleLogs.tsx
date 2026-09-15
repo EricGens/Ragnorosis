@@ -13,6 +13,7 @@ const OUTCOME_LABEL: Record<BattleOutcome, string> = {
   'attacker-withdrew': 'Attacker withdrew',
   'defender-withdrew': 'Defender withdrew',
   'defender-surrendered': 'Defender surrendered',
+  'standoff-ended': 'Fire ceased',
 }
 
 /**
@@ -86,7 +87,7 @@ function BattleDetail({ battle }: { battle: Battle }) {
   return (
     <div className="overflow-y-auto p-5 text-xs">
       <h3 className="text-sm tracking-[0.15em] text-ink-100 uppercase">
-        Invasion of {region.name}
+        {battle.kind === 'invasion' ? 'Invasion of' : 'Long-range fire over'} {region.name}
         {live && <span className="ml-2 text-alert">· live</span>}
       </h3>
       <p className="mt-1 text-ink-400">
@@ -105,12 +106,22 @@ function BattleDetail({ battle }: { battle: Battle }) {
                 {side.name} <span className="text-ink-400">· {FACTIONS[side.faction].name}</span>
               </div>
               <dl className="mt-2 space-y-1">
-                <Row label="Hits landed" value={String(side.hitsLanded)} />
+                <Row
+                  label="Hits landed"
+                  value={`${side.hits.frontLine + side.hits.longRange + side.hits.cas} (FL ${side.hits.frontLine} · LR ${side.hits.longRange} · CAS ${side.hits.cas} · AA kills ${side.hits.airDefense})`}
+                />
+                <Row
+                  label="Air superiority"
+                  value={`${Math.round(role === 'attacker' ? battle.airSuperiority.contested : 100 - battle.airSuperiority.contested)}% over ${region.name}`}
+                />
                 <Row label="Losses" value={formatLosses(game, side)} />
                 <Row label="Production lost" value={`${formatInt(value)} Prod`} />
                 {live && (
                   <>
-                    <Row label="On the line" value={String(side.frontLine.filter((x) => x !== null).length)} />
+                    <Row
+                      label="On the lines"
+                      value={`FL ${side.frontLine.filter((x) => x !== null).length} · LR ${side.longRange.filter((x) => x !== null).length} · CAS ${side.cas.filter((x) => x !== null).length}`}
+                    />
                     <Row label="In Reserves" value={String(Object.values(side.reserves).reduce((a, b) => a + b, 0))} />
                   </>
                 )}

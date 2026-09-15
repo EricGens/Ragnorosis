@@ -30,6 +30,7 @@ export function TaskForcePanel({
 }) {
   const game = useGameStore((s) => s.game)
   const orderMove = useGameStore((s) => s.orderMove)
+  const orderStandoff = useGameStore((s) => s.orderStandoff)
   const openEditor = useUIStore((s) => s.openTaskForceEditor)
   const openBattleLogs = useUIStore((s) => s.openBattleLogs)
   const own = tf.faction === perspective
@@ -93,9 +94,25 @@ export function TaskForcePanel({
               className="mt-1 w-full rounded border border-alert/60 px-2 py-1 text-left text-[11px] text-alert hover:bg-alert/10"
               data-battle-status
             >
-              ⚔ {battle.attacker.taskForceId === tf.id ? 'Attacking' : 'Defending'} {game.regions[battle.regionId].name}{' '}
-              vs {battle.attacker.taskForceId === tf.id ? battle.defender.name : battle.attacker.name} — open log
+              ⚔{' '}
+              {battle.kind === 'standoff'
+                ? 'Exchanging long-range fire over'
+                : battle.attacker.taskForceId === tf.id
+                  ? 'Attacking'
+                  : 'Defending'}{' '}
+              {game.regions[battle.regionId].name} vs{' '}
+              {battle.attacker.taskForceId === tf.id ? battle.defender.name : battle.attacker.name} — open log
             </button>
+          )}
+          {tf.standoffTarget && (
+            <p className="mt-1 text-[10px] text-warn" data-standoff-status>
+              🚀 Standoff fire on {game.regions[tf.standoffTarget].name}
+              {own && (
+                <button type="button" onClick={() => orderStandoff(tf.id, null)} className="ml-2 text-alert underline">
+                  cancel
+                </button>
+              )}
+            </p>
           )}
         </div>
 
@@ -166,7 +183,9 @@ export function TaskForcePanel({
         {own && (
           <div className="border-t border-ink-700 pt-2">
             {pinned ? (
-              <p className="mb-2 text-[10px] text-signal">Active — click a region to move; shift-click adds a leg.</p>
+              <p className="mb-2 text-[10px] text-signal">
+                Active — click a region to move; shift-click adds a leg; the 🚀 by the icon aims standoff fire.
+              </p>
             ) : (
               <p className="mb-2 text-[10px] text-ink-400">Click to make Active for orders.</p>
             )}

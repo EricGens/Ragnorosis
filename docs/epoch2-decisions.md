@@ -198,6 +198,36 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 - **Battle Logs:** every battle stays on `GameState.battles`; the browser lists live ones first and values
   losses at today's costs when opened (§6). The crossed-swords map indicator opens the live log.
 
+## Long-Range Fires, CAS, Air Superiority & standoff fire (skeleton §1.2–1.4, §5.2, §5.3, §6; slice 6)
+
+- **Tick order inside a battle:** sensors (ISR/Radar per-type cap → force cap → relative delta), freedom of
+  maneuver from the *previous* tick's Air Superiority (the bonus feeds the rolls that produce this
+  tick's number, so it must lag one tick), Long-Range Fires, CAS, Front Line, hits, reinforcement per
+  line, loss check, then this tick's Air Superiority. Long-Range and CAS hits carry an explicit target
+  (the paired unit, a random Front Line/Reserve unit, or the aircraft) rather than the Front Line's
+  inverse-cost draw; a target already removed earlier in the tick wastes the hit.
+- **"Active units" for sensors** are everything currently on any line (the skeleton's "currently paired"
+  read literally would exclude unpaired flankers, which contribute rolls too).
+- **Full-vacate needs "fielded some, now none"** — a force that never put anything on Long-Range/CAS is
+  not "cleared" (§1.5's mass-infantry example gains +3.75%/tick, not an instant 100).
+- **CAS air-defence "kills"** count destroyed aircraft only (the skeleton says kills); CAS attack effects
+  count hits. Air-vs-air duel successes pick their region 50/50 as specified; nothing this epoch can
+  actually duel air-to-air.
+- **Standoff exchanges** are a second battle kind: only Long-Range Fires resolve, no Shock, no Planning,
+  no partisan bonus, no loss condition — a force can be ground down (units and Organization) but never
+  retreats from standoff fire alone. They start on the tick after a side engages and end the tick
+  neither side's flag points at the other (the OR rule) or either side moves. A Task Force already in an
+  invasion ignores its standoff flag (the invasion's Long-Range phase covers it).
+- **Undefended standoff target:** no battle object; the map shows a dim ⚔ on the target and clicking it
+  says "Counter-value targeting to be implemented in the future." A non-hostile or non-adjacent target
+  is refused with the red X.
+- **`domainControl` reads the live battle** for the two factions in it (contested region and the
+  attacker's home, complements for the defender); third parties keep the static rule. Energy routing
+  and movement rates therefore respond to a contest in progress, per §1.1 item 4.
+- **Map controls:** the rocket and × sit to the right of the Active Task Force's icon; the rocket arms
+  the next region click (or disarms), the × cancels this side's flag; whichever matches the current flag
+  is circled. Pinning something else drops back to move mode.
+
 ## Combat rulings ahead of the combat slice (Eric, 2026-09-15)
 
 - **Organization regeneration out of contact: 0.5% of max per tick** (a worn-down Task Force takes about a

@@ -144,7 +144,7 @@ describe('invasion battles (§4.6, §5.1)', () => {
     expect(b.outcome).toBe('attacker-won')
     expect(['e-land', 's-land']).toContain(cn(s)!.regionId) // China's own regions, adjacent to C Land
     expect(organization(s, cn(s)!)).toBe(0)
-    expect(b.defender.hitsLanded + b.attacker.hitsLanded).toBeGreaterThan(0)
+    expect(b.defender.hits.frontLine + b.attacker.hits.frontLine).toBeGreaterThan(0)
     // Transit clock: 300 mi at Combat Speed is 60 ticks; capture lands once both clocks are done.
     while (us(s).regionId !== 'c-land' && guard++ < 600) s = ticks(s, 1)
     const c = s.regions['c-land'] as LandRegion

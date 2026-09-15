@@ -1,7 +1,7 @@
 import { produce } from 'immer'
 import { formatDate, isPulseBoundary, pulseOf, TICKS_PER_PULSE, tickInPulse } from './clock'
 import { log } from './log'
-import { clearPlanning, recoverTaskForces, resolveBattles } from './military/battle'
+import { clearPlanning, recoverTaskForces, resolveBattles, startStandoffs } from './military/battle'
 import { moveTaskForces } from './military/movement'
 import { allocateAllFactions, streamConstruction } from './steps/productionSteps'
 import { beginPulse, resolvePulseEnd } from './steps/pulseSteps'
@@ -35,6 +35,7 @@ export function advanceTick(state: GameState): TickResult {
     updateWeather(draft)
     streamConstruction(draft)
     moveTaskForces(draft)
+    startStandoffs(draft)
     resolveBattles(draft)
     recoverTaskForces(draft)
     if (isPulseBoundary(draft.tick)) {

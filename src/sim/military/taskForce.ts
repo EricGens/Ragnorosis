@@ -67,6 +67,7 @@ export function createTaskForce(
     shock: 'ready',
     lastInvasionCombatTick: -1,
     consolidating: false,
+    standoffTarget: null,
   }
   state.taskForces.push(tf)
   log(state, 'military', `${faction} raises ${tf.name} in ${region.name}`)

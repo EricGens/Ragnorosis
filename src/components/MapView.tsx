@@ -69,12 +69,16 @@ export function MapView() {
   const openBattleLogs = useUIStore((s) => s.openBattleLogs)
   const activeFaction = useGameStore((s) => s.activeFaction)
   const orderMove = useGameStore((s) => s.orderMove)
+  const orderStandoff = useGameStore((s) => s.orderStandoff)
+  const orderMode = useUIStore((s) => s.orderMode)
+  const setOrderMode = useUIStore((s) => s.setOrderMode)
   const hovered = useUIStore((s) => s.hovered)
   const pinned = useUIStore((s) => s.pinned)
   const setHovered = useUIStore((s) => s.setHovered)
   const togglePin = useUIStore((s) => s.togglePin)
   const [view, setView] = useState({ x: 0, y: 0, zoom: 1 })
   const [flash, setFlash] = useState<{ x: number; y: number; reason: string; key: number } | null>(null)
+  const flashSeq = useRef(0)
   const svgRef = useRef<SVGSVGElement>(null)
 
   // WASD scroll, +/- zoom (skeleton §2.1).
@@ -151,18 +155,26 @@ export function MapView() {
       ? taskForces.find((t) => String(t.id) === pinned.id && t.faction === activeFaction)
       : undefined
 
+  function flashAt(e: React.MouseEvent, reason: string) {
+    const svg = svgRef.current
+    if (!svg) return
+    const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM()!.inverse())
+    setFlash({ x: pt.x, y: pt.y, reason, key: ++flashSeq.current })
+  }
+
   function onRegionClick(regionId: RegionId, e: React.MouseEvent) {
     if (!activeTaskForce) {
       togglePin({ kind: 'region', id: regionId })
       return
     }
-    const result = orderMove(activeTaskForce.id, regionId, e.shiftKey)
-    if (!result.ok) {
-      const svg = svgRef.current
-      if (!svg) return
-      const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM()!.inverse())
-      setFlash({ x: pt.x, y: pt.y, reason: result.reason, key: Date.now() })
+    if (orderMode === 'standoff') {
+      const result = orderStandoff(activeTaskForce.id, regionId)
+      if (!result.ok) flashAt(e, result.reason)
+      else setOrderMode('move')
+      return
     }
+    const result = orderMove(activeTaskForce.id, regionId, e.shiftKey)
+    if (!result.ok) flashAt(e, result.reason)
   }
 
   const viewSize = SIZE / view.zoom
@@ -176,6 +188,7 @@ export function MapView() {
       role="img"
       aria-label="Region map"
       data-active-task-force={activeTaskForce?.id}
+      data-order-mode={activeTaskForce ? orderMode : undefined}
     >
       <defs>
         {FACTION_IDS.map((id) => (
@@ -239,6 +252,62 @@ export function MapView() {
           />
         ) : null
       })}
+      {activeTaskForce && (
+        <StandoffControls
+          tf={activeTaskForce}
+          position={
+            travelGeometry(activeTaskForce, centers, distances)?.position ?? {
+              x: centers[activeTaskForce.regionId].cx,
+              y: centers[activeTaskForce.regionId].cy + MARKER_DY + MARKER_H / 2,
+            }
+          }
+          armed={orderMode === 'standoff'}
+          onArm={() => setOrderMode(orderMode === 'standoff' ? 'move' : 'standoff')}
+          onCancel={() => {
+            orderStandoff(activeTaskForce.id, null)
+            setOrderMode('move')
+          }}
+        />
+      )}
+      {taskForces
+        .filter(
+          (tf) =>
+            tf.standoffTarget !== null && !battles.some((b) => b.endedAt === null && b.attacker.taskForceId === tf.id),
+        )
+        .map((tf) => {
+          // Fire on a region with no defender: a real action with nothing to track yet (§6).
+          const c = centers[tf.standoffTarget!]
+          return (
+            <g
+              key={`standoff-${tf.id}`}
+              className="cursor-pointer"
+              data-standoff-indicator={tf.id}
+              transform={`translate(${c.cx + 44} ${c.cy - 62})`}
+              onClick={(e) => {
+                e.stopPropagation()
+                flashAt(e, 'Counter-value targeting to be implemented in the future.')
+              }}
+            >
+              <title>Long-range fire — no defending Task Force</title>
+              <circle
+                r={14}
+                fill="var(--color-ink-950)"
+                fillOpacity={0.85}
+                stroke="var(--color-ink-400)"
+                strokeWidth={2}
+              />
+              <text
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={15}
+                fill="var(--color-ink-200)"
+                pointerEvents="none"
+              >
+                ⚔
+              </text>
+            </g>
+          )
+        })}
       {battles
         .filter((b) => b.endedAt === null)
         .map((b) => {
@@ -458,6 +527,82 @@ function TaskForceMarkers({
         <Marker key={tf.id} tf={tf} x={x0 + i * (MARKER_W + MARKER_GAP)} y={center.cy + MARKER_DY} {...rest} />
       ))}
     </>
+  )
+}
+
+/**
+ * The standoff-fire toggle beside an Active Task Force (§6): a rocket ("Standoff Attack") that arms a
+ * region click, and a small red × ("Cancel") beneath it. Whichever reflects this side's own flag is
+ * circled — the rocket while engaged, the × while not.
+ */
+function StandoffControls({
+  tf,
+  position,
+  armed,
+  onArm,
+  onCancel,
+}: {
+  tf: TaskForce
+  position: Pt
+  armed: boolean
+  onArm: () => void
+  onCancel: () => void
+}) {
+  const engaged = tf.standoffTarget !== null
+  const x = position.x + MARKER_W / 2 + 18
+  return (
+    <g data-standoff-controls={tf.id}>
+      <g
+        className="cursor-pointer"
+        transform={`translate(${x} ${position.y - 8})`}
+        onClick={(e) => {
+          e.stopPropagation()
+          onArm()
+        }}
+        data-standoff-rocket
+      >
+        <title>
+          {engaged ? 'Standoff Attack — engaged' : armed ? 'Click an adjacent hostile region' : 'Standoff Attack'}
+        </title>
+        <circle
+          r={12}
+          fill="var(--color-ink-950)"
+          fillOpacity={0.9}
+          stroke={engaged || armed ? 'var(--color-alert)' : 'var(--color-ink-700)'}
+          strokeWidth={engaged ? 3 : 2}
+        />
+        <text textAnchor="middle" dominantBaseline="central" fontSize={13} pointerEvents="none">
+          🚀
+        </text>
+      </g>
+      <g
+        className="cursor-pointer"
+        transform={`translate(${x} ${position.y + 18})`}
+        onClick={(e) => {
+          e.stopPropagation()
+          onCancel()
+        }}
+        data-standoff-cancel
+      >
+        <title>Cancel</title>
+        <circle
+          r={8}
+          fill="var(--color-ink-950)"
+          fillOpacity={0.9}
+          stroke={engaged ? 'var(--color-ink-700)' : 'var(--color-alert)'}
+          strokeWidth={engaged ? 1 : 2}
+        />
+        <text
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={11}
+          fill="var(--color-alert)"
+          pointerEvents="none"
+        >
+          ×
+        </text>
+      </g>
+    </g>
   )
 }
 

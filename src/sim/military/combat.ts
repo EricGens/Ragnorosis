@@ -23,6 +23,56 @@ export const SURRENDER_EQUIPMENT_SHARE = 0.25
 /** Stability a captured region must reach before its captor may move on (Eric, 2026-09-15). */
 export const CONSOLIDATION_STABILITY = 50
 
+/** ISR/Radar caps (§1.2): per platform type, then Task-Force-wide, before the relative delta is taken. */
+export const SENSOR_TYPE_CAP = 10
+export const SENSOR_TF_CAP = 50
+/** Air Superiority effects per successful engagement (§1.3). */
+export const AIR_PER_LONG_RANGE_SUCCESS = 8
+export const AIR_PER_CAS_EFFECT = 5
+/** Freedom of maneuver (§1.4): +1 per this many points of summed Air Superiority above 100. */
+export const MANEUVER_POINTS_PER_BONUS = 20
+
+/**
+ * A side's Radar (Anti-Air rolls) and ISR (ground rolls) totals from its active units: each platform
+ * type's raw sum is clipped to +10 first, then the capped sums are added and clipped to +50 (§1.2).
+ */
+export function sensorTotals(
+  state: GameState,
+  tf: TaskForce,
+  activeDesignIds: number[],
+): { radar: number; isr: number } {
+  const perType: Record<string, { radar: number; isr: number }> = {}
+  for (const id of activeDesignIds) {
+    const ls = lineStats(state, tf, id)
+    if (!ls) continue
+    const t = (perType[ls.design.platform] ??= { radar: 0, isr: 0 })
+    t.radar += ls.stats.radar
+    t.isr += ls.stats.isr
+  }
+  let radar = 0
+  let isr = 0
+  for (const t of Object.values(perType)) {
+    radar += Math.min(SENSOR_TYPE_CAP, t.radar)
+    isr += Math.min(SENSOR_TYPE_CAP, t.isr)
+  }
+  return { radar: Math.min(SENSOR_TF_CAP, radar), isr: Math.min(SENSOR_TF_CAP, isr) }
+}
+
+/** Only the delta matters: +1 to the advantaged side per 2 points (1–2 → +1, 3–4 → +2 …). */
+export function relativeBonus(own: number, other: number): number {
+  const delta = own - other
+  return delta > 0 ? Math.ceil(delta / 2) : 0
+}
+
+/**
+ * Freedom of maneuver (§1.4): the attacker's Air Superiority summed over both regions. Positive
+ * result → bonus to the attacker's nonzero vector values; negative → the same bonus to the defender.
+ */
+export function maneuverBonus(summedAirSuperiority: number): number {
+  const over = summedAirSuperiority - 100
+  return Math.sign(over) * Math.floor(Math.abs(over) / MANEUVER_POINTS_PER_BONUS)
+}
+
 /** Which vector column a platform is read against (§3.6; Artillery reads against Vehicle's, §3.3). */
 export function columnFor(platform: PlatformId): number {
   return PLATFORMS[platform].column

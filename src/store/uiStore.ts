@@ -56,6 +56,8 @@ interface UIStore {
   taskForceEditor: { open: boolean; id: number | null }
   /** Battle Logs browser: closed, or open (optionally focused on one battle). */
   battleLogs: { open: boolean; battleId: number | null }
+  /** What a region click does while an own Task Force is Active: move it, or aim its standoff fire (§6). */
+  orderMode: 'move' | 'standoff'
 
   openSelector: (regionId: string) => void
   closeSelector: () => void
@@ -67,6 +69,7 @@ interface UIStore {
   closeTaskForceEditor: () => void
   openBattleLogs: (battleId?: number | null) => void
   closeBattleLogs: () => void
+  setOrderMode: (mode: 'move' | 'standoff') => void
   setHovered: (ref: EntityRef | null) => void
   /** Left-click: pin this entity, or unpin it if it is already pinned. */
   togglePin: (ref: EntityRef) => void
@@ -97,6 +100,7 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   unitEditor: { open: false, designId: null },
   taskForceEditor: { open: false, id: null },
   battleLogs: { open: false, battleId: null },
+  orderMode: 'move',
 
   openSelector: (regionId) => set({ selectorRegion: regionId }),
   closeSelector: () => set({ selectorRegion: null }),
@@ -108,12 +112,14 @@ export const useUIStore = create<UIStore>()((set, get) => ({
   closeTaskForceEditor: () => set({ taskForceEditor: { open: false, id: null } }),
   openBattleLogs: (battleId = null) => set({ battleLogs: { open: true, battleId } }),
   closeBattleLogs: () => set({ battleLogs: { open: false, battleId: null } }),
+  setOrderMode: (mode) => set({ orderMode: mode }),
 
   setHovered: (ref) => set({ hovered: ref }),
 
-  togglePin: (ref) => set({ pinned: sameRef(get().pinned, ref) ? null : ref }),
+  // Changing what's pinned always drops back to plain move orders.
+  togglePin: (ref) => set({ pinned: sameRef(get().pinned, ref) ? null : ref, orderMode: 'move' }),
 
-  unpin: () => set({ pinned: null }),
+  unpin: () => set({ pinned: null, orderMode: 'move' }),
 
   openWindow: (content, area, reserved = []) => {
     const existing = get().windows.map((w) => ({ x: w.x, y: w.y, ...WINDOW_SIZE }))

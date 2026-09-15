@@ -173,10 +173,25 @@ export interface TaskForce {
   lastInvasionCombatTick: number
   /** Consolidation lock after a capture (GDD §8.6.7): no orders until Org is full and Stability ≥ 50. */
   consolidating: boolean
+  /** Standoff fire (§6): the adjacent hostile region this side has personally engaged, if any. */
+  standoffTarget: RegionId | null
 }
 
 export type BattleOutcome =
-  'attacker-won' | 'defender-won' | 'attacker-withdrew' | 'defender-withdrew' | 'defender-surrendered'
+  | 'attacker-won'
+  | 'defender-won'
+  | 'attacker-withdrew'
+  | 'defender-withdrew'
+  | 'defender-surrendered'
+  | 'standoff-ended'
+
+/** Hits a side landed, by the line that scored them; airDefense counts CAS aircraft shot down. */
+export interface HitTally {
+  frontLine: number
+  longRange: number
+  cas: number
+  airDefense: number
+}
 
 /** One side of a battle: live line state while it runs, and the loss record that outlives it. */
 export interface BattleSide {
@@ -184,30 +199,45 @@ export interface BattleSide {
   faction: FactionId
   /** Snapshotted at the start so the log still reads once the Task Force is gone. */
   name: string
-  /** Design id per Front Line slot (null = empty). */
+  /** Design id per slot on each line (null = empty): Front Line 12, Long-Range Fires 12, CAS 6. */
   frontLine: (number | null)[]
-  /** Units held off the line, per design id. */
+  longRange: (number | null)[]
+  cas: (number | null)[]
+  /** Units held off every line, per design id. */
   reserves: Record<string, number>
+  /** How many units each line started with — the full-vacate rule needs "had some, now none" (§1.3). */
+  fielded: { longRange: number; cas: number }
   /** Units destroyed, per design id. */
   unitsLost: Record<string, number>
   manpowerLost: number
-  hitsLanded: number
+  hits: HitTally
 }
 
-/** An invasion fight (Epoch 2 skeleton §4.6, §5.1). Kept after it ends as the Battle Log. */
+/**
+ * A fight between two Task Forces (Epoch 2 skeleton §4.6, §5.1–5.3). An invasion runs every line;
+ * a standoff exchange runs Long-Range Fires only. Kept after it ends as the Battle Log.
+ */
 export interface Battle {
   id: number
+  kind: 'invasion' | 'standoff'
   /** The contested (defender's) region. */
   regionId: RegionId
+  /** The attacker's own region at the start — the other region in the freedom-of-maneuver sum (§1.4). */
+  attackerRegionId: RegionId
   startedAt: number
   endedAt: number | null
   outcome: BattleOutcome | null
   attacker: BattleSide
   defender: BattleSide
-  /** Shock window for the attacker: multiplier and the tick it expires (GDD §8.6.2); null if Planning. */
+  /** Shock window for the attacker: multiplier and the tick it expires (GDD §8.6.2); null if none. */
   shock: { multiplier: number; until: number } | null
   /** Production cost per "faction|designId", frozen for targeting weights (§5.1). */
   costs: Record<string, number>
+  /**
+   * The attacker's Air Superiority over the contested region and over its own region, recomputed
+   * from each tick's engagements (§1.3). The defender's numbers are the complements.
+   */
+  airSuperiority: { contested: number; attackerHome: number }
 }
 
 export interface FactionState {

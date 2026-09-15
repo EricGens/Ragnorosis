@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { advancePulse, advanceTick } from '../sim/advance'
 import { TICKS_PER_SECOND, tickInPulse, type Speed } from '../sim/clock'
 import { queueBuild, type QueueResult } from '../sim/construction'
+import { orderStandoff } from '../sim/military/battle'
 import { orderMove, type MoveResult } from '../sim/military/movement'
 import { deleteDesign, renameDesign, saveDesign, type DesignInput, type RosterResult } from '../sim/military/roster'
 import {
@@ -65,6 +66,8 @@ interface GameStore {
   assignTaskForceSlot: (tfId: number, role: LineRole, index: number, designId: number | null) => TaskForceResult
   /** Map orders: plain click replaces the order (redirect cost applies), shift-click appends a leg. */
   orderMove: (tfId: number, destination: RegionId, append: boolean) => MoveResult
+  /** Standoff fire toggle (§6): engage an adjacent hostile region, or null to cancel this side's flag. */
+  orderStandoff: (tfId: number, target: RegionId | null) => MoveResult
 
   setFocus: (focus: Focus) => void
   queueBuild: (regionId: RegionId, building: BuildingType) => QueueResult
@@ -172,6 +175,7 @@ export const useGameStore = create<GameStore>()((set, get) => {
     cycleTaskForcePriority: (tfId, designId) => run((d) => cyclePriority(d, tfId, designId)),
     assignTaskForceSlot: (tfId, role, index, designId) => run((d) => assignSlot(d, tfId, role, index, designId)),
     orderMove: (tfId, destination, append) => run((d) => orderMove(d, tfId, destination, append)),
+    orderStandoff: (tfId, target) => run((d) => orderStandoff(d, tfId, target)),
 
     setFocus: (focus) =>
       set({ game: produce(get().game, (d) => void (d.factions[get().activeFaction].focus = focus)) }),
