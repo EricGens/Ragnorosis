@@ -203,6 +203,12 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 - **Consolidation lock** is set on capture and lifts when the deficit is 0 and Stability ≥ 50. Note the
   Stability anchor can sit below 50 (C Land's does), in which case the lock never lifts on its own until
   the force-occupation mechanics (suppress dissent) exist; devtools can edit Stability meanwhile.
+  **Pacing is deliberate for now (Eric, 2026-11-15):** after a capture Stability falls 25 and recovers ~10% of the
+  gap per pulse, so a US-held Chinese region (anchor 52.3) takes roughly 24 pulses (~4,000 ticks) to reach 50. It
+  feels slow, but other levers are coming (Task Force crack-downs, Agents, economic effects), so don't retune the
+  drift or the threshold yet. Two fixes keep the lock honest: it is re-checked right after pulse end (Stability
+  only drifts there, so it used to lag a tick), and Stability is displayed truncated, not rounded (49.96 reads
+  "49.9", never "50.0" while still locked); the check also tolerates 1e-9 of float dust.
 - **Planning clears at pulse end** if the whole pulse (168 ticks) saw no invasion combat for that Task
   Force; the tick a battle starts or runs counts, on both sides.
 - **Battle Logs:** every battle stays on `GameState.battles`; the browser lists live ones first and values

@@ -4,7 +4,7 @@
 
 import { BUILDINGS } from '../../sim/data/buildings'
 import { FACTIONS } from '../../sim/data/factions'
-import { formatInt, formatMoney, formatPercent, formatPopulation } from '../../sim/format'
+import { formatInt, formatMoney, formatPercent, formatPopulation, formatStability } from '../../sim/format'
 import { defensibility } from '../../sim/formulas/defensibility'
 import { domainControl } from '../../sim/formulas/domainControl'
 import { moneyPerPulse, perCapitaGdp, popularityCut, researchPerTick } from '../../sim/formulas/economy'
@@ -127,7 +127,7 @@ function landStats(state: GameState, region: LandRegion, perspective: FactionId)
         title: 'Money per Pulse',
         lines: [
           `Collected by ${controllerName}.`,
-          `Weekly GDP ${formatMoney(region.gdp / 52)} × Stability ${region.stability.toFixed(1)}% × cut ${
+          `Weekly GDP ${formatMoney(region.gdp / 52)} × Stability ${formatStability(region.stability)}% × cut ${
             controllerPop === null ? '—' : popularityCut(controllerPop).toFixed(3)
           }.`,
           'The cut is 0 below 50% Popularity and rises linearly to 0.7 at 100%.',
@@ -155,7 +155,7 @@ function landStats(state: GameState, region: LandRegion, perspective: FactionId)
       tooltip: {
         title: 'Research per Tick',
         lines: [
-          `GDP ${formatMoney(region.gdp)} ÷ $1B × Stability ${region.stability.toFixed(1)}% = ${researchPerTick(region).toFixed(1)}.`,
+          `GDP ${formatMoney(region.gdp)} ÷ $1B × Stability ${formatStability(region.stability)}% = ${researchPerTick(region).toFixed(1)}.`,
           'Flows continuously to the controller every Tick and pushes progress toward the focused tech.',
         ],
       },
@@ -164,7 +164,7 @@ function landStats(state: GameState, region: LandRegion, perspective: FactionId)
     {
       key: 'stability',
       label: 'Stability',
-      value: region.stability.toFixed(1),
+      value: formatStability(region.stability),
       trend: {
         target: anchor.toFixed(1),
         direction: anchor > region.stability ? 'up' : anchor < region.stability ? 'down' : 'flat',
@@ -172,7 +172,7 @@ function landStats(state: GameState, region: LandRegion, perspective: FactionId)
       tooltip: {
         title: 'Stability',
         lines: [
-          `Currently ${region.stability.toFixed(1)}, trending toward its anchor of ${anchor.toFixed(1)}.`,
+          `Currently ${formatStability(region.stability)}, trending toward its anchor of ${anchor.toFixed(1)}.`,
           `Anchor = mean of ${
             controllerPop === null
               ? 'the per-capita GDP input only (no controlling faction)'

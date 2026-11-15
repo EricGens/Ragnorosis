@@ -2,6 +2,7 @@ import { produce } from 'immer'
 import { describe, expect, it } from 'vitest'
 import { advancePulse, advanceTick } from '../advance'
 import { DUMMY_MAP } from '../data/dummyMap'
+import { formatStability } from '../format'
 import { setFactionRelation } from '../relations'
 import { createInitialState } from '../state'
 import type { GameState, LandRegion } from '../types'
@@ -163,6 +164,34 @@ describe('invasion battles (§4.6, §5.1)', () => {
     produce(s, (d) => {
       expect(orderMove(d, 1, 'w-land')).toMatchObject({ ok: false, reason: expect.stringContaining('Consolidating') })
     })
+  })
+
+  it('the consolidation lock lifts on the very tick Stability drifts past 50 at pulse end', () => {
+    const s = produce(scenario(2), (d) => {
+      const c = d.regions['c-land'] as LandRegion
+      c.controller = US
+      c.stability = 49.9 // the next pulse-end drift (toward the 52.3 anchor) carries it over 50
+      d.taskForces[0].regionId = 'c-land'
+      d.taskForces[0].consolidating = true
+      d.tick = 167 // the next tick closes the pulse
+    })
+    const after = advanceTick(s).state
+    expect((after.regions['c-land'] as LandRegion).stability).toBeGreaterThanOrEqual(50)
+    expect(us(after).consolidating).toBe(false) // not one tick later
+  })
+
+  it('the lock lifts on float dust just under 50, and Stability never displays 50.0 until it is really 50', () => {
+    const s = produce(scenario(2), (d) => {
+      const c = d.regions['c-land'] as LandRegion
+      c.controller = US
+      c.stability = 50 - 1e-12 // accumulated drift can land a hair under 50
+      d.taskForces[0].regionId = 'c-land'
+      d.taskForces[0].consolidating = true
+    })
+    expect(us(advanceTick(s).state).consolidating).toBe(false)
+    expect(formatStability(49.96)).toBe('49.9') // rounding would read "50.0" while still locked
+    expect(formatStability(50 - 1e-12)).toBe('50.0')
+    expect(formatStability(50.2)).toBe('50.2')
   })
 
   it('surrounded with nowhere to go, the defender surrenders and the victor seizes 25% of its Equipment', () => {
