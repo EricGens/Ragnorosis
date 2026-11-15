@@ -41,18 +41,18 @@ describe('distance geometry (§4.1)', () => {
 
 describe('speed (§4.5)', () => {
   it('is the slowest ground component, Combat(Transit), and null with nothing to move', () => {
-    expect(taskForceSpeed(base, tf(base))).toEqual({ combat: 5, transit: 30 })
+    expect(taskForceSpeed(base, tf(base))).toEqual({ combat: 5 / 3, transit: 10 })
     const empty = produce(base, (d) => void setTarget(d, 1, 1, 0))
     expect(taskForceSpeed(empty, tf(empty))).toBeNull()
     expect(produce(empty, (d) => void expect(orderMove(d, 1, 'n-land')).toMatchObject({ ok: false }))).toBeDefined()
   })
 
-  it('moves at Transit Speed into permissive territory: 300 mi in 10 ticks, a hard flip on arrival', () => {
+  it('moves at Transit Speed into permissive territory: 300 mi in 30 ticks, a hard flip on arrival', () => {
     let s = produce(base, (d) => void orderMove(d, 1, 'n-land'))
-    expect(etaTicks(s, tf(s))).toBe(10)
-    s = ticks(s, 9)
+    expect(etaTicks(s, tf(s))).toBe(30)
+    s = ticks(s, 29)
     expect(tf(s).regionId).toBe('nw-land') // still fully "in" the origin (§4.3)
-    expect(tf(s).movement?.progress).toBe(270)
+    expect(tf(s).movement?.progress).toBe(290)
     s = ticks(s, 1)
     expect(tf(s).regionId).toBe('n-land')
     expect(tf(s).movement).toBeNull()
@@ -60,28 +60,29 @@ describe('speed (§4.5)', () => {
 
   it('moves at Combat Speed into hostile Control and captures an undefended region on arrival', () => {
     let s = produce(hostile(base, 'hive'), (d) => void orderMove(d, 1, 'w-land')) // stage next to C Land
-    s = ticks(s, 10)
+    s = ticks(s, 30)
     s = produce(s, (d) => void orderMove(d, 1, 'c-land'))
-    expect(etaTicks(s, tf(s))).toBe(60) // 300 mi at 5 mph
-    s = ticks(s, 59)
+    expect(etaTicks(s, tf(s))).toBe(180) // 300 mi at 5/3 mph
+    s = ticks(s, 179)
     expect(tf(s).regionId).toBe('w-land')
     expect((s.regions['c-land'] as LandRegion).controller).toBe('hive')
     s = ticks(s, 1)
     const c = s.regions['c-land'] as LandRegion
     expect(tf(s).regionId).toBe('c-land')
     expect(c.controller).toBe(US)
-    expect(c.stability).toBe(25) // 50 − the placeholder capture hit
+    expect(c.stability).toBeGreaterThanOrEqual(25) // 50 − the placeholder capture hit, plus a little drift while we walked
+    expect(c.stability).toBeLessThan(26)
   })
 })
 
 describe('pathing (§4.2)', () => {
   it('takes the shortest path by time, not hops, mixing rates per leg', () => {
-    // NW → SE with Hive, China and MU hostile. Via unaffiliated France (N, NE at 30 mph; E, SE at 5 mph):
-    // 10 + 10 + 60 + 60 = 140 ticks. Via the centre or the west: three hostile legs, 190.
+    // NW → SE with Hive, China and MU hostile. Via unaffiliated France (N, NE at 10 mph; E, SE at 5/3 mph):
+    // 30 + 30 + 180 + 180 = 420 ticks. Via the centre or the west: three hostile legs, 570.
     const s = hostile(base, 'china', 'hive', 'mankind-united')
     expect(findPath(s, tf(s), 'nw-land', 'se-land')).toEqual(['n-land', 'ne-land', 'e-land', 'se-land'])
     const s2 = produce(s, (d) => void orderMove(d, 1, 'se-land'))
-    expect(etaTicks(s2, tf(s2))).toBe(140)
+    expect(etaTicks(s2, tf(s2))).toBe(420)
   })
 
   it('refuses the sea, routes around a defended region, and appends shift-click legs from the last leg', () => {
@@ -108,15 +109,15 @@ describe('pathing (§4.2)', () => {
 describe('redirect cost (§4.4)', () => {
   it('walks progress back at Combat Speed before the new leg starts', () => {
     let s = produce(base, (d) => void orderMove(d, 1, 'n-land'))
-    s = ticks(s, 4) // 120 mi toward N Land
+    s = ticks(s, 12) // 120 mi toward N Land
     s = produce(s, (d) => void orderMove(d, 1, 'w-land'))
     expect(tf(s).movement).toEqual({ legs: ['w-land'], progress: 0, backtrack: 120, returnFrom: 'n-land' })
-    expect(etaTicks(s, tf(s))).toBe(24 + 10)
-    s = ticks(s, 23)
+    expect(etaTicks(s, tf(s))).toBe(72 + 30)
+    s = ticks(s, 71)
     expect(tf(s).movement?.returnFrom).toBe('n-land')
     s = ticks(s, 1)
     expect(tf(s).movement).toEqual({ legs: ['w-land'], progress: 0, backtrack: 0 }) // home; walk-back forgotten
-    s = ticks(s, 9)
+    s = ticks(s, 29)
     expect(tf(s).regionId).toBe('nw-land')
     s = ticks(s, 1)
     expect(tf(s).regionId).toBe('w-land')
@@ -128,13 +129,13 @@ describe('redirect cost (§4.4)', () => {
       orderMove(d, 1, 'w-land')
     })
     expect(tf(s).movement).toEqual({ legs: ['w-land'], progress: 0, backtrack: 0 })
-    let s2 = ticks(s, 2)
+    let s2 = ticks(s, 6)
     s2 = produce(s2, (d) => void orderMove(d, 1, 'nw-land'))
     expect(tf(s2).movement).toEqual({ legs: [], progress: 0, backtrack: 60, returnFrom: 'w-land' })
     // A second redirect mid-walk-back keeps walking back from the same place.
     const s3 = produce(s2, (d) => void orderMove(d, 1, 'n-land'))
     expect(tf(s3).movement).toEqual({ legs: ['n-land'], progress: 0, backtrack: 60, returnFrom: 'w-land' })
-    s2 = ticks(s2, 12)
+    s2 = ticks(s2, 36)
     expect(tf(s2).movement).toBeNull()
     expect(tf(s2).regionId).toBe('nw-land')
   })
@@ -150,7 +151,7 @@ describe('tick step', () => {
       d.taskForces[1].regionId = 'n-land' // teleported in ahead of us
       moveTaskForces(d)
     })
-    expect(tf(s).movement?.progress).toBe(5) // an invasion leg runs at Combat Speed even into our own N Land
+    expect(tf(s).movement?.progress).toBeCloseTo(5 / 3) // an invasion leg runs at Combat Speed even into our own N Land
     expect(s.battles).toHaveLength(1)
     expect(s.battles[0]).toMatchObject({
       regionId: 'n-land',

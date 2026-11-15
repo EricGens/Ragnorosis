@@ -153,9 +153,13 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   is a battle-map arc), the icon travels along the curve with its progress, and a redirect shows a gray
   arrow home with the icon sliding back along it (Eric, 2026-09-15). `Movement.returnFrom` exists only so
   the map knows where the walk-back starts; the sim ignores it.
-- **Speed tuning pending:** Eric's first impression (2026-09-15) is that 5(30) mph feels 3–5× too fast on
-  the dummy map; to be revisited once combat testing gives a feel for pacing. Speeds are platform data,
-  so it's a numbers change.
+- **Speed tune (Eric, 2026-11-15): every speed ÷3.** Eric's playtest impression was that 5(30) mph felt 3–5×
+  too fast, so all platform and module speeds are divided by 3 (Infantry 5(30) → 5/3(10) mph, Vehicle 10(30) →
+  10/3(10), Tank 8(30) → 8/3(10), Light Aircraft 300 → 100; module modifiers too, so Reactive Armor is −2/3(−5/3)).
+  Speeds are now fractions, not integers, and the UI rounds to 2 places. The skeleton's 5(30)-style numbers
+  are superseded. Two knock-on changes: **`SHOCK_PER_MPH` ×3 (0.3 → 0.9)** so Shock strength is unchanged
+  (Shock = average Combat Speed × constant), and backtrack gets a 1e-9 tolerance so fractional speeds don't
+  owe an extra tick to float dust. Aircraft speed is scaled for consistency but doesn't affect movement.
 
 ## Front Line combat & transit combat (skeleton §4.6, §5.1; slice 4)
 

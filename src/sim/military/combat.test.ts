@@ -59,8 +59,8 @@ describe('formulas (§5.1, §5.4, GDD §8.6)', () => {
   })
 
   it('derives Shock from Front Line speed and Defensibility from the region', () => {
-    expect(shockMultiplier(5)).toBeCloseTo(1.5)
-    expect(shockMultiplier(10)).toBeCloseTo(3)
+    expect(shockMultiplier(5 / 3)).toBeCloseTo(1.5)
+    expect(shockMultiplier(10 / 3)).toBeCloseTo(3)
     const base = createInitialState(DUMMY_MAP)
     expect(defenseMultiplier(base.regions['c-land'] as LandRegion)).toBeCloseTo(1.8) // 30 + 50
     expect(defenseMultiplier(base.regions['w-land'] as LandRegion)).toBeCloseTo(1.1)
@@ -150,12 +150,12 @@ describe('invasion battles (§4.6, §5.1)', () => {
     produce(s, (d) => {
       expect(orderMove(d, 2, 'se-land')).toMatchObject({ ok: false, reason: expect.stringContaining('Retreating') })
     })
-    const routed = ticks(s, 60) // 300 mi at 5 mph
+    const routed = ticks(s, 180) // 300 mi at 5/3 mph
     expect(routed.taskForces.find((t) => t.id === 2)!.retreating).toBe(false)
     expect(['e-land', 's-land']).toContain(routed.taskForces.find((t) => t.id === 2)!.regionId)
     expect(organization(s, cn(s)!)).toBe(0)
     expect(b.defender.hits.frontLine + b.attacker.hits.frontLine).toBeGreaterThan(0)
-    // Transit clock: 300 mi at Combat Speed is 60 ticks; capture lands once both clocks are done.
+    // Transit clock: 300 mi at Combat Speed is 180 ticks; capture lands once both clocks are done.
     while (us(s).regionId !== 'c-land' && guard++ < 600) s = ticks(s, 1)
     const c = s.regions['c-land'] as LandRegion
     expect(c.controller).toBe(US)
@@ -209,7 +209,7 @@ describe('invasion battles (§4.6, §5.1)', () => {
     s = produce(s, (d) => void orderMove(d, 1, 'nw-land'))
     s = ticks(s, 1)
     expect(s.battles[0].outcome).toBe('attacker-withdrew')
-    expect(us(s).movement?.backtrack).toBe(10) // 15 mi of transit owed back, 5 already walked this tick
+    expect(us(s).movement?.backtrack).toBeCloseTo(10 / 3) // 5 mi of transit owed back, 5/3 already walked this tick
   })
 
   it('Planning clears after a full pulse with no invasion combat', () => {
