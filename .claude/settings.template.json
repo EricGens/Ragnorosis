@@ -4,12 +4,28 @@
     "failIfUnavailable": false,
     "allowUnsandboxedCommands": false,
     "filesystem": {
-      "denyRead": ["~/"],
-      "allowRead": [".", "~/.nvm", "~/.npm", "~/.config/gh", "~/.gitconfig"],
-      "allowWrite": ["~/.npm"]
+      "denyRead": [
+        "~/",
+        "/mnt/c"
+      ],
+      "allowRead": [
+        ".",
+        "~/.nvm",
+        "~/.npm",
+        "~/.config/gh",
+        "~/.gitconfig"
+      ],
+      "allowWrite": [
+        "~/.npm"
+      ]
     },
     "network": {
-      "allowedDomains": ["github.com", "api.github.com", "*.npmjs.org", "registry.npmjs.org"]
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "*.npmjs.org",
+        "registry.npmjs.org"
+      ]
     }
   },
   "permissions": {
@@ -18,8 +34,7 @@
       "Bash(git push -f*)",
       "Bash(gh pr merge*)",
       "Bash(gh pr review*)",
-      "Read(~/.ssh/**)",
-      "Read(~/.config/gh/hosts.yml)"
+      "Read(~/.ssh/**)"
     ]
   }
 }
