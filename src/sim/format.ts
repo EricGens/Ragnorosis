@@ -41,3 +41,11 @@ export function formatPercent(value: number): string {
 export function formatInt(value: number): string {
   return Math.round(value).toLocaleString('en-US')
 }
+
+/**
+ * Stability to one decimal, truncated rather than rounded: gates like the consolidation lock need a true ≥ 50,
+ * so 49.96 must read "49.9", never "50.0". The 1e-9 keeps float dust (49.99999999999) from truncating down.
+ */
+export function formatStability(value: number): string {
+  return (Math.floor(value * 10 + 1e-9) / 10).toFixed(1)
+}

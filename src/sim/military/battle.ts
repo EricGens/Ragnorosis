@@ -852,7 +852,7 @@ export function liftConsolidation(state: GameState): void {
   for (const tf of state.taskForces) {
     if (!tf.consolidating) continue
     const region = state.regions[tf.regionId]
-    if (tf.organizationLost <= 0 && isLand(region) && region.stability >= CONSOLIDATION_STABILITY) {
+    if (tf.organizationLost <= 0 && isLand(region) && region.stability >= CONSOLIDATION_STABILITY - 1e-9) {
       tf.consolidating = false
       log(state, 'military', `${tf.name} has consolidated ${region.name}`)
     }
