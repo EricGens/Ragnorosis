@@ -122,3 +122,9 @@ export function findDuplicate(
 ): UnitDesign | undefined {
   return designs.find((d) => d.id !== exceptId && d.platform === platform && sameModules(d.modules, modules))
 }
+
+/** "Combat(Transit) mph" for display; speeds are fractions after the ÷3 tune, so round to 2 places. */
+export function formatSpeed(speed: { combat: number; transit: number }): string {
+  const r = (n: number) => Number(n.toFixed(2))
+  return `${r(speed.combat)}(${r(speed.transit)}) mph`
+}

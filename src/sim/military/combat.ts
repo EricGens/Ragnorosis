@@ -15,7 +15,7 @@ export const ADVANTAGE_CAP_PERCENT = 50
 export const REINFORCE_PERCENT = 33
 /** Shock lasts this long from the start of invasion combat (GDD §8.6.2). */
 export const SHOCK_TICKS = 24
-export const SHOCK_PER_MPH = 0.3
+export const SHOCK_PER_MPH = 0.3 * 3 // ×3 when all speeds were divided by 3, so Shock strength is unchanged
 /** Organization regained per tick out of contact, as a fraction of max (Eric, 2026-09-15). */
 export const ORG_REGEN_PER_TICK = 0.005
 /** Share of a surrendered Task Force's Equipment the victor converts (Eric, 2026-09-15). */

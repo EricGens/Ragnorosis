@@ -2,6 +2,7 @@ import { FACTIONS } from '../../sim/data/factions'
 import { formatInt } from '../../sim/format'
 import { battleFor } from '../../sim/military/battle'
 import { maxOrganization, organization } from '../../sim/military/combat'
+import { formatSpeed } from '../../sim/military/design'
 import { etaTicks, taskForceSpeed } from '../../sim/military/movement'
 import { findDesign, unitManpower } from '../../sim/military/taskForce'
 import { pairKey } from '../../sim/relations'
@@ -157,7 +158,7 @@ export function TaskForcePanel({
             </>
           )}
           <p className="mt-1 text-ink-400">
-            Speed <span className="text-ink-100">{speed ? `${speed.combat}(${speed.transit}) mph` : '—'}</span>
+            Speed <span className="text-ink-100">{speed ? formatSpeed(speed) : '—'}</span>
           </p>
         </div>
 

@@ -26,7 +26,7 @@ const busy = produce(createInitialState(DUMMY_MAP), (d) => {
 describe('save & load (§8)', () => {
   it('round-trips an at-rest game, including a Task Force peacefully mid-transit', () => {
     let s = busy
-    for (let i = 0; i < 4; i++) s = advanceTick(s).state
+    for (let i = 0; i < 12; i++) s = advanceTick(s).state
     const r = serializeSave(s, US, new Date('2026-09-15T12:00:00Z'))
     if (!r.ok) throw new Error(r.reason)
     expect(r.filename).toBe('ragnorosis-sandbox-2026-09-15T12-00-00.json')
@@ -40,7 +40,7 @@ describe('save & load (§8)', () => {
     expect(restored.taskForces[0].movement).toEqual({ legs: ['n-land'], progress: 120, backtrack: 0 })
     // It keeps running from where it was.
     const later = advanceTick(restored).state
-    expect(later.taskForces[0].movement?.progress).toBe(150)
+    expect(later.taskForces[0].movement?.progress).toBe(130)
   })
 
   it('refuses to save while a battle is live', () => {

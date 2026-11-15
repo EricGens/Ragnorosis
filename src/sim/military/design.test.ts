@@ -3,6 +3,12 @@ import type { UnitDesign } from '../types'
 import { autoName, designProblems, designStats, findDuplicate, sameModules } from './design'
 import { INFANTRY, moduleDef } from './platforms'
 
+/** Speeds are thirds after the ÷3 tune, so compare with tolerance. */
+function expectSpeed(actual: { combat: number; transit: number }, combat: number, transit: number) {
+  expect(actual.combat).toBeCloseTo(combat)
+  expect(actual.transit).toBeCloseTo(transit)
+}
+
 const SA = 'inf-small-arms-1'
 const AT = 'inf-man-at'
 const AA = 'inf-man-aa'
@@ -30,7 +36,7 @@ describe('Infantry equipment types (skeleton §3.1 table)', () => {
       expect(s.organization).toBe(25)
       expect(s.health).toBe(10)
       expect(s.manpower).toBe(50)
-      expect(s.speed).toEqual({ combat: 5, transit: 30 })
+      expectSpeed(s.speed, 5 / 3, 10)
       expect(s.standoffCapable).toBe(false)
     })
   }
@@ -66,10 +72,10 @@ describe('Vehicle (§3.2)', () => {
       weight: 5,
       armor: 0,
     })
-    expect(base.speed).toEqual({ combat: 10, transit: 30 })
+    expectSpeed(base.speed, 10 / 3, 10)
     const apc = designStats('vehicle', ['veh-csw-1', 'veh-diesel-1', 'veh-reactive-armor'])
     expect(apc.armor).toBe(5)
-    expect(apc.speed).toEqual({ combat: 8, transit: 25 })
+    expectSpeed(apc.speed, 8 / 3, 25 / 3)
     expect(designProblems('vehicle', ['veh-csw-1'])).toEqual(['Vehicle requires 1 engine module'])
   })
 })
@@ -84,8 +90,8 @@ describe('Artillery (§3.3)', () => {
     )
     const towed = designStats('artillery', ['art-tube'])
     expect(towed).toMatchObject({ cost: 100, organization: 5, health: 15, manpower: 15, standoffCapable: true })
-    expect(towed.speed).toEqual({ combat: 5, transit: 30 })
-    expect(designStats('artillery', ['art-tube', 'art-diesel-1']).speed).toEqual({ combat: 10, transit: 30 })
+    expectSpeed(towed.speed, 5 / 3, 10)
+    expectSpeed(designStats('artillery', ['art-tube', 'art-diesel-1']).speed, 10 / 3, 10)
     const mlrs = designStats('artillery', ['art-rocket'])
     expect(mlrs.vector).toEqual([
       { short: 5, long: 10 },
@@ -104,8 +110,8 @@ describe('Tank (§3.4)', () => {
     expect(autoName('tank', ['tank-cannon-1', 'tank-diesel-1'])).toBe('Main Battle Tank')
     expect(mbt).toMatchObject({ cost: 200, armor: 5, health: 25, manpower: 16, weight: 10, piercing: 10, damage: 15 })
     expect(mbt.vector.map((e) => e.short)).toEqual([10, 10, 8, 0])
-    expect(mbt.speed).toEqual({ combat: 8, transit: 30 })
-    expect(designStats('tank', ['tank-autocannon-1', 'tank-turbine-1']).speed).toEqual({ combat: 10, transit: 30 })
+    expectSpeed(mbt.speed, 8 / 3, 10)
+    expectSpeed(designStats('tank', ['tank-autocannon-1', 'tank-turbine-1']).speed, 10 / 3, 10)
     expect(autoName('tank', ['tank-autocannon-1', 'tank-turbine-1', 'tank-cs-aa', 'tank-targeting-1'])).toBe(
       'Infantry Fighting Vehicle (SHORAD/AFCS)',
     )

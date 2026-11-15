@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatInt } from '../../sim/format'
-import { autoName, designProblems, designStats, findDuplicate } from '../../sim/military/design'
+import { autoName, designProblems, designStats, findDuplicate, formatSpeed } from '../../sim/military/design'
 import {
   PLATFORMS,
   PLATFORM_IDS,
@@ -356,7 +356,7 @@ function StatsPanel({ stats }: { stats: ReturnType<typeof designStats> }) {
       <Row label="Piercing" value={`${stats.piercing}`} />
       <Row label="Damage" value={`${stats.damage}`} />
       <Row label="Armor" value={`${stats.armor}`} />
-      <Row label="Speed" value={`${stats.speed.combat}(${stats.speed.transit}) mph`} />
+      <Row label="Speed" value={formatSpeed(stats.speed)} />
       <Row label="Organization" value={`${stats.organization}`} />
       <Row label="Health" value={`${stats.health}`} />
       <Row label="Manpower" value={`${stats.manpower}`} />

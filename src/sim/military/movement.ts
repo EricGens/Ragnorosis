@@ -173,6 +173,7 @@ export function moveTaskForces(state: GameState): void {
     }
     if (m.backtrack > 0) {
       m.backtrack = Math.max(0, m.backtrack - speed.combat)
+      if (m.backtrack < 1e-9) m.backtrack = 0 // speeds are fractions (÷3 tune); don't owe an extra tick to float dust
       if (m.backtrack === 0) {
         delete m.returnFrom
         if (m.legs.length === 0) tf.movement = null
