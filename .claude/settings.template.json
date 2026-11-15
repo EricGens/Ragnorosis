@@ -1,0 +1,40 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": false,
+    "allowUnsandboxedCommands": false,
+    "filesystem": {
+      "denyRead": [
+        "~/",
+        "/mnt/c"
+      ],
+      "allowRead": [
+        ".",
+        "~/.nvm",
+        "~/.npm",
+        "~/.config/gh",
+        "~/.gitconfig"
+      ],
+      "allowWrite": [
+        "~/.npm"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "*.npmjs.org",
+        "registry.npmjs.org"
+      ]
+    }
+  },
+  "permissions": {
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(gh pr merge*)",
+      "Bash(gh pr review*)",
+      "Read(~/.ssh/**)"
+    ]
+  }
+}
