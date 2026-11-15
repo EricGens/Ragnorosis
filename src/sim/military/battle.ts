@@ -839,12 +839,22 @@ export function recoverTaskForces(state: GameState): void {
     if (tf.organizationLost > 0 && !battleFor(state, tf.id)) {
       tf.organizationLost = Math.max(0, tf.organizationLost - ORG_REGEN_PER_TICK * maxOrganization(state, tf))
     }
-    if (tf.consolidating) {
-      const region = state.regions[tf.regionId]
-      if (tf.organizationLost <= 0 && isLand(region) && region.stability >= CONSOLIDATION_STABILITY) {
-        tf.consolidating = false
-        log(state, 'military', `${tf.name} has consolidated ${region.name}`)
-      }
+  }
+  liftConsolidation(state)
+}
+
+/**
+ * The consolidation lock lifts once Organization is full and Stability ≥ 50. Checked after Org recovery
+ * *and again after pulse end*: Stability only drifts at pulse end, so without the second check a force
+ * would show Stability 50.2 yet stay locked until the next tick (found in Eric's playtest, 2026-11-15).
+ */
+export function liftConsolidation(state: GameState): void {
+  for (const tf of state.taskForces) {
+    if (!tf.consolidating) continue
+    const region = state.regions[tf.regionId]
+    if (tf.organizationLost <= 0 && isLand(region) && region.stability >= CONSOLIDATION_STABILITY) {
+      tf.consolidating = false
+      log(state, 'military', `${tf.name} has consolidated ${region.name}`)
     }
   }
 }

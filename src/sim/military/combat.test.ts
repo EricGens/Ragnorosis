@@ -165,6 +165,20 @@ describe('invasion battles (§4.6, §5.1)', () => {
     })
   })
 
+  it('the consolidation lock lifts on the very tick Stability drifts past 50 at pulse end', () => {
+    const s = produce(scenario(2), (d) => {
+      const c = d.regions['c-land'] as LandRegion
+      c.controller = US
+      c.stability = 49.9 // the next pulse-end drift (toward the 52.3 anchor) carries it over 50
+      d.taskForces[0].regionId = 'c-land'
+      d.taskForces[0].consolidating = true
+      d.tick = 167 // the next tick closes the pulse
+    })
+    const after = advanceTick(s).state
+    expect((after.regions['c-land'] as LandRegion).stability).toBeGreaterThanOrEqual(50)
+    expect(us(after).consolidating).toBe(false) // not one tick later
+  })
+
   it('surrounded with nowhere to go, the defender surrenders and the victor seizes 25% of its Equipment', () => {
     // C Land's neighbours: N and W (US), E and S (China). Make the defender a Hive unit whose own
     // faction is hostile to everyone around it: no retreat → surrender. 36 attackers so it does break.
