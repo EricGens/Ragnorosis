@@ -59,3 +59,5 @@ Next per GDD §12: Epoch 3, Agents. Visual polish is being scoped in `docs/art-d
   directory under `.claude/`), so the following `git stash pop` conflicts with itself. To compare against
   an old version, extract it with `git archive <ref> <path> | tar -x -C "$TMPDIR/..."` instead.
 - `git worktree add` doesn't work in the sandbox.
+- `git push -u` prints "could not lock config file .git/config". The push itself succeeded; only the
+  upstream-tracking setting couldn't be written. Confirm with `git ls-remote --heads origin <branch>`.
