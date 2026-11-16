@@ -109,6 +109,7 @@ sim/
     combat.ts         Combat formulas and constants (pure).
     battle.ts         Battle lifecycle: start, end, outcomes, retreat, surrender, recovery.
     battleRound.ts    One tick of one battle: sensors, the three lines, hits, reinforcement, air.
+  balance/            Headless battle arena and the generated balance report (see §5).
 ```
 
 `formulas/` vs `steps/` is the pure/mutating split for the economy; `combat.ts` vs `battle*.ts` is the
@@ -163,6 +164,19 @@ opening a PR (CI runs the same thing).
 - **Tests run in Node, not a simulated browser.** A test that renders components must start with the line
   `// @vitest-environment jsdom`. There are no component tests yet; UI behaviour has so far been verified
   by driving the running app.
+
+### The balance arena (`src/sim/balance/`)
+
+For questions of the form "does this composition punch above its cost?". `arena.ts` stages one invasion
+between two forces on a blank battlefield using the game's real combat code (`runBattle`), or the same
+matchup over many seeds (`runMatchup`), and reports who won, how long it took, what each side lost, and
+whether the loser broke on Organization. It skips the economy and Immer, so a few thousand battles take
+seconds. `forces.ts` is the catalog of designs and force builders to draw on.
+
+`npm run balance` regenerates `src/sim/balance/balance-report.md` — win-rate grids for single-type and
+combined-arms forces, what Shock is worth, mass against quality at several army sizes. The report is
+committed, so a tuning change shows up in the PR as a diff to it. Rerun it after changing any combat
+number or catalog entry; add a section to `report.test.ts` when a new mechanic deserves watching.
 
 ## 6. How to add things
 
