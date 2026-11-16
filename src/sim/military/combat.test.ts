@@ -1,10 +1,9 @@
 import { produce } from 'immer'
 import { describe, expect, it } from 'vitest'
 import { advancePulse, advanceTick } from '../advance'
-import { DUMMY_MAP } from '../data/dummyMap'
 import { formatStability } from '../format'
 import { setFactionRelation } from '../relations'
-import { createInitialState } from '../state'
+import { CN, giveRegion, land, LIGHT_INFANTRY, newGame, raiseTaskForce, ticks, US } from '../testing'
 import type { GameState, LandRegion } from '../types'
 import { battleFor, defenderRetreatTarget } from './battle'
 import {
@@ -20,10 +19,7 @@ import {
 } from './combat'
 import { orderMove } from './movement'
 import { saveDesign } from './roster'
-import { assignSlot, createTaskForce, fillTaskForce, setTarget } from './taskForce'
 
-const US = 'united-states'
-const CN = 'china'
 const SA = 'inf-small-arms-1'
 
 describe('formulas (§5.1, §5.4, GDD §8.6)', () => {
@@ -62,33 +58,23 @@ describe('formulas (§5.1, §5.4, GDD §8.6)', () => {
   it('derives Shock from Front Line speed and Defensibility from the region', () => {
     expect(shockMultiplier(5 / 3)).toBeCloseTo(1.5)
     expect(shockMultiplier(10 / 3)).toBeCloseTo(3)
-    const base = createInitialState(DUMMY_MAP)
-    expect(defenseMultiplier(base.regions['c-land'] as LandRegion)).toBeCloseTo(1.8) // 30 + 50
-    expect(defenseMultiplier(base.regions['w-land'] as LandRegion)).toBeCloseTo(1.1)
+    const base = newGame()
+    expect(defenseMultiplier(land(base, 'c-land'))).toBeCloseTo(1.8) // 30 + 50
+    expect(defenseMultiplier(land(base, 'w-land'))).toBeCloseTo(1.1)
   })
 })
 
 /** US: `attackers` Light Infantry in W Land, filled. China: `defenders` Light Infantry in C Land (given to China). */
 function scenario(defenders: number, attackers = 12): GameState {
-  return produce(createInitialState(DUMMY_MAP), (d) => {
-    ;(d.regions['c-land'] as LandRegion).controller = CN
+  return newGame((d) => {
+    giveRegion(d, 'c-land', CN)
     setFactionRelation(d, US, CN, 'hostile')
-    for (const f of [US, CN] as const) saveDesign(d, f, { name: 'Light Infantry', platform: 'infantry', modules: [SA] })
-    createTaskForce(d, US, 'w-land')
-    setTarget(d, 1, 1, attackers)
-    for (let i = 0; i < Math.min(12, attackers); i++) assignSlot(d, 1, 'frontLine', i, 1)
-    fillTaskForce(d, 1)
-    createTaskForce(d, CN, 'c-land')
-    setTarget(d, 2, 1, defenders)
-    for (let i = 0; i < Math.min(12, defenders); i++) assignSlot(d, 2, 'frontLine', i, 1)
-    fillTaskForce(d, 2)
+    for (const f of [US, CN]) saveDesign(d, f, LIGHT_INFANTRY)
+    raiseTaskForce(d, US, 'w-land', [[1, attackers]]) // Task Force 1; units auto-place on the Front Line
+    raiseTaskForce(d, CN, 'c-land', [[1, defenders]]) // Task Force 2
   })
 }
 
-const ticks = (s: GameState, n: number) => {
-  for (let i = 0; i < n; i++) s = advanceTick(s).state
-  return s
-}
 const us = (s: GameState) => s.taskForces.find((t) => t.id === 1)!
 const cn = (s: GameState) => s.taskForces.find((t) => t.id === 2)
 /** Units a side still accounts for: on the line, in Reserves, or destroyed. */

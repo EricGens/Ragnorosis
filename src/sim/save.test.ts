@@ -1,32 +1,25 @@
 import { produce } from 'immer'
 import { describe, expect, it } from 'vitest'
 import { advanceTick } from './advance'
-import { DUMMY_MAP } from './data/dummyMap'
 import { setFactionRelation } from './relations'
 import { saveDesign } from './military/roster'
 import { createTaskForce, fillTaskForce, setTarget } from './military/taskForce'
 import { orderMove } from './military/movement'
 import { parseSave, restoreGame, serializeSave } from './save'
-import { createInitialState } from './state'
-import type { LandRegion } from './types'
-
-const US = 'united-states'
+import { giveRegion, LIGHT_INFANTRY, newGame, raiseTaskForce, ticks, US } from './testing'
 
 /** A busy sandbox: designs, a Task Force mid-transit, a standing standoff flag, relations, a captured region. */
-const busy = produce(createInitialState(DUMMY_MAP), (d) => {
-  saveDesign(d, US, { name: 'Light Infantry', platform: 'infantry', modules: ['inf-small-arms-1'] })
+const busy = newGame((d) => {
+  saveDesign(d, US, LIGHT_INFANTRY)
   setFactionRelation(d, US, 'china', 'hostile')
-  ;(d.regions['c-land'] as LandRegion).controller = US
-  createTaskForce(d, US, 'nw-land')
-  setTarget(d, 1, 1, 3)
-  fillTaskForce(d, 1)
+  giveRegion(d, 'c-land', US)
+  raiseTaskForce(d, US, 'nw-land', [[1, 3]])
   orderMove(d, 1, 'n-land')
 })
 
 describe('save & load (§8)', () => {
   it('round-trips an at-rest game, including a Task Force peacefully mid-transit', () => {
-    let s = busy
-    for (let i = 0; i < 12; i++) s = advanceTick(s).state
+    const s = ticks(busy, 12)
     const r = serializeSave(s, US, new Date('2026-09-15T12:00:00Z'))
     if (!r.ok) throw new Error(r.reason)
     expect(r.filename).toBe('ragnorosis-sandbox-2026-09-15T12-00-00.json')
