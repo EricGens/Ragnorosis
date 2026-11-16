@@ -25,6 +25,7 @@ import { adoptDesign, designStats } from './design'
 import type { MoveResult } from './movement'
 import { PLATFORMS } from './platforms'
 import { deleteTaskForce, eligibleRoles, findDesign, findTaskForce } from './taskForce'
+import { EPSILON } from '../numeric'
 
 export function activeBattles(state: GameState): Battle[] {
   return state.battles.filter((b) => b.endedAt === null)
@@ -342,7 +343,7 @@ export function liftConsolidation(state: GameState): void {
   for (const tf of state.taskForces) {
     if (!tf.consolidating) continue
     const region = state.regions[tf.regionId]
-    if (tf.organizationLost <= 0 && isLand(region) && region.stability >= CONSOLIDATION_STABILITY - 1e-9) {
+    if (tf.organizationLost <= 0 && isLand(region) && region.stability >= CONSOLIDATION_STABILITY - EPSILON) {
       tf.consolidating = false
       log(state, 'military', `${tf.name} has consolidated ${region.name}`)
     }

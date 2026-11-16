@@ -2,6 +2,7 @@
 // machine in battle.ts applies them. Every number here is the spec's; tuning lives in playtesting.
 
 import { defensibility } from '../formulas/defensibility'
+import { EPSILON } from '../numeric'
 import type { CompositionLine, GameState, LandRegion, TaskForce, UnitDesign } from '../types'
 import { designStats, type DesignStats } from './design'
 import { PLATFORMS, type PlatformId } from './platforms'
@@ -117,7 +118,7 @@ export function defenseMultiplier(region: LandRegion): number {
 
 /** Inverse-cost targeting weights (§5.1): (1 ÷ cost) ÷ Σ(1 ÷ cost). */
 export function inverseCostWeights(costs: number[]): number[] {
-  const inv = costs.map((c) => 1 / Math.max(c, 1e-9))
+  const inv = costs.map((c) => 1 / Math.max(c, EPSILON))
   const sum = inv.reduce((s, v) => s + v, 0)
   return inv.map((v) => v / sum)
 }

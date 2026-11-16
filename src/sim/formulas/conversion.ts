@@ -3,6 +3,7 @@
 
 import type { BuildingType, FactionId, GameState } from '../types'
 import { isLand } from '../types'
+import { EPSILON } from '../numeric'
 
 export const FACILITY_BONUS_PER_LEVEL = 0.2
 
@@ -39,6 +40,6 @@ export function convertWithRemainder(
   remainder: number,
 ): { units: number; remainder: number } {
   const raw = points * multiplier + remainder
-  const units = Math.floor(raw + 1e-9)
+  const units = Math.floor(raw + EPSILON)
   return { units, remainder: raw - units }
 }

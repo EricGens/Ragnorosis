@@ -1,4 +1,4 @@
-import { DEFAULT_DISTANCE, type MapDefinition } from './data/dummyMap'
+import { DEFAULT_DISTANCE, type MapDefinition } from './data/map'
 import { pairKey } from './relations'
 import { computePulseSnapshot } from './snapshot'
 import type { FactionId, FactionState, GameState, Region, RegionId, SimSettings } from './types'

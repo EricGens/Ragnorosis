@@ -11,6 +11,7 @@ import { drawdownManpower, equipmentAllocationRoom, manufactureEquipment } from 
 import { productionFor } from '../snapshot'
 import type { ConstructionProject, FactionId, GameState, LandRegion, ProductionAllocation } from '../types'
 import { FACTION_IDS } from '../types'
+import { EPSILON } from '../numeric'
 
 /** Aggregate Production across a faction's controlled regions this pulse. */
 export function factionProduction(state: GameState, faction: FactionId): number {
@@ -58,7 +59,7 @@ export function streamConstruction(state: GameState): void {
     for (const p of [...f.projects]) {
       p.progress += each
       // A cheap queued level can complete in the same tick; keep going while the square is active.
-      while (p.progress + 1e-9 >= p.cost && completeLevel(state, id, p)) {
+      while (p.progress + EPSILON >= p.cost && completeLevel(state, id, p)) {
         /* next queued level */
       }
     }

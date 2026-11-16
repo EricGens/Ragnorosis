@@ -11,6 +11,7 @@ import { battleFor, startBattle } from './battle'
 import { designStats } from './design'
 import { PLATFORMS } from './platforms'
 import { findDesign, findTaskForce } from './taskForce'
+import { EPSILON } from '../numeric'
 
 export type MoveResult = { ok: true } | { ok: false; reason: string }
 
@@ -158,7 +159,7 @@ export function etaTicks(state: GameState, tf: TaskForce): number | null {
     ticks += remaining / legRate(state, tf, state.regions[to], speed)
     from = to
   })
-  return Math.ceil(ticks - 1e-9)
+  return Math.ceil(ticks - EPSILON)
 }
 
 /** Per tick: walk back any redirect debt, else advance the current leg; arrive when it completes. */
@@ -173,7 +174,7 @@ export function moveTaskForces(state: GameState): void {
     }
     if (m.backtrack > 0) {
       m.backtrack = Math.max(0, m.backtrack - speed.combat)
-      if (m.backtrack < 1e-9) m.backtrack = 0 // speeds are fractions (÷3 tune); don't owe an extra tick to float dust
+      if (m.backtrack < EPSILON) m.backtrack = 0 // speeds are fractions (÷3 tune); don't owe an extra tick to float dust
       if (m.backtrack === 0) {
         delete m.returnFrom
         if (m.legs.length === 0) tf.movement = null
@@ -191,7 +192,7 @@ export function moveTaskForces(state: GameState): void {
       continue
     }
     m.progress += legRate(state, tf, region, speed)
-    if (m.progress + 1e-9 >= distance) {
+    if (m.progress + EPSILON >= distance) {
       arrive(state, tf, region)
       m.legs.shift()
       m.progress = 0
