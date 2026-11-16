@@ -167,19 +167,28 @@ before release we'll check Steam's and the relevant rating bodies' current rules
 - **No gore or gratuitous violence.** Combat is shown through effects, bars and abstraction. War crimes and
   atrocities may occur in Events as *narrative*, never depicted explicitly or gratuitously.
 - **No sexually explicit content.** Agents may be implied to seduce or manipulate; nothing is shown.
-- **Real-world flags and national symbols are allowed.**
-- Candidates to also keep out or treat with care (to confirm with Eric):
-  - Likenesses of **real, living people** (including AI-generated lookalikes of politicians or celebrities).
-  - **Extremist or hate symbols** and real terrorist-group insignia, except where a historical or narrative
-    context clearly needs them.
-  - **Caricatured or stereotyped depictions** of ethnic, national or religious groups.
-  - Depictions of **real religious figures**, and anything that treats a real faith as a joke.
-  - **Harm to children**, even implied in imagery.
-  - **Real brand logos** and trademarks, and art imitating a living artist's style or copyrighted characters
-    (especially relevant if art is AI-generated).
+- **Real-world flags and national symbols are allowed** (for the nations themselves).
+- **No real, living people.** No likenesses of politicians, celebrities or other living individuals, including
+  AI-generated lookalikes, and no naming them in art. Events may refer to offices generically ("the President").
+- **No extremist or hate symbols** and no real terrorist-group insignia. This applies to real-world symbols.
+  Fictional factions are separate: **Mankind United** is regarded by some groups in the novels as a hate group
+  (anti-AI extremists). It is portrayed *as a fictional faction within the story*, with an original emblem and
+  look that don't borrow iconography from real extremist movements.
+- **No caricatured or stereotyped depictions** of ethnic, national or religious groups.
+- **No specific real individuals as religious figures.** Events may refer to the role generically ("The Pope
+  denounces the war", "a prominent preacher at a megachurch") but not to a named real person ("Pope Leo
+  denounces...").
+- **No harm to children**, including in imagery.
+- **No real brand logos or trademarks, and no imitative art of specific works.** *Genres* of art are fine: for
+  example anime-style or animated-style faces are OK, but not Evangelion-style mechs or characters, and not
+  characters in the style of Batman: The Animated Series, or any other specific franchise's look.
+- **Practical rule for AI-generated art:** don't name artists, franchises or characters in prompts. Describe the
+  qualities wanted instead (line weight, palette, mood, era). Review outputs for accidental resemblance to
+  specific works or real people before using them.
 
 ## 14. Still open
 
 - Portraits: deferred (silhouettes first). Revisit after checking Steam's AI-content disclosure rules.
 - Zoom thresholds: what appears at each level is to be tuned in play.
-- The content "also keep out" candidates in §13 need Eric's yes/no.
+- Whether the content rules in §13 should also govern Event *text* (not only imagery), for example atrocities
+  involving children. Currently written for art and narrative tone.
