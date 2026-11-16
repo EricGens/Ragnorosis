@@ -169,7 +169,9 @@ before release we'll check Steam's and the relevant rating bodies' current rules
 - **No sexually explicit content.** Agents may be implied to seduce or manipulate; nothing is shown.
 - **Real-world flags and national symbols are allowed** (for the nations themselves).
 - **No real, living people.** No likenesses of politicians, celebrities or other living individuals, including
-  AI-generated lookalikes, and no naming them in art. Events may refer to offices generically ("the President").
+  AI-generated lookalikes, and no naming them in art. **Fictional characters from the novels are fine in any role**,
+  including real-world offices (e.g. President Powell / Virtual Powell, who is also an Agent). The rule is against
+  real-world political figures and celebrities, not against fictional characters holding those positions.
 - **No extremist or hate symbols** and no real terrorist-group insignia. This applies to real-world symbols.
   Fictional factions are separate: **Mankind United** is regarded by some groups in the novels as a hate group
   (anti-AI extremists). It is portrayed *as a fictional faction within the story*, with an original emblem and
@@ -178,8 +180,12 @@ before release we'll check Steam's and the relevant rating bodies' current rules
 - **No specific real individuals as religious figures.** Events may refer to the role generically ("The Pope
   denounces the war", "a prominent preacher at a megachurch") but not to a named real person ("Pope Leo
   denounces...").
-- **No harm to children**, including in imagery.
-- **No real brand logos or trademarks, and no imitative art of specific works.** *Genres* of art are fine: for
+- **No harm to children**, including in imagery. In Event text, atrocities and mass-casualty events may be
+  described, but generically: they don't single out or target children. (A sterilization-virus Event or other
+  mass-casualty Event naturally affects children, but the text need not call them out.)
+- **No real company names in Events** (or elsewhere). The world uses stand-in names (Rayshot Dynamics, LaserWard,
+  OnlyCamSesh, and so on). No real brand names or logos.
+- **No imitative art of specific works.** *Genres* of art are fine: for
   example anime-style or animated-style faces are OK, but not Evangelion-style mechs or characters, and not
   characters in the style of Batman: The Animated Series, or any other specific franchise's look.
 - **Practical rule for AI-generated art:** don't name artists, franchises or characters in prompts. Describe the
@@ -190,5 +196,3 @@ before release we'll check Steam's and the relevant rating bodies' current rules
 
 - Portraits: deferred (silhouettes first). Revisit after checking Steam's AI-content disclosure rules.
 - Zoom thresholds: what appears at each level is to be tuned in play.
-- Whether the content rules in §13 should also govern Event *text* (not only imagery), for example atrocities
-  involving children. Currently written for art and narrative tone.
