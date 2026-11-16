@@ -66,6 +66,19 @@ export function sensorTotals(
   return { radar: Math.min(SENSOR_TF_CAP, radar), isr: Math.min(SENSOR_TF_CAP, isr) }
 }
 
+/**
+ * An unopposed CAS run adds this share of the aircraft's value against its target to the baseline (Eric,
+ * 2026-11-16): 5% + half value, so a standard CAS aircraft hits about 11% against Infantry and 10% against
+ * Tanks instead of a flat 5%. Flanking and unpaired Long-Range Fires stay at the flat baseline.
+ */
+export const UNOPPOSED_CAS_VALUE_SHARE = 0.5
+
+/** Hit chance (percent) of a CAS run no air defence rose to meet. */
+export function unopposedCasChance(value: number): number {
+  if (value <= 0) return 0
+  return Math.min(ADVANTAGE_CAP_PERCENT, BASE_HIT_PERCENT + value * UNOPPOSED_CAS_VALUE_SHARE)
+}
+
 /** Only the delta matters: +1 to the advantaged side per 2 points (1–2 → +1, 3–4 → +2 …). */
 export function relativeBonus(own: number, other: number): number {
   const delta = own - other

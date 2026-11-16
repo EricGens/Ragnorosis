@@ -5,7 +5,8 @@ import { setFactionRelation } from '../relations'
 import { CN, giveRegion, LIGHT_INFANTRY, newGame, raiseTaskForce, ticks, TOWED_ARTILLERY, US } from '../testing'
 import type { GameState, LandRegion } from '../types'
 import { battleFor, orderStandoff } from './battle'
-import { maneuverBonus, relativeBonus, sensorTotals } from './combat'
+import { drawWeighted } from './battleRound'
+import { maneuverBonus, relativeBonus, sensorTotals, unopposedCasChance } from './combat'
 import { orderMove } from './movement'
 import { saveDesign } from './roster'
 import { createTaskForce, fillTaskForce, setTarget } from './taskForce'
@@ -154,5 +155,59 @@ describe('CAS (§5.3) and the combined-arms invasion', () => {
     // Air Superiority moved during the fight, and a CAS-only force never triggers the full-vacate 100.
     expect(done.airSuperiority.contested).toBeGreaterThanOrEqual(0)
     expect(done.airSuperiority.contested).toBeLessThanOrEqual(100)
+  })
+
+  it("an unopposed run hits at 5% + half the aircraft's value, capped at 50% (decisions doc)", () => {
+    expect(unopposedCasChance(12)).toBe(11) // standard CAS against Infantry
+    expect(unopposedCasChance(10)).toBe(10) // against Tanks
+    expect(unopposedCasChance(36)).toBe(23) // three Precision Guided Munitions
+    expect(unopposedCasChance(200)).toBe(50)
+    expect(unopposedCasChance(0)).toBe(0) // nothing to hit it with
+  })
+
+  it('pilots prefer the richer target: candidates are drawn in proportion to Production cost', () => {
+    // A 200-Production tank beside a 50-Production infantry unit is picked four times in five.
+    let tank = 0
+    produce(newGame(), (d) => {
+      for (let i = 0; i < 2000; i++) if (drawWeighted(d, [50, 200]) === 1) tank++
+    })
+    expect(tank / 2000).toBeGreaterThan(0.77)
+    expect(tank / 2000).toBeLessThan(0.83)
+  })
+
+  /** US: 12 Light Infantry + 6 CAS, no artillery of its own. China: 12 Light Infantry, 12 Towed Artillery, `aa` AA Infantry. */
+  function artilleryUnderAir(aa: number): { everHit: boolean; lost: number } {
+    let s = newGame((d) => {
+      giveRegion(d, 'c-land', CN)
+      setFactionRelation(d, US, CN, 'hostile')
+      saveDesign(d, US, LIGHT_INFANTRY)
+      saveDesign(d, US, { name: 'CAS Aircraft', platform: 'light-aircraft', modules: ['la-pgm', 'la-turbofan'] })
+      saveDesign(d, CN, LIGHT_INFANTRY)
+      saveDesign(d, CN, TOWED_ARTILLERY) // design 2
+      saveDesign(d, CN, { name: 'AA Infantry', platform: 'infantry', modules: ['inf-small-arms-1', 'inf-man-aa'] })
+      raiseTaskForce(d, US, 'w-land', [
+        [1, 12],
+        [2, 6],
+      ])
+      raiseTaskForce(d, CN, 'c-land', [[1, 12], [2, 12], ...(aa > 0 ? [[3, aa] as [number, number]] : [])])
+      orderMove(d, 1, 'c-land')
+    })
+    // The US has nothing on Long-Range Fires, so only its aircraft could ever reach the Chinese guns.
+    let everHit = false
+    for (let guard = 0; guard < 400 && !s.battles[0]?.endedAt; guard++) {
+      s = ticks(s, 1)
+      if (s.battles[0].defender.longRange.some((slot) => slot === null)) everHit = true
+    }
+    return { everHit, lost: s.battles[0].defender.unitsLost[2] ?? 0 }
+  }
+
+  it('unopposed aircraft hunt the enemy Long-Range line as well as the Front Line', () => {
+    const r = artilleryUnderAir(0)
+    expect(r.everHit).toBe(true)
+    expect(r.lost).toBeGreaterThan(0)
+  })
+
+  it('intercepted aircraft are held to the Front Line: with air defence for every run, the guns are never touched', () => {
+    expect(artilleryUnderAir(40)).toEqual({ everHit: false, lost: 0 })
   })
 })

@@ -77,12 +77,12 @@ Attacker win rate. Rows attack, columns defend.
 | attacker ↓ / defender → | Infantry | Infantry + artillery | Infantry + artillery + CAS | Tanks | Tanks + artillery + CAS | 12 tanks + Light Infantry | 12 tanks + artillery + CAS + Light Infantry | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | **Infantry** | 23% | 0% | 0% | 68% | 0% | 0% | 0% | 13% |
-| **Infantry + artillery** | 100% | 45% | 35% | 100% | 48% | 57% | 20% | 58% |
-| **Infantry + artillery + CAS** | 100% | 78% | 60% | 100% | 90% | 73% | 60% | 80% |
-| **Tanks** | 30% | 0% | 3% | 85% | 0% | 98% | 8% | 32% |
-| **Tanks + artillery + CAS** | 100% | 75% | 45% | 100% | 85% | 100% | 100% | 86% |
-| **12 tanks + Light Infantry** | 95% | 38% | 25% | 23% | 0% | 65% | 15% | 37% |
-| **12 tanks + artillery + CAS + Light Infantry** | 100% | 95% | 83% | 100% | 70% | 100% | 88% | 91% |
+| **Infantry + artillery** | 100% | 45% | 0% | 100% | 25% | 57% | 0% | 47% |
+| **Infantry + artillery + CAS** | 100% | 100% | 57% | 100% | 98% | 100% | 70% | 89% |
+| **Tanks** | 30% | 0% | 0% | 85% | 0% | 98% | 0% | 30% |
+| **Tanks + artillery + CAS** | 100% | 98% | 38% | 100% | 88% | 100% | 93% | 88% |
+| **12 tanks + Light Infantry** | 95% | 38% | 0% | 23% | 0% | 65% | 0% | 31% |
+| **12 tanks + artillery + CAS + Light Infantry** | 100% | 100% | 68% | 100% | 75% | 100% | 83% | 89% |
 
 - Infantry: 100 AT Infantry — 5000 Manpower
 - Infantry + artillery: 80 AT Infantry, 12 Towed Artillery — 4180 Manpower
@@ -99,12 +99,12 @@ Attacker win rate. Rows attack, columns defend.
 | attacker ↓ / defender → | Infantry | Infantry + artillery | Infantry + artillery + CAS | Tanks | Tanks + artillery + CAS | 12 tanks + Light Infantry | 12 tanks + artillery + CAS + Light Infantry | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | **Infantry** | 8% | 0% | 0% | 68% | 0% | 0% | 0% | 11% |
-| **Infantry + artillery** | 100% | 40% | 18% | 100% | 45% | 100% | 0% | 58% |
-| **Infantry + artillery + CAS** | 100% | 93% | 55% | 100% | 98% | 100% | 23% | 81% |
+| **Infantry + artillery** | 100% | 40% | 0% | 100% | 3% | 100% | 0% | 49% |
+| **Infantry + artillery + CAS** | 100% | 100% | 25% | 100% | 100% | 100% | 8% | 76% |
 | **Tanks** | 13% | 0% | 0% | 13% | 0% | 100% | 0% | 18% |
-| **Tanks + artillery + CAS** | 100% | 53% | 0% | 100% | 70% | 100% | 83% | 72% |
+| **Tanks + artillery + CAS** | 100% | 100% | 0% | 100% | 73% | 100% | 25% | 71% |
 | **12 tanks + Light Infantry** | 100% | 0% | 0% | 0% | 0% | 57% | 0% | 23% |
-| **12 tanks + artillery + CAS + Light Infantry** | 100% | 98% | 70% | 100% | 48% | 100% | 68% | 83% |
+| **12 tanks + artillery + CAS + Light Infantry** | 100% | 100% | 88% | 100% | 88% | 100% | 63% | 91% |
 
 - Infantry: 333 AT Infantry — 16650 Manpower
 - Infantry + artillery: 313 AT Infantry, 12 Towed Artillery — 15830 Manpower
@@ -120,8 +120,8 @@ Attacker: 60 AT Infantry + 6 CAS Aircraft, no Shock. Hit rate is per aircraft pe
 
 | defender | CAS hit rate | aircraft shot down | attacker wins |
 | --- | ---: | ---: | ---: |
-| 100 AT Infantry (no air defence) | 5.0% | 0.0 of 6 | 28% |
-| 94 AT Infantry + 6 AA Infantry in Reserves | 6.8% | 3.6 of 6 | 35% |
+| 100 AT Infantry (no air defence) | 10.8% | 0.0 of 6 | 95% |
+| 94 AT Infantry + 6 AA Infantry in Reserves | 7.1% | 3.7 of 6 | 28% |
 | 100 Heavy Infantry (air defence on every unit) | 6.6% | 4.0 of 6 | 23% |
 
 ## Does the Front Line stay full, and how do battles end?
@@ -148,17 +148,17 @@ air-defence units wait in Reserves, where they intercept CAS.
 
 | you ↓ / opponent → | More infantry | AA Infantry | Recon Vehicles | SHORAD Vehicles | IFVs | MBT+ | MBT (AT) | Towed Artillery | MLRS | CAS | Spread | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **More infantry** | 50% | 58% | 32% | 80% | 0% | 0% | 0% | 5% | 25% | 45% | 15% | 28% |
-| **AA Infantry** | 42% | 50% | 23% | 58% | 0% | 0% | 0% | 2% | 20% | 7% | 3% | 19% |
-| **Recon Vehicles** | 68% | 77% | 50% | 77% | 7% | 3% | 5% | 10% | 38% | 32% | 20% | 35% |
-| **SHORAD Vehicles** | 20% | 42% | 23% | 50% | 0% | 0% | 0% | 0% | 8% | 80% | 12% | 21% |
-| **IFVs** | 100% | 100% | 93% | 100% | 50% | 28% | 23% | 77% | 97% | 80% | 77% | 75% |
-| **MBT+** | 100% | 100% | 97% | 100% | 72% | 50% | 37% | 78% | 93% | 97% | 90% | 83% |
-| **MBT (AT)** | 100% | 100% | 95% | 100% | 77% | 63% | 50% | 57% | 93% | 90% | 70% | 81% |
-| **Towed Artillery** | 95% | 98% | 90% | 100% | 23% | 22% | 43% | 50% | 62% | 90% | 70% | 68% |
-| **MLRS** | 75% | 80% | 62% | 92% | 3% | 7% | 7% | 38% | 50% | 73% | 40% | 48% |
-| **CAS** | 55% | 93% | 68% | 20% | 20% | 3% | 10% | 10% | 27% | 50% | 28% | 35% |
-| **Spread** | 85% | 97% | 80% | 88% | 23% | 10% | 30% | 30% | 60% | 72% | 50% | 57% |
+| **More infantry** | 50% | 58% | 32% | 80% | 0% | 0% | 0% | 5% | 25% | 2% | 2% | 23% |
+| **AA Infantry** | 42% | 50% | 23% | 58% | 0% | 0% | 0% | 2% | 20% | 8% | 5% | 19% |
+| **Recon Vehicles** | 68% | 77% | 50% | 77% | 7% | 3% | 5% | 10% | 38% | 5% | 8% | 32% |
+| **SHORAD Vehicles** | 20% | 42% | 23% | 50% | 0% | 0% | 0% | 0% | 8% | 80% | 8% | 21% |
+| **IFVs** | 100% | 100% | 93% | 100% | 50% | 28% | 23% | 77% | 97% | 37% | 60% | 70% |
+| **MBT+** | 100% | 100% | 97% | 100% | 72% | 50% | 37% | 78% | 93% | 5% | 35% | 70% |
+| **MBT (AT)** | 100% | 100% | 95% | 100% | 77% | 63% | 50% | 57% | 93% | 5% | 32% | 70% |
+| **Towed Artillery** | 95% | 98% | 90% | 100% | 23% | 22% | 43% | 50% | 62% | 48% | 47% | 62% |
+| **MLRS** | 75% | 80% | 62% | 92% | 3% | 7% | 7% | 38% | 50% | 10% | 13% | 40% |
+| **CAS** | 98% | 92% | 95% | 20% | 63% | 95% | 95% | 52% | 90% | 50% | 78% | 75% |
+| **Spread** | 98% | 95% | 92% | 92% | 40% | 65% | 68% | 53% | 87% | 22% | 50% | 69% |
 
 - More infantry: 64 Light Infantry
 - AA Infantry: 40 Light Infantry + 20 AA Infantry
@@ -176,17 +176,17 @@ air-defence units wait in Reserves, where they intercept CAS.
 
 | you ↓ / opponent → | More infantry | AA Infantry | Recon Vehicles | SHORAD Vehicles | IFVs | MBT+ | MBT (AT) | Towed Artillery | MLRS | CAS | Spread | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **More infantry** | 50% | 53% | 78% | 83% | 37% | 8% | 33% | 2% | 17% | 22% | 18% | 37% |
+| **More infantry** | 50% | 53% | 78% | 83% | 37% | 8% | 33% | 2% | 17% | 0% | 3% | 33% |
 | **AA Infantry** | 47% | 50% | 50% | 73% | 12% | 3% | 8% | 0% | 13% | 13% | 5% | 25% |
-| **Recon Vehicles** | 22% | 50% | 50% | 68% | 12% | 2% | 3% | 2% | 5% | 7% | 2% | 20% |
-| **SHORAD Vehicles** | 17% | 27% | 32% | 50% | 12% | 0% | 2% | 0% | 5% | 82% | 5% | 21% |
-| **IFVs** | 63% | 88% | 88% | 88% | 50% | 12% | 10% | 2% | 27% | 27% | 20% | 43% |
-| **MBT+** | 92% | 97% | 98% | 100% | 88% | 50% | 45% | 25% | 62% | 60% | 60% | 71% |
-| **MBT (AT)** | 67% | 92% | 97% | 98% | 90% | 55% | 50% | 10% | 35% | 37% | 38% | 61% |
-| **Towed Artillery** | 98% | 100% | 98% | 100% | 98% | 75% | 90% | 50% | 50% | 93% | 83% | 85% |
-| **MLRS** | 83% | 87% | 95% | 95% | 73% | 38% | 65% | 50% | 50% | 68% | 62% | 70% |
-| **CAS** | 78% | 87% | 93% | 18% | 73% | 40% | 63% | 7% | 32% | 50% | 40% | 53% |
-| **Spread** | 82% | 95% | 98% | 95% | 80% | 40% | 62% | 17% | 38% | 60% | 50% | 65% |
+| **Recon Vehicles** | 22% | 50% | 50% | 68% | 12% | 2% | 3% | 2% | 5% | 2% | 2% | 20% |
+| **SHORAD Vehicles** | 17% | 27% | 32% | 50% | 12% | 0% | 2% | 0% | 5% | 75% | 5% | 20% |
+| **IFVs** | 63% | 88% | 88% | 88% | 50% | 12% | 10% | 2% | 27% | 7% | 13% | 41% |
+| **MBT+** | 92% | 97% | 98% | 100% | 88% | 50% | 45% | 25% | 62% | 2% | 30% | 63% |
+| **MBT (AT)** | 67% | 92% | 97% | 98% | 90% | 55% | 50% | 10% | 35% | 0% | 12% | 55% |
+| **Towed Artillery** | 98% | 100% | 98% | 100% | 98% | 75% | 90% | 50% | 50% | 47% | 65% | 79% |
+| **MLRS** | 83% | 87% | 95% | 95% | 73% | 38% | 65% | 50% | 50% | 5% | 47% | 63% |
+| **CAS** | 100% | 87% | 98% | 25% | 93% | 98% | 100% | 53% | 95% | 50% | 77% | 80% |
+| **Spread** | 97% | 95% | 98% | 95% | 87% | 70% | 88% | 35% | 53% | 23% | 50% | 72% |
 
 - More infantry: 60 AT Infantry
 - AA Infantry: 40 AT Infantry + 20 AA Infantry
@@ -204,17 +204,17 @@ air-defence units wait in Reserves, where they intercept CAS.
 
 | you ↓ / opponent → | More infantry | AA Infantry | Recon Vehicles | SHORAD Vehicles | IFVs | MBT+ | MBT (AT) | Towed Artillery | MLRS | CAS | Spread | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **More infantry** | 50% | 62% | 88% | 80% | 35% | 2% | 3% | 0% | 0% | 15% | 0% | 30% |
+| **More infantry** | 50% | 62% | 88% | 80% | 35% | 2% | 3% | 0% | 0% | 0% | 0% | 29% |
 | **AA Infantry** | 38% | 50% | 55% | 63% | 3% | 0% | 0% | 0% | 0% | 2% | 0% | 19% |
-| **Recon Vehicles** | 12% | 45% | 50% | 58% | 7% | 0% | 0% | 0% | 0% | 2% | 0% | 16% |
-| **SHORAD Vehicles** | 20% | 37% | 42% | 50% | 5% | 0% | 0% | 0% | 0% | 78% | 0% | 21% |
+| **Recon Vehicles** | 12% | 45% | 50% | 58% | 7% | 0% | 0% | 0% | 0% | 0% | 0% | 16% |
+| **SHORAD Vehicles** | 20% | 37% | 42% | 50% | 5% | 0% | 0% | 0% | 0% | 70% | 0% | 20% |
 | **IFVs** | 65% | 97% | 93% | 95% | 50% | 3% | 5% | 0% | 0% | 3% | 0% | 37% |
-| **MBT+** | 98% | 100% | 100% | 100% | 97% | 50% | 38% | 28% | 30% | 67% | 3% | 65% |
-| **MBT (AT)** | 97% | 100% | 100% | 100% | 95% | 62% | 50% | 8% | 8% | 37% | 0% | 60% |
-| **Towed Artillery** | 100% | 100% | 100% | 100% | 100% | 72% | 92% | 50% | 43% | 97% | 53% | 82% |
-| **MLRS** | 100% | 100% | 100% | 100% | 100% | 70% | 92% | 57% | 50% | 95% | 67% | 85% |
-| **CAS** | 85% | 98% | 98% | 22% | 97% | 33% | 63% | 3% | 5% | 50% | 0% | 50% |
-| **Spread** | 100% | 100% | 100% | 100% | 100% | 97% | 100% | 47% | 33% | 100% | 50% | 84% |
+| **MBT+** | 98% | 100% | 100% | 100% | 97% | 50% | 38% | 28% | 30% | 2% | 0% | 58% |
+| **MBT (AT)** | 97% | 100% | 100% | 100% | 95% | 62% | 50% | 8% | 8% | 0% | 0% | 56% |
+| **Towed Artillery** | 100% | 100% | 100% | 100% | 100% | 72% | 92% | 50% | 43% | 58% | 13% | 75% |
+| **MLRS** | 100% | 100% | 100% | 100% | 100% | 70% | 92% | 57% | 50% | 5% | 3% | 71% |
+| **CAS** | 100% | 98% | 100% | 30% | 97% | 98% | 100% | 42% | 95% | 50% | 18% | 75% |
+| **Spread** | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 87% | 97% | 82% | 50% | 92% |
 
 - More infantry: 140 AT Infantry
 - AA Infantry: 100 AT Infantry + 40 AA Infantry
@@ -239,19 +239,19 @@ is best — hold rate against each attacker. If nothing here holds, the attacker
 
 | defender | holds vs Tanks + artillery + CAS | holds vs 12 tanks + artillery + CAS + Light Infantry | holds vs Infantry + artillery + CAS |
 | --- | ---: | ---: | ---: |
-| 12 MBT (AT) + 12 MLRS + 26 AT Infantry | 50% | 31% | 31% |
-| 12 MBT (AT) + 12 Towed Artillery + 36 AT Infantry | 38% | 38% | 31% |
-| 12 MLRS + 70 AT Infantry | 56% | 25% | 38% |
-| 12 MLRS + 6 CAS Aircraft + 50 AT Infantry | 69% | 19% | 44% |
-| 12 Towed Artillery + 6 CAS Aircraft + 60 AT Infantry | 50% | 19% | 38% |
+| 12 Towed Artillery + 6 CAS Aircraft + 51 Heavy Infantry | 88% | 25% | 31% |
+| 12 MBT (AT) + 12 Towed Artillery + 6 CAS Aircraft + 16 AT Infantry | 56% | 56% | 25% |
+| 12 Towed Artillery + 6 CAS Aircraft + 60 AT Infantry | 50% | 25% | 44% |
+| 12 MLRS + 6 CAS Aircraft + 42 Heavy Infantry | 50% | 19% | 38% |
+| 12 MBT (AT) + 12 Towed Artillery + 6 CAS Aircraft + 13 Heavy Infantry | 88% | 19% | 13% |
 
 ### 20000 Production (84 defenders tried)
 
 | defender | holds vs Tanks + artillery + CAS | holds vs 12 tanks + artillery + CAS + Light Infantry | holds vs Infantry + artillery + CAS |
 | --- | ---: | ---: | ---: |
-| 12 MBT+ + 12 MLRS + 6 CAS Aircraft + 239 AT Infantry | 100% | 100% | 100% |
-| 24 MBT (AT) + 12 MLRS + 6 CAS Aircraft + 234 Light Infantry | 94% | 88% | 100% |
-| 12 MBT (AT) + 12 MLRS + 6 CAS Aircraft + 239 AT Infantry | 100% | 81% | 100% |
-| 12 MLRS + 6 CAS Aircraft + 242 Heavy Infantry | 100% | 81% | 81% |
-| 24 MBT+ + 12 MLRS + 6 CAS Aircraft + 195 AT Infantry | 100% | 69% | 94% |
+| 12 Towed Artillery + 6 CAS Aircraft + 251 Heavy Infantry | 100% | 100% | 100% |
+| 12 MLRS + 6 CAS Aircraft + 242 Heavy Infantry | 100% | 100% | 100% |
+| 12 MBT+ + 12 Towed Artillery + 6 CAS Aircraft + 213 Heavy Infantry | 100% | 100% | 100% |
+| 12 MBT+ + 12 MLRS + 6 CAS Aircraft + 205 Heavy Infantry | 100% | 100% | 100% |
+| 12 MBT (AT) + 12 Towed Artillery + 6 CAS Aircraft + 213 Heavy Infantry | 100% | 100% | 100% |
 

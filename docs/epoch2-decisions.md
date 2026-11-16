@@ -258,6 +258,19 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 - **CAS air-defence "kills"** count destroyed aircraft only (the skeleton says kills); CAS attack effects
   count hits. Air-vs-air duel successes pick their region 50/50 as specified; nothing this epoch can
   actually duel air-to-air.
+- **CAS rules revised (Eric, 2026-11-16), superseding §5.3 where they differ.** Three changes, all to make air power
+  a real counter in a web of counters rather than six flat 5% rolls:
+  1. **An unopposed run hits at 5% + half the aircraft's value** against its target (cap 50%): about 11% against
+     Infantry and 10% against Tanks for a standard aircraft. Full value was tried and overshot — CAS beat everything
+     but dedicated air-defence vehicles 98–100% of the time. Flanking and unpaired Long-Range Fires deliberately
+     stay at the flat 5%; giving artillery the same bonus pushed it to an ~90% average.
+  2. **An unopposed aircraft may strike the enemy's Long-Range line as well as its Front Line** — with air
+     superiority it loiters and hunts artillery. An intercepted aircraft is held to the Front Line.
+  3. **CAS targets are drawn in proportion to Production cost** — the pilot passes over infantry for a tank or a
+     gun. This is the reverse of Front Line hits, which stay inverse-cost (the valuable unit is the protected one).
+     Long-Range Fires' deep strikes remain an even draw across Front Line and Reserve units.
+  Measured on "40 AT Infantry plus one 1,200-Production purchase": CAS against MBT+ goes from 44% to 98%, against
+  Towed Artillery from 8% to 65%, while SHORAD Vehicles still stop it. Numbers: `src/sim/balance/balance-report.md`.
 - **Standoff exchanges** are a second battle kind: only Long-Range Fires resolve, no Shock, no Planning,
   no partisan bonus, no loss condition — a force can be ground down (units and Organization) but never
   retreats from standoff fire alone. They start on the tick after a side engages and end the tick
@@ -301,6 +314,8 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 
 ## Source-doc fixes needed
 
+- **Skeleton §5.3:** unopposed CAS is 5% + half value, may target the Long-Range line, and all CAS targets are
+  drawn in proportion to cost (see the CAS rules entry above).
 - **GDD §8.6.2:** the Shock formula `Average Combat Speed × 0.3` is superseded by `1 + Average Combat Speed × 0.15`
   (at the post-tune speeds); the worked multipliers there should become ×1.25 / ×1.4 / ×1.5.
 - **Skeleton §5.1:** replace the "~90-point advantage gap" caveat paragraph with the universal
