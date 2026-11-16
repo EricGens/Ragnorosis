@@ -316,6 +316,9 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 
 - **Skeleton §5.3:** unopposed CAS is 5% + half value, may target the Long-Range line, and all CAS targets are
   drawn in proportion to cost (see the CAS rules entry above).
+- **Epoch 1 skeleton §4.5:** "1 Production point → 1 Population converted to available Manpower" is now 5, and the
+  worked example beside it (a level 5 Training Facility giving 2.0) becomes 10.
+- **Skeleton §5.4:** the Shock line still cites the `Speed × 0.3` magnitude formula; same change as the GDD's below.
 - **GDD §8.6.2:** the Shock formula `Average Combat Speed × 0.3` is superseded by `1 + Average Combat Speed × 0.15`
   (at the post-tune speeds); the worked multipliers there should become ×1.25 / ×1.4 / ×1.5.
 - **Skeleton §5.1:** replace the "~90-point advantage gap" caveat paragraph with the universal
