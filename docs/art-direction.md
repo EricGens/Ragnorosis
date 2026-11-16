@@ -1,6 +1,7 @@
-# Ragnorosis — Art Direction (v0.1)
+# Ragnorosis — Art Direction (v0.2)
 
-Status: draft for Eric's review, 2026-11-15. Written from Eric's notes on eight reference screenshots
+Status: draft, revised after Eric's review, 2026-11-15. These are working intentions, not hard rules; we
+expect to adjust them as we try things. Written from Eric's notes on eight reference screenshots
 (Terra Invicta ×4, HOI4 ×2, Victoria 3 ×2), which are kept locally in `docs/art-reference/` and are **not**
 committed (other studios' copyrighted images). This doc records *intent*; individual features still get their own
 slices and PRs.
@@ -10,19 +11,23 @@ slices and PRs.
 - **Flat map, not a globe** (Eric, 2026-11-15). Terra Invicta's globe serves its space theme; ours doesn't need it.
   The map renderer is a flat 2D canvas/WebGL surface. Region picking, arrows and zoom stay simple.
 - **Style target: Terra Invicta** — dark, minimalist, techno-thriller. HOI4 and Victoria 3 are borrowed from for
-  *specific mechanics of presentation* (below), **not** for their look. We do not imitate Victoria 3's painterly
-  3D terrain.
-- **Information first.** Every visual device must carry game information. Decoration comes second and is always
-  optional (can be toggled off or fades at low zoom).
+  *specific mechanics of presentation* (below), **not** for their look. We're not aiming to imitate Victoria 3's
+  painterly 3D terrain.
+- **Information first.** Visual devices should carry game information where they can. Decoration comes second and
+  should be optional (toggleable, or fading with zoom).
 
 ## 2. Principles
 
-1. **Read the map at a glance.** Who controls what, where forces are, where fighting is, and who is winning must be
-   clear without opening a panel.
-2. **One visual language per concept.** A fill means control, a hatch means occupation, a glow means border, a bar
-   means a depletable resource. Never reuse a device for a second meaning.
-3. **Detail grows with zoom.** Zoomed out: fills, borders, icons, bars. Zoomed in: structures, units, battle
-   effects. Nothing may become unreadable at the zoomed-out level.
+1. **Aim for a map that reads at a glance.** Who controls what, where forces are, where fighting is, and who is
+   winning should be clear, as far as possible, without opening a panel.
+2. **Aim for one visual language per concept.** A fill means control, a hatch means occupation, a glow means border,
+   a bar means a depletable resource. Avoid reusing a device for a second meaning.
+3. **Detail follows zoom, in both directions.** The further out the player is, the less the map conveys, but we
+   try to keep as much *actionable* information as we can. The floor at maximum zoom-out is the minimum needed to
+   take game actions: **region ownership by color, and Task Force and Agent locations**. As the player zooms in,
+   more is added: borders and glow, unit frames and bars, battle indicators, facility badges, then structures.
+   At maximum zoom-in the map gets the cosmetic layer: region structures, battle eye candy, and so on. The exact
+   zoom thresholds, and what appears at each, are to be tuned by feel.
 4. **The map shows the state of the world.** Regions look busier as they develop; fronts look hot when they're hot.
 5. **Cheap first.** Prefer vector, procedural and data-driven art we can generate and revise in code. Painted
    assets are used only where vector can't carry the feeling (portraits, hero art).
@@ -51,7 +56,7 @@ Known collisions to resolve when we skin the map:
   the UI danger color toward a deeper crimson or add an icon to every alert. **Proposed:** keep faction colors
   saturated and move UI alerts to icon + shape + pulse rather than color alone.
 - Hive yellow vs the warning yellow, and Gamer green vs `signal` green, collide the same way. Same fix.
-- Color is never the only signal (accessibility): pair it with pattern, icon or shape.
+- Where practical, don't rely on color alone (accessibility): pair it with a pattern, icon or shape.
 
 **Map surface:** terrain stays dark and desaturated so faction colors pop (as in Terra Invicta); land is a muted
 texture, sea is near-black blue. Faction fill is a translucent tint over terrain, not an opaque flat color.
@@ -59,10 +64,11 @@ texture, sea is near-black blue. Faction fill is a translucent tint over terrain
 ## 4. Typography
 
 - **Data and numbers:** keep JetBrains Mono (already in use): tables, resource counters, stats.
-- **Headings and labels:** *candidate* to try is a condensed techno sans (e.g. Rajdhani, Barlow Semi Condensed,
-  or Saira Condensed — all OFL-licensed). We'll compare 2–3 on real panels before deciding.
-- **Map labels:** region names small, uppercase, letter-spaced, light on dark, fading out at low zoom. (HOI4 uses
-  giant curved country names; we use them only for factions, if at all, to keep the map uncluttered.)
+- **Headings and labels:** **Rajdhani** (Eric's pick; OFL-licensed). We'll try it on real panels and can revisit
+  if it doesn't hold up at small sizes.
+- **Map labels:** the map is **label-light, like Terra Invicta** (Eric's decision). Region names are small,
+  uppercase, letter-spaced, light on dark, and appear only as needed (on hover/selection or at closer zoom). No
+  giant HOI4-style country names.
 - Fonts are self-hosted, not loaded from a CDN, so the game works offline.
 
 ## 5. Panels and chrome
@@ -99,9 +105,9 @@ texture, sea is near-black blue. Faction fill is a translucent tint over terrain
 - **Needed first:** platform silhouettes (infantry, vehicle, artillery, tank, light aircraft), role markers
   (Front Line, Deep Strike, CAS, Air Superiority, ISR/Radar, Long-Range Fires), resource icons, status icons
   (consolidating, routing, Shock Ready).
-- **Faction flags/emblems:** original fictional designs, one distinct silhouette per faction, designed to hold up as a
-  16px flag and as a large panel crest.
-- **Agents/portraits (later):** need outside art (commissioned or generated; see §11). Until then, silhouettes.
+- **Faction flags/emblems:** real-world flags and symbols are fine to use for real nations. Fictional factions get
+  original designs, one distinct silhouette each, designed to hold up as a 16px flag and as a large panel crest.
+- **Agents/portraits:** portraits are **deferred**. When Agents arrive, they use **silhouettes** first.
 
 ## 8. Designer screens (Unit Designer, Task Force Designer)
 
@@ -138,7 +144,7 @@ Inspired by Victoria 3's visibly growing regions, but flat and vector:
 |---|---|
 | UI, icons, flags, patterns, arrows, region structures | Made in code (SVG/CSS/canvas) by us |
 | Map terrain base | Public-domain or CC0 imagery (e.g. NASA Blue Marble) once the license is confirmed, darkened and tinted; or generated procedurally |
-| Portraits and hero art | Outside: commissioned, or AI-generated with Eric's approval. Check the generator's terms and Steam's AI-content disclosure before committing to it |
+| Portraits and hero art | Deferred. Eric leans strongly toward generating art himself with AI tools, and would reconsider if Steam's rules make that a major problem. Before committing: check the generator's terms and Steam's current AI-content disclosure requirements |
 | Fonts | OFL-licensed, self-hosted |
 | Third-party tools (art MCPs, etc.) | Treated as an access change given the sandbox; discuss before installing |
 
@@ -153,9 +159,27 @@ Inspired by Victoria 3's visibly growing regions, but flat and vector:
 6. **With Epoch 6 (full map):** flat WebGL map renderer, terrain base, zoom levels, battle effects.
 7. Later: zoomed-in battle eye candy, portraits, audio.
 
-## 13. Open questions for Eric
+## 13. Content guidelines
 
-- Heading font: try Rajdhani / Barlow Semi Condensed / Saira Condensed on a real panel?
-- Should country-style giant labels (HOI4) appear for factions, or keep the map label-light like Terra Invicta?
-- Portraits: commission, generate, or silhouettes only for now?
-- Any art you want to keep *out* (e.g. no gore, no real-world flags or symbols)?
+What we keep out, and what we handle carefully. These are intentions for the art and writing, not a legal review;
+before release we'll check Steam's and the relevant rating bodies' current rules.
+
+- **No gore or gratuitous violence.** Combat is shown through effects, bars and abstraction. War crimes and
+  atrocities may occur in Events as *narrative*, never depicted explicitly or gratuitously.
+- **No sexually explicit content.** Agents may be implied to seduce or manipulate; nothing is shown.
+- **Real-world flags and national symbols are allowed.**
+- Candidates to also keep out or treat with care (to confirm with Eric):
+  - Likenesses of **real, living people** (including AI-generated lookalikes of politicians or celebrities).
+  - **Extremist or hate symbols** and real terrorist-group insignia, except where a historical or narrative
+    context clearly needs them.
+  - **Caricatured or stereotyped depictions** of ethnic, national or religious groups.
+  - Depictions of **real religious figures**, and anything that treats a real faith as a joke.
+  - **Harm to children**, even implied in imagery.
+  - **Real brand logos** and trademarks, and art imitating a living artist's style or copyrighted characters
+    (especially relevant if art is AI-generated).
+
+## 14. Still open
+
+- Portraits: deferred (silhouettes first). Revisit after checking Steam's AI-content disclosure rules.
+- Zoom thresholds: what appears at each level is to be tuned in play.
+- The content "also keep out" candidates in §13 need Eric's yes/no.
