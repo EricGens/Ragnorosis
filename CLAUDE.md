@@ -14,6 +14,7 @@ npm run dev      # dev server on http://localhost:5173 (Eric usually has his own
 npm run check    # type-check + lint + format check + tests. Run before every PR; CI runs the same.
 npm test         # tests only (~1s)
 npm run format   # Prettier, 120 columns
+npm run balance  # regenerate src/sim/balance/balance-report.md (a few minutes); rerun after changing combat numbers
 ```
 
 Node 24 via nvm. If `node` isn't on PATH in a tool shell: `export PATH="$HOME/.nvm/versions/node/<version>/bin:$PATH"`.

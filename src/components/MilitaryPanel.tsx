@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { tickInPulse } from '../sim/clock'
 import { formatInt } from '../sim/format'
-import { factionFacilityMultiplier } from '../sim/formulas/conversion'
+import { factionFacilityMultiplier, manpowerPerPoint } from '../sim/formulas/conversion'
 import { manpowerCap } from '../sim/formulas/manpower'
 import { allStandings, demandPools } from '../sim/military/pipeline'
 import { factionTaskForces, unitManpower } from '../sim/military/taskForce'
@@ -59,7 +59,7 @@ export function MilitaryPanel() {
     allocation.equipment * factionFacilityMultiplier(game, faction.id, 'production-facility'),
   )
   const manpowerIncoming = Math.min(
-    Math.floor(allocation.manpower * factionFacilityMultiplier(game, faction.id, 'training-facility')),
+    Math.floor(allocation.manpower * manpowerPerPoint(game, faction.id)),
     Math.max(0, cap - faction.manpower),
   )
 

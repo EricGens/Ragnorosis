@@ -15,7 +15,7 @@ export const FOCUS_SPLIT: Record<Focus, Record<ProductionCategory, number>> = {
 export const FOCUSES: readonly Focus[] = ['balanced', 'equipment', 'manpower', 'construction']
 
 export interface AllocationInputs {
-  /** How much more Manpower the pool can hold before hitting the 2% cap. */
+  /** How many more allocation points Manpower can absorb before the pool hits the 2% cap. */
   manpowerCapRoom: number
   /**
    * How much Equipment Production has somewhere to go: unfilled Task Force demand plus stockpile
