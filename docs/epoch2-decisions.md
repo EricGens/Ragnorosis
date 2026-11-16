@@ -118,6 +118,10 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   Production than the pool could absorb and thrown the excess away. Equipment prices are deliberately left alone
   for now: cheaper infantry also means more of it, which turns close fights against upgraded tanks into certain
   wins (balance arena), so that lever waits until this one has been seen in play.
+- **The 2% Manpower cap is a peacetime baseline, not a ceiling to tune (Eric, 2026-11-16).** Technologies and
+  global effects (conscription-like measures as the world escalates) will raise the share of the population a
+  faction can draw on. With training now cheap, the cap is the real limit on mass infantry by design — if it feels
+  tight early, that is intended; don't loosen the base value.
 - **Sourcing happens at pulse end** (stockpile → lines, then manufacture, then pool → lines), not the
   instant a +/− is clicked; the devtools "Fill to target" bypasses this for test setup. Lowering a target
   *does* return the excess immediately (Equipment to the stockpile, Manpower to the pool), as does

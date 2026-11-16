@@ -15,6 +15,7 @@ noted, both sides have 6000 Production of filled units and the attacker arrives 
 | Light Utility Vehicle | 100 | 20 | 10 | 15 | 0 | 10.0 | 5 / 3 / 0 / 0 |
 | Recon Vehicle | 150 | 20 | 10 | 15 | 0 | 6.7 | 8 / 8 / 3 / 3 |
 | APC | 200 | 20 | 10 | 15 | 5 | 5.0 | 8 / 8 / 3 / 3 |
+| SHORAD Vehicle | 195 | 20 | 10 | 15 | 0 | 5.1 | 10 / 10 / 5 / 18 |
 | IFV | 150 | 16 | 10 | 25 | 5 | 6.7 | 8 / 8 / 3 / 3 |
 | MBT | 200 | 16 | 10 | 25 | 5 | 5.0 | 10 / 10 / 8 / 0 |
 | MBT+ | 220 | 16 | 10 | 25 | 5 | 4.5 | 17 / 15 / 10 / 0 |
@@ -135,6 +136,98 @@ running out of Organization rather than by having nothing left to hold the line.
 | AT Infantry | AT Infantry | 23% | 10.9 | 10.9 | 100% |
 | MBT | MBT | 68% | 10.9 | 10.6 | 100% |
 | 12 MBT+ only | AT Infantry | 0% | 10.5 | 8.7 | 100% |
+
+## What counters what: a base of infantry plus one purchase
+
+Both sides have the same infantry base and the same extra Production, and each spends the extra on one
+thing. Each cell is the row force's result against the column force, averaged over attacking it and
+defending against it (50% = even). Tanks and vehicles are placed on the Front Line ahead of the base;
+air-defence units wait in Reserves, where they intercept CAS.
+
+### Base: 40 Light Infantry, plus 1200 Production
+
+| you ↓ / opponent → | More infantry | AA Infantry | Recon Vehicles | SHORAD Vehicles | IFVs | MBT+ | MBT (AT) | Towed Artillery | MLRS | CAS | Spread | average |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| **More infantry** | 50% | 58% | 32% | 80% | 0% | 0% | 0% | 5% | 25% | 45% | 15% | 28% |
+| **AA Infantry** | 42% | 50% | 23% | 58% | 0% | 0% | 0% | 2% | 20% | 7% | 3% | 19% |
+| **Recon Vehicles** | 68% | 77% | 50% | 77% | 7% | 3% | 5% | 10% | 38% | 32% | 20% | 35% |
+| **SHORAD Vehicles** | 20% | 42% | 23% | 50% | 0% | 0% | 0% | 0% | 8% | 80% | 12% | 21% |
+| **IFVs** | 100% | 100% | 93% | 100% | 50% | 28% | 23% | 77% | 97% | 80% | 77% | 75% |
+| **MBT+** | 100% | 100% | 97% | 100% | 72% | 50% | 37% | 78% | 93% | 97% | 90% | 83% |
+| **MBT (AT)** | 100% | 100% | 95% | 100% | 77% | 63% | 50% | 57% | 93% | 90% | 70% | 81% |
+| **Towed Artillery** | 95% | 98% | 90% | 100% | 23% | 22% | 43% | 50% | 62% | 90% | 70% | 68% |
+| **MLRS** | 75% | 80% | 62% | 92% | 3% | 7% | 7% | 38% | 50% | 73% | 40% | 48% |
+| **CAS** | 55% | 93% | 68% | 20% | 20% | 3% | 10% | 10% | 27% | 50% | 28% | 35% |
+| **Spread** | 85% | 97% | 80% | 88% | 23% | 10% | 30% | 30% | 60% | 72% | 50% | 57% |
+
+- More infantry: 64 Light Infantry
+- AA Infantry: 40 Light Infantry + 20 AA Infantry
+- Recon Vehicles: 8 Recon Vehicle + 40 Light Infantry
+- SHORAD Vehicles: 40 Light Infantry + 6 SHORAD Vehicle
+- IFVs: 8 IFV + 40 Light Infantry
+- MBT+: 5 MBT+ + 40 Light Infantry
+- MBT (AT): 5 MBT (AT) + 40 Light Infantry
+- Towed Artillery: 40 Light Infantry + 12 Towed Artillery
+- MLRS: 40 Light Infantry + 8 MLRS
+- CAS: 40 Light Infantry + 6 CAS Aircraft
+- Spread: 1 MBT+ + 40 Light Infantry + 4 Towed Artillery + 2 CAS Aircraft
+
+### Base: 40 AT Infantry, plus 1200 Production
+
+| you ↓ / opponent → | More infantry | AA Infantry | Recon Vehicles | SHORAD Vehicles | IFVs | MBT+ | MBT (AT) | Towed Artillery | MLRS | CAS | Spread | average |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| **More infantry** | 50% | 53% | 78% | 83% | 37% | 8% | 33% | 2% | 17% | 22% | 18% | 37% |
+| **AA Infantry** | 47% | 50% | 50% | 73% | 12% | 3% | 8% | 0% | 13% | 13% | 5% | 25% |
+| **Recon Vehicles** | 22% | 50% | 50% | 68% | 12% | 2% | 3% | 2% | 5% | 7% | 2% | 20% |
+| **SHORAD Vehicles** | 17% | 27% | 32% | 50% | 12% | 0% | 2% | 0% | 5% | 82% | 5% | 21% |
+| **IFVs** | 63% | 88% | 88% | 88% | 50% | 12% | 10% | 2% | 27% | 27% | 20% | 43% |
+| **MBT+** | 92% | 97% | 98% | 100% | 88% | 50% | 45% | 25% | 62% | 60% | 60% | 71% |
+| **MBT (AT)** | 67% | 92% | 97% | 98% | 90% | 55% | 50% | 10% | 35% | 37% | 38% | 61% |
+| **Towed Artillery** | 98% | 100% | 98% | 100% | 98% | 75% | 90% | 50% | 50% | 93% | 83% | 85% |
+| **MLRS** | 83% | 87% | 95% | 95% | 73% | 38% | 65% | 50% | 50% | 68% | 62% | 70% |
+| **CAS** | 78% | 87% | 93% | 18% | 73% | 40% | 63% | 7% | 32% | 50% | 40% | 53% |
+| **Spread** | 82% | 95% | 98% | 95% | 80% | 40% | 62% | 17% | 38% | 60% | 50% | 65% |
+
+- More infantry: 60 AT Infantry
+- AA Infantry: 40 AT Infantry + 20 AA Infantry
+- Recon Vehicles: 8 Recon Vehicle + 40 AT Infantry
+- SHORAD Vehicles: 40 AT Infantry + 6 SHORAD Vehicle
+- IFVs: 8 IFV + 40 AT Infantry
+- MBT+: 5 MBT+ + 40 AT Infantry
+- MBT (AT): 5 MBT (AT) + 40 AT Infantry
+- Towed Artillery: 40 AT Infantry + 12 Towed Artillery
+- MLRS: 40 AT Infantry + 8 MLRS
+- CAS: 40 AT Infantry + 6 CAS Aircraft
+- Spread: 1 MBT+ + 40 AT Infantry + 4 Towed Artillery + 2 CAS Aircraft
+
+### Base: 100 AT Infantry, plus 2400 Production
+
+| you ↓ / opponent → | More infantry | AA Infantry | Recon Vehicles | SHORAD Vehicles | IFVs | MBT+ | MBT (AT) | Towed Artillery | MLRS | CAS | Spread | average |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| **More infantry** | 50% | 62% | 88% | 80% | 35% | 2% | 3% | 0% | 0% | 15% | 0% | 30% |
+| **AA Infantry** | 38% | 50% | 55% | 63% | 3% | 0% | 0% | 0% | 0% | 2% | 0% | 19% |
+| **Recon Vehicles** | 12% | 45% | 50% | 58% | 7% | 0% | 0% | 0% | 0% | 2% | 0% | 16% |
+| **SHORAD Vehicles** | 20% | 37% | 42% | 50% | 5% | 0% | 0% | 0% | 0% | 78% | 0% | 21% |
+| **IFVs** | 65% | 97% | 93% | 95% | 50% | 3% | 5% | 0% | 0% | 3% | 0% | 37% |
+| **MBT+** | 98% | 100% | 100% | 100% | 97% | 50% | 38% | 28% | 30% | 67% | 3% | 65% |
+| **MBT (AT)** | 97% | 100% | 100% | 100% | 95% | 62% | 50% | 8% | 8% | 37% | 0% | 60% |
+| **Towed Artillery** | 100% | 100% | 100% | 100% | 100% | 72% | 92% | 50% | 43% | 97% | 53% | 82% |
+| **MLRS** | 100% | 100% | 100% | 100% | 100% | 70% | 92% | 57% | 50% | 95% | 67% | 85% |
+| **CAS** | 85% | 98% | 98% | 22% | 97% | 33% | 63% | 3% | 5% | 50% | 0% | 50% |
+| **Spread** | 100% | 100% | 100% | 100% | 100% | 97% | 100% | 47% | 33% | 100% | 50% | 84% |
+
+- More infantry: 140 AT Infantry
+- AA Infantry: 100 AT Infantry + 40 AA Infantry
+- Recon Vehicles: 16 Recon Vehicle + 100 AT Infantry
+- SHORAD Vehicles: 100 AT Infantry + 12 SHORAD Vehicle
+- IFVs: 16 IFV + 100 AT Infantry
+- MBT+: 10 MBT+ + 100 AT Infantry
+- MBT (AT): 10 MBT (AT) + 100 AT Infantry
+- Towed Artillery: 100 AT Infantry + 24 Towed Artillery
+- MLRS: 100 AT Infantry + 16 MLRS
+- CAS: 100 AT Infantry + 12 CAS Aircraft
+- Spread: 3 MBT+ + 100 AT Infantry + 8 Towed Artillery + 4 CAS Aircraft
+
 
 ## Is there a win button?
 

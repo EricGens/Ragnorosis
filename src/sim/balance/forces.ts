@@ -15,6 +15,16 @@ export const DESIGNS = {
   utility: design('Light Utility Vehicle', 'vehicle', 'veh-csw-1', 'veh-diesel-1'),
   recon: design('Recon Vehicle', 'vehicle', 'veh-autocannon-1', 'veh-diesel-1'),
   apc: design('APC', 'vehicle', 'veh-autocannon-1', 'veh-diesel-1', 'veh-reactive-armor'),
+  /** Vehicle built for air defence: Autocannon, Crew-Served AA, Targeting Computer, Radar (13 vs aircraft). */
+  shorad: design(
+    'SHORAD Vehicle',
+    'vehicle',
+    'veh-autocannon-1',
+    'veh-diesel-1',
+    'veh-cs-aa',
+    'veh-targeting-1',
+    'veh-radar-1',
+  ),
   ifv: design('IFV', 'tank', 'tank-autocannon-1', 'tank-diesel-1'),
   mbt: design('MBT', 'tank', 'tank-cannon-1', 'tank-diesel-1'),
   /** MBT with Crew Served Weapons and a Targeting Computer: +20 Production for +7 vs Infantry. */
