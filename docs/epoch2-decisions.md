@@ -191,6 +191,16 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   the line plan is empty (the force relies on reinforcement rolls) the average is over every unit in the
   force instead, and a force with no units gets no Shock. Found live: an empty initial line produced a
   ×0 multiplier that muted the attacker's rolls entirely.
+- **Shock curve compressed (Eric, 2026-11-16): `Shock Multiplier = 1 + average Combat Speed × 0.15`** — Infantry
+  ×1.25, Tanks ×1.4, Vehicles ×1.5 — replacing speed × 0.9 (×1.5 / ×2.4 / ×3.0; the GDD's × 0.3 before the ÷3 speed
+  tune). Faster assaults still shock harder, which is the point of the rule, but the old range let a tank-fronted
+  force with full artillery and CAS win every attack inside the 24-tick Shock window: in the balance arena it won
+  100% against every other build, and none of ~140–220 defending compositions held more than 6% of the time. Under
+  the new curve the same build averages 83–91% attacking and has real counters at army scale. Two things tried and
+  **not** adopted because they changed nothing measurable: Reserve units contributing only 50% (or 25%, or 0%) of
+  their Organization, and Shock boosting hit chance but not damage. Numbers: `src/sim/balance/balance-report.md`.
+  The battle log now shows the multiplier to two decimals. This supersedes the "`SHOCK_PER_MPH` ×3" note under
+  Movement's speed tune.
 - **Beaten defender retreat target:** adjacent land it can enter (permissive, no hostile Task Force), own
   territory first, then Friendly, then anything else. **The rout is a real move (Eric, 2026-09-15):** the
   Task Force gets a normal move order to that region, walked at Combat Speed with the usual arrow, at
@@ -276,5 +286,7 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 
 ## Source-doc fixes needed
 
+- **GDD §8.6.2:** the Shock formula `Average Combat Speed × 0.3` is superseded by `1 + Average Combat Speed × 0.15`
+  (at the post-tune speeds); the worked multipliers there should become ×1.25 / ×1.4 / ×1.5.
 - **Skeleton §5.1:** replace the "~90-point advantage gap" caveat paragraph with the universal
   `min(50, 5 + point_gap)` rule already stated in §5.2, so the two sections agree.

@@ -44,6 +44,8 @@ export interface SideReport {
   unitsLost: number
   /** Hits this side landed, by the line that scored them. */
   hits: HitTally
+  /** Average number of its 12 Front Line slots this side had filled over the battle. */
+  meanFrontLine: number
 }
 
 /** Why the losing side lost: its Organization hit zero, or it ran out of units able to hold the Front Line. */
@@ -87,7 +89,7 @@ function raise(state: GameState, faction: FactionId, regionId: string, force: Fo
   return tf.id
 }
 
-function report(state: GameState, force: Force, side: BattleSide): SideReport {
+function report(state: GameState, force: Force, side: BattleSide, meanFrontLine: number): SideReport {
   let costLost = 0
   let unitsLost = 0
   for (const [id, n] of Object.entries(side.unitsLost)) {
@@ -95,7 +97,14 @@ function report(state: GameState, force: Force, side: BattleSide): SideReport {
     if (design) costLost += n * designStats(design.platform, design.modules).cost
     unitsLost += n
   }
-  return { ...forceCost(force), costLost, manpowerLost: side.manpowerLost, unitsLost, hits: { ...side.hits } }
+  return {
+    ...forceCost(force),
+    costLost,
+    manpowerLost: side.manpowerLost,
+    unitsLost,
+    hits: { ...side.hits },
+    meanFrontLine,
+  }
 }
 
 /** One invasion: `attacker` marches from open ground into `defender`'s region. Deterministic per seed. */
@@ -121,12 +130,20 @@ export function runBattle(
 
   let battle = state.battles[0]
   let endReason: EndReason = 'none'
+  let samples = 0
+  let frontA = 0
+  let frontD = 0
   while (state.tick < maxTicks) {
     state.tick += 1
     moveTaskForces(state)
     startStandoffs(state)
     resolveBattles(state)
     battle = state.battles[0]
+    if (battle) {
+      samples += 1
+      frontA += battle.attacker.frontLine.filter((id) => id !== null).length
+      frontD += battle.defender.frontLine.filter((id) => id !== null).length
+    }
     if (battle && battle.endedAt !== null) {
       // Read the loser's Organization before recovery starts topping it back up.
       const loserId = battle.outcome === 'defender-won' ? battle.attacker.taskForceId : battle.defender.taskForceId
@@ -143,8 +160,8 @@ export function runBattle(
     attackerWon: outcome === 'attacker-won' || outcome === 'defender-surrendered' || outcome === 'defender-withdrew',
     endReason,
     ticks: (battle.endedAt ?? state.tick) - battle.startedAt + 1,
-    attacker: report(state, attacker, battle.attacker),
-    defender: report(state, defender, battle.defender),
+    attacker: report(state, attacker, battle.attacker, frontA / Math.max(1, samples)),
+    defender: report(state, defender, battle.defender, frontD / Math.max(1, samples)),
   }
 }
 

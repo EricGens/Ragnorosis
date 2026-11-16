@@ -19,6 +19,8 @@ export const DESIGNS = {
   mbt: design('MBT', 'tank', 'tank-cannon-1', 'tank-diesel-1'),
   /** MBT with Crew Served Weapons and a Targeting Computer: +20 Production for +7 vs Infantry. */
   mbtPlus: design('MBT+', 'tank', 'tank-cannon-1', 'tank-diesel-1', 'tank-csw', 'tank-targeting-1'),
+  /** MBT tuned against armour: Crew-served AT and a Targeting Computer. */
+  mbtAT: design('MBT (AT)', 'tank', 'tank-cannon-1', 'tank-diesel-1', 'tank-cs-at', 'tank-targeting-1'),
   towed: design('Towed Artillery', 'artillery', 'art-tube'),
   mlrs: design('MLRS', 'artillery', 'art-rocket'),
   cas: design('CAS Aircraft', 'light-aircraft', 'la-pgm', 'la-turbofan'),

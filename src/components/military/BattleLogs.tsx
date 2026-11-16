@@ -93,7 +93,7 @@ function BattleDetail({ battle }: { battle: Battle }) {
       <p className="mt-1 text-ink-400">
         {formatDate(battle.startedAt)} · {duration} ticks
         {battle.outcome && ` · ${OUTCOME_LABEL[battle.outcome]}`}
-        {battle.shock && ` · Shock ×${battle.shock.multiplier.toFixed(1)} until tick ${battle.shock.until}`}
+        {battle.shock && ` · Shock ×${battle.shock.multiplier.toFixed(2)} until tick ${battle.shock.until}`}
       </p>
       <div className="mt-4 grid grid-cols-2 gap-4">
         {(['attacker', 'defender'] as const).map((role) => {

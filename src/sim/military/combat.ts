@@ -16,7 +16,14 @@ export const ADVANTAGE_CAP_PERCENT = 50
 export const REINFORCE_PERCENT = 33
 /** Shock lasts this long from the start of invasion combat (GDD §8.6.2). */
 export const SHOCK_TICKS = 24
-export const SHOCK_PER_MPH = 0.3 * 3 // ×3 when all speeds were divided by 3, so Shock strength is unchanged
+/**
+ * Shock multiplier = SHOCK_BASE + average Combat Speed × SHOCK_PER_MPH (Eric, 2026-11-16): Infantry ×1.25,
+ * Tanks ×1.4, Vehicles ×1.5. Faster assaults still shock harder, but the range is compressed: at the
+ * earlier speed × 0.9 (×1.5 / ×2.4 / ×3.0) a tank-fronted attacker won every battle inside the Shock window
+ * and no defending composition could hold (decisions doc, balance report).
+ */
+export const SHOCK_BASE = 1
+export const SHOCK_PER_MPH = 0.15
 /** Organization regained per tick out of contact, as a fraction of max (Eric, 2026-09-15). */
 export const ORG_REGEN_PER_TICK = 0.005
 /** Share of a surrendered Task Force's Equipment the victor converts (Eric, 2026-09-15). */
@@ -108,7 +115,7 @@ export function partisanBonus(stability: number): number {
 
 /** Shock multiplier from the attacker's average Front Line Combat Speed (GDD §8.6.2). */
 export function shockMultiplier(averageCombatSpeed: number): number {
-  return averageCombatSpeed * SHOCK_PER_MPH
+  return SHOCK_BASE + averageCombatSpeed * SHOCK_PER_MPH
 }
 
 /** Defensibility → defending-vector multiplier (§3.6): 1 + D ÷ 100. */

@@ -1,5 +1,5 @@
 // Regenerates balance-report.md: `npm run balance`. Skipped in the normal test run (it stages a few
-// thousand battles, about 40 seconds). The report is committed, so a tuning change shows up as a diff to it.
+// tens of thousands of battles, a few minutes). The report is committed, so a tuning change shows up as a diff to it.
 
 import { expect, it } from 'vitest'
 import { designStats } from '../military/design'
@@ -130,6 +130,91 @@ it.runIf(import.meta.env.VITE_BALANCE)(
       out.push(
         `| ${def.name} | ${((hits / ticks / 6) * 100).toFixed(1)}% | ${(shot / RUNS).toFixed(1)} of 6 | ${pct(wins / RUNS)} |`,
       )
+    }
+
+    out.push('', '## Does the Front Line stay full, and how do battles end?', '')
+    out.push(
+      'Average Front Line slots filled (of 12) over the battle, and the share of battles the loser lost by',
+      'running out of Organization rather than by having nothing left to hold the line.',
+      '',
+    )
+    out.push(
+      '| attacker | defender | attacker wins | attacker line | defender line | ended by Org break |',
+      '| --- | --- | ---: | ---: | ---: | ---: |',
+    )
+    for (const [a, b] of [
+      [pure(BUDGET, D.mbtPlus), pure(BUDGET, D.atInf)],
+      [pure(BUDGET, D.atInf), pure(BUDGET, D.mbtPlus)],
+      [pure(BUDGET, D.atInf), pure(BUDGET, D.atInf)],
+      [pure(BUDGET, D.mbt), pure(BUDGET, D.mbt)],
+      [mix('12 MBT+ only', [D.mbtPlus, 12]), pure(BUDGET, D.atInf)],
+    ] as [Force, Force][]) {
+      let wins = 0
+      let la = 0
+      let ld = 0
+      let broke = 0
+      for (let seed = 1; seed <= RUNS; seed++) {
+        const r = runBattle(a, b, seed * 7919)
+        if (r.attackerWon) wins++
+        if (r.endReason === 'organization') broke++
+        la += r.attacker.meanFrontLine
+        ld += r.defender.meanFrontLine
+      }
+      out.push(
+        `| ${a.name} | ${b.name} | ${pct(wins / RUNS)} | ${(la / RUNS).toFixed(1)} | ${(ld / RUNS).toFixed(1)} | ${pct(broke / RUNS)} |`,
+      )
+    }
+
+    out.push('', '## Is there a win button?', '')
+    out.push(
+      'The three strongest attackers against every defending composition in a search space of fronts',
+      '(infantry or 12–24 tanks), artillery, CAS and Reserve fillers. Listed: the defenders whose *worst* result',
+      'is best — hold rate against each attacker. If nothing here holds, the attackers have no counter.',
+      '',
+    )
+    for (const budget of [6000, 20000]) {
+      const attackers = builds(budget).filter(
+        (f) => f.name.includes('artillery + CAS') && f.name !== 'Infantry + artillery + CAS',
+      )
+      const attackersAll = [...attackers, builds(budget)[2]]
+      const cost = (d: DesignInput) => designStats(d.platform, d.modules).cost
+      const found: { name: string; hold: number[] }[] = []
+      const fronts: [DesignInput, number | null][] = [
+        [D.atInf, null],
+        [D.heavyInf, null],
+        [D.mbtPlus, 12],
+        [D.mbtAT, 12],
+        [D.mbtPlus, 24],
+        [D.mbtAT, 24],
+      ]
+      for (const [front, count] of fronts)
+        for (const arty of [null, D.towed, D.mlrs])
+          for (const cas of [0, 6])
+            for (const filler of [D.lightInf, D.atInf, D.heavyInf]) {
+              if (count === null && filler !== front) continue
+              const units: [DesignInput, number][] = []
+              if (count !== null) units.push([front, count])
+              if (arty) units.push([arty, 12])
+              if (cas) units.push([D.cas, cas])
+              const spent = units.reduce((s, [d, n]) => s + n * cost(d), 0)
+              const n = Math.floor((budget - spent) / cost(filler))
+              if (n < 0) continue
+              if (n > 0) units.push([filler, n])
+              const def = mix(units.map(([d, k]) => `${k} ${d.name}`).join(' + '), ...units)
+              found.push({ name: def.name, hold: attackersAll.map((a) => 1 - runMatchup(a, def, 16).attackerWinRate) })
+            }
+      found.sort(
+        (x, y) =>
+          Math.min(...y.hold) - Math.min(...x.hold) ||
+          y.hold.reduce((s, v) => s + v, 0) - x.hold.reduce((s, v) => s + v, 0),
+      )
+      out.push(`### ${budget} Production (${found.length} defenders tried)`, '')
+      out.push(
+        `| defender | ${attackersAll.map((a) => `holds vs ${a.name}`).join(' | ')} |`,
+        `| --- | ${attackersAll.map(() => '---:').join(' | ')} |`,
+      )
+      for (const f of found.slice(0, 5)) out.push(`| ${f.name} | ${f.hold.map(pct).join(' | ')} |`)
+      out.push('')
     }
 
     await expect(out.join('\n') + '\n').toMatchFileSnapshot('./balance-report.md')

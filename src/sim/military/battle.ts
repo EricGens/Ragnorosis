@@ -127,7 +127,7 @@ export function startBattle(state: GameState, attacker: TaskForce, defender: Tas
   log(
     state,
     'military',
-    `${attacker.name} invades ${state.regions[defender.regionId].name}, defended by ${defender.name}${shock ? ` — Shock ×${shock.multiplier.toFixed(1)}` : ' — no Shock (still Planning)'}`,
+    `${attacker.name} invades ${state.regions[defender.regionId].name}, defended by ${defender.name}${shock ? ` — Shock ×${shock.multiplier.toFixed(2)}` : ' — no Shock (still Planning)'}`,
   )
   return battle
 }

@@ -18,6 +18,7 @@ noted, both sides have 6000 Production of filled units and the attacker arrives 
 | IFV | 150 | 16 | 10 | 25 | 5 | 6.7 | 8 / 8 / 3 / 3 |
 | MBT | 200 | 16 | 10 | 25 | 5 | 5.0 | 10 / 10 / 8 / 0 |
 | MBT+ | 220 | 16 | 10 | 25 | 5 | 4.5 | 17 / 15 / 10 / 0 |
+| MBT (AT) | 220 | 16 | 10 | 25 | 5 | 4.5 | 13 / 17 / 15 / 0 |
 | Towed Artillery | 100 | 15 | 5 | 15 | 0 | 5.0 | 8(8) / 8(8) / 5(5) / 0 |
 | MLRS | 150 | 15 | 5 | 15 | 0 | 3.3 | 5(10) / 5(10) / 3(8) / 0 |
 | CAS Aircraft | 200 | 5 | 10 | 20 | 0 | 5.0 | 12 / 12 / 10 / 0 |
@@ -30,25 +31,25 @@ Attacker win rate. Rows attack, columns defend.
 
 | attacker ↓ / defender → | Light Infantry | AT Infantry | Heavy Infantry | Light Utility Vehicle | Recon Vehicle | APC | IFV | MBT | MBT+ | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **Light Infantry** | 38% | 35% | 75% | 100% | 98% | 100% | 0% | 0% | 0% | 49% |
-| **AT Infantry** | 40% | 35% | 83% | 100% | 100% | 100% | 100% | 100% | 55% | 79% |
-| **Heavy Infantry** | 15% | 8% | 40% | 100% | 100% | 100% | 93% | 95% | 40% | 66% |
-| **Light Utility Vehicle** | 3% | 0% | 0% | 80% | 18% | 73% | 0% | 0% | 0% | 19% |
-| **Recon Vehicle** | 23% | 0% | 3% | 100% | 100% | 100% | 0% | 10% | 0% | 37% |
-| **APC** | 0% | 0% | 0% | 93% | 80% | 100% | 0% | 0% | 0% | 30% |
-| **IFV** | 100% | 13% | 40% | 100% | 100% | 100% | 80% | 10% | 13% | 62% |
-| **MBT** | 100% | 15% | 40% | 100% | 100% | 100% | 100% | 100% | 98% | 84% |
-| **MBT+** | 100% | 90% | 98% | 100% | 100% | 100% | 100% | 100% | 100% | 99% |
+| **Light Infantry** | 18% | 23% | 70% | 100% | 98% | 100% | 0% | 0% | 0% | 45% |
+| **AT Infantry** | 20% | 23% | 68% | 100% | 100% | 100% | 98% | 98% | 68% | 75% |
+| **Heavy Infantry** | 5% | 3% | 28% | 100% | 100% | 100% | 80% | 93% | 45% | 61% |
+| **Light Utility Vehicle** | 0% | 0% | 0% | 40% | 13% | 55% | 0% | 0% | 0% | 12% |
+| **Recon Vehicle** | 3% | 0% | 0% | 98% | 68% | 100% | 0% | 5% | 0% | 30% |
+| **APC** | 0% | 0% | 0% | 65% | 25% | 68% | 0% | 0% | 0% | 18% |
+| **IFV** | 100% | 0% | 8% | 100% | 100% | 100% | 48% | 5% | 18% | 53% |
+| **MBT** | 100% | 0% | 10% | 100% | 98% | 100% | 100% | 68% | 25% | 67% |
+| **MBT+** | 100% | 30% | 55% | 100% | 100% | 100% | 98% | 90% | 85% | 84% |
 
 ## Mirror matches: what Shock is worth
 
 | attacker | defender | attacker wins | ticks | attacker value lost | defender value lost | ended by Org break |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| AT Infantry | AT Infantry | 35% | 166 | 35% | 32% | 100% |
+| AT Infantry | AT Infantry | 23% | 169 | 35% | 30% | 100% |
 | AT Infantry | AT Infantry (attacker has no Shock) | 18% | 166 | 35% | 27% | 100% |
-| Recon Vehicle | Recon Vehicle | 100% | 25 | 12% | 66% | 100% |
+| Recon Vehicle | Recon Vehicle | 68% | 58 | 34% | 43% | 100% |
 | Recon Vehicle | Recon Vehicle (attacker has no Shock) | 28% | 63 | 41% | 32% | 100% |
-| MBT | MBT | 100% | 24 | 13% | 53% | 100% |
+| MBT | MBT | 68% | 43 | 28% | 33% | 100% |
 | MBT | MBT (attacker has no Shock) | 30% | 47 | 33% | 27% | 100% |
 
 ## Mass against quality as armies grow
@@ -57,14 +58,14 @@ AT Infantry against MBTs at equal Production.
 
 | attacker | defender | attacker wins | ticks | attacker value lost | defender value lost | ended by Org break |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| AT Infantry ×10 | MBT ×3 | 100% | 7 | 8% | 16% | 100% |
-| MBT ×3 | AT Infantry ×10 | 10% | 9 | 15% | 36% | 100% |
-| AT Infantry ×40 | MBT ×12 | 98% | 24 | 32% | 16% | 100% |
-| MBT ×12 | AT Infantry ×40 | 70% | 21 | 12% | 76% | 100% |
-| AT Infantry ×100 | MBT ×30 | 100% | 60 | 36% | 17% | 100% |
-| MBT ×30 | AT Infantry ×100 | 15% | 64 | 16% | 58% | 100% |
-| AT Infantry ×400 | MBT ×120 | 100% | 246 | 39% | 14% | 100% |
-| MBT ×120 | AT Infantry ×400 | 0% | 243 | 16% | 39% | 100% |
+| AT Infantry ×10 | MBT ×3 | 98% | 7 | 12% | 14% | 100% |
+| MBT ×3 | AT Infantry ×10 | 3% | 9 | 14% | 19% | 100% |
+| AT Infantry ×40 | MBT ×12 | 95% | 25 | 35% | 15% | 100% |
+| MBT ×12 | AT Infantry ×40 | 10% | 23 | 15% | 45% | 100% |
+| AT Infantry ×100 | MBT ×30 | 98% | 62 | 39% | 14% | 100% |
+| MBT ×30 | AT Infantry ×100 | 0% | 65 | 15% | 44% | 100% |
+| AT Infantry ×400 | MBT ×120 | 100% | 251 | 40% | 13% | 100% |
+| MBT ×120 | AT Infantry ×400 | 0% | 241 | 16% | 35% | 100% |
 
 ## Combined arms
 
@@ -74,13 +75,13 @@ Attacker win rate. Rows attack, columns defend.
 
 | attacker ↓ / defender → | Infantry | Infantry + artillery | Infantry + artillery + CAS | Tanks | Tanks + artillery + CAS | 12 tanks + Light Infantry | 12 tanks + artillery + CAS + Light Infantry | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **Infantry** | 35% | 0% | 0% | 55% | 3% | 0% | 3% | 14% |
-| **Infantry + artillery** | 100% | 80% | 63% | 100% | 78% | 75% | 55% | 79% |
-| **Infantry + artillery + CAS** | 100% | 80% | 80% | 100% | 95% | 90% | 83% | 90% |
-| **Tanks** | 90% | 0% | 20% | 100% | 45% | 100% | 68% | 60% |
-| **Tanks + artillery + CAS** | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 100% |
-| **12 tanks + Light Infantry** | 100% | 88% | 83% | 88% | 23% | 95% | 80% | 79% |
-| **12 tanks + artillery + CAS + Light Infantry** | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 100% |
+| **Infantry** | 23% | 0% | 0% | 68% | 0% | 0% | 0% | 13% |
+| **Infantry + artillery** | 100% | 45% | 35% | 100% | 48% | 57% | 20% | 58% |
+| **Infantry + artillery + CAS** | 100% | 78% | 60% | 100% | 90% | 73% | 60% | 80% |
+| **Tanks** | 30% | 0% | 3% | 85% | 0% | 98% | 8% | 32% |
+| **Tanks + artillery + CAS** | 100% | 75% | 45% | 100% | 85% | 100% | 100% | 86% |
+| **12 tanks + Light Infantry** | 95% | 38% | 25% | 23% | 0% | 65% | 15% | 37% |
+| **12 tanks + artillery + CAS + Light Infantry** | 100% | 95% | 83% | 100% | 70% | 100% | 88% | 91% |
 
 - Infantry: 100 AT Infantry — 5000 Manpower
 - Infantry + artillery: 80 AT Infantry, 12 Towed Artillery — 4180 Manpower
@@ -96,13 +97,13 @@ Attacker win rate. Rows attack, columns defend.
 
 | attacker ↓ / defender → | Infantry | Infantry + artillery | Infantry + artillery + CAS | Tanks | Tanks + artillery + CAS | 12 tanks + Light Infantry | 12 tanks + artillery + CAS + Light Infantry | average |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| **Infantry** | 10% | 0% | 0% | 65% | 0% | 0% | 0% | 11% |
-| **Infantry + artillery** | 100% | 63% | 23% | 100% | 78% | 100% | 0% | 66% |
-| **Infantry + artillery + CAS** | 100% | 93% | 73% | 100% | 100% | 100% | 48% | 88% |
-| **Tanks** | 28% | 0% | 0% | 83% | 0% | 100% | 0% | 30% |
-| **Tanks + artillery + CAS** | 100% | 100% | 30% | 100% | 100% | 100% | 100% | 90% |
-| **12 tanks + Light Infantry** | 100% | 0% | 0% | 0% | 0% | 88% | 0% | 27% |
-| **12 tanks + artillery + CAS + Light Infantry** | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 100% |
+| **Infantry** | 8% | 0% | 0% | 68% | 0% | 0% | 0% | 11% |
+| **Infantry + artillery** | 100% | 40% | 18% | 100% | 45% | 100% | 0% | 58% |
+| **Infantry + artillery + CAS** | 100% | 93% | 55% | 100% | 98% | 100% | 23% | 81% |
+| **Tanks** | 13% | 0% | 0% | 13% | 0% | 100% | 0% | 18% |
+| **Tanks + artillery + CAS** | 100% | 53% | 0% | 100% | 70% | 100% | 83% | 72% |
+| **12 tanks + Light Infantry** | 100% | 0% | 0% | 0% | 0% | 57% | 0% | 23% |
+| **12 tanks + artillery + CAS + Light Infantry** | 100% | 98% | 70% | 100% | 48% | 100% | 68% | 83% |
 
 - Infantry: 333 AT Infantry — 16650 Manpower
 - Infantry + artillery: 313 AT Infantry, 12 Towed Artillery — 15830 Manpower
@@ -121,3 +122,43 @@ Attacker: 60 AT Infantry + 6 CAS Aircraft, no Shock. Hit rate is per aircraft pe
 | 100 AT Infantry (no air defence) | 5.0% | 0.0 of 6 | 28% |
 | 94 AT Infantry + 6 AA Infantry in Reserves | 6.8% | 3.6 of 6 | 35% |
 | 100 Heavy Infantry (air defence on every unit) | 6.6% | 4.0 of 6 | 23% |
+
+## Does the Front Line stay full, and how do battles end?
+
+Average Front Line slots filled (of 12) over the battle, and the share of battles the loser lost by
+running out of Organization rather than by having nothing left to hold the line.
+
+| attacker | defender | attacker wins | attacker line | defender line | ended by Org break |
+| --- | --- | ---: | ---: | ---: | ---: |
+| MBT+ | AT Infantry | 30% | 11.1 | 8.9 | 100% |
+| AT Infantry | MBT+ | 68% | 9.0 | 11.0 | 100% |
+| AT Infantry | AT Infantry | 23% | 10.9 | 10.9 | 100% |
+| MBT | MBT | 68% | 10.9 | 10.6 | 100% |
+| 12 MBT+ only | AT Infantry | 0% | 10.5 | 8.7 | 100% |
+
+## Is there a win button?
+
+The three strongest attackers against every defending composition in a search space of fronts
+(infantry or 12–24 tanks), artillery, CAS and Reserve fillers. Listed: the defenders whose *worst* result
+is best — hold rate against each attacker. If nothing here holds, the attackers have no counter.
+
+### 6000 Production (54 defenders tried)
+
+| defender | holds vs Tanks + artillery + CAS | holds vs 12 tanks + artillery + CAS + Light Infantry | holds vs Infantry + artillery + CAS |
+| --- | ---: | ---: | ---: |
+| 12 MBT (AT) + 12 MLRS + 26 AT Infantry | 50% | 31% | 31% |
+| 12 MBT (AT) + 12 Towed Artillery + 36 AT Infantry | 38% | 38% | 31% |
+| 12 MLRS + 70 AT Infantry | 56% | 25% | 38% |
+| 12 MLRS + 6 CAS Aircraft + 50 AT Infantry | 69% | 19% | 44% |
+| 12 Towed Artillery + 6 CAS Aircraft + 60 AT Infantry | 50% | 19% | 38% |
+
+### 20000 Production (84 defenders tried)
+
+| defender | holds vs Tanks + artillery + CAS | holds vs 12 tanks + artillery + CAS + Light Infantry | holds vs Infantry + artillery + CAS |
+| --- | ---: | ---: | ---: |
+| 12 MBT+ + 12 MLRS + 6 CAS Aircraft + 239 AT Infantry | 100% | 100% | 100% |
+| 24 MBT (AT) + 12 MLRS + 6 CAS Aircraft + 234 Light Infantry | 94% | 88% | 100% |
+| 12 MBT (AT) + 12 MLRS + 6 CAS Aircraft + 239 AT Infantry | 100% | 81% | 100% |
+| 12 MLRS + 6 CAS Aircraft + 242 Heavy Infantry | 100% | 81% | 81% |
+| 24 MBT+ + 12 MLRS + 6 CAS Aircraft + 195 AT Infantry | 100% | 69% | 94% |
+
