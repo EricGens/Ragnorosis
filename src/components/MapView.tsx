@@ -3,11 +3,20 @@ import type { MapLayout } from '../sim/data/dummyMap'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
 import { pairKey } from '../sim/relations'
 import type { FactionId, Region, RegionId, TaskForce } from '../sim/types'
-import { FACTION_IDS, isLand } from '../sim/types'
+import { isLand } from '../sim/types'
 import { useGameStore } from '../store/gameStore'
 import { useUIStore, type EntityRef } from '../store/uiStore'
 import { factionColor } from './factionColors'
-import { cubicPoint, cubicsPath, cubicsThrough, splitCubic, type Cubic, type Pt } from './mapCurves'
+import {
+  cubicPoint,
+  cubicsThrough,
+  ORDER_RIBBON,
+  routeFraction,
+  taperedRibbon,
+  type Cubic,
+  type Pt,
+  type RibbonStyle,
+} from './mapCurves'
 import { OilPlatformIcon, WeatherIcon } from './panels/overlayIcons'
 
 // Map space is a 1000×1000 square: a 3×3 land grid of 200-unit cells inset by 200 on each side,
@@ -190,25 +199,6 @@ export function MapView() {
       data-active-task-force={activeTaskForce?.id}
       data-order-mode={activeTaskForce ? orderMode : undefined}
     >
-      <defs>
-        {FACTION_IDS.map((id) => (
-          <marker
-            key={id}
-            id={`arrow-${id}`}
-            viewBox="0 0 10 10"
-            refX="9"
-            refY="5"
-            markerWidth="5"
-            markerHeight="5"
-            orient="auto"
-          >
-            <path d="M0,0 L10,5 L0,10 z" fill={factionColor(id)} />
-          </marker>
-        ))}
-        <marker id="arrow-back" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="var(--color-ink-400)" />
-        </marker>
-      </defs>
       {regionOrder.map((id) => (
         <RegionShape
           key={id}
@@ -639,46 +629,25 @@ function travelGeometry(
   return { forward, f, back, g, position }
 }
 
+const WALK_BACK_RIBBON: RibbonStyle = { tail: 12, neck: 6, headLength: 20, headWidth: 22 }
+
 /**
- * The order arrow (§4.2): a curve through every region centre on the route — solid for the progress
- * made on the current leg, dashed for what remains — plus a gray arrow home while walking back a
- * redirect (§4.4).
+ * The order arrow (§4.2), HOI4-style: a tapered, translucent ribbon in the faction colour through every region
+ * centre on the route, brighter over the progress made on the current leg and paler over what remains — plus a
+ * gray ribbon home while walking back a redirect (§4.4).
  */
 function OrderArrow({ tf, travel }: { tf: TaskForce; travel: Travel }) {
   const color = factionColor(tf.faction)
   const { forward, f, back } = travel
-  let done: Cubic[] = []
-  let remaining: Cubic[] = forward ?? []
-  if (forward && f > 0) {
-    const [a, b] = splitCubic(forward[0], f)
-    done = [a]
-    remaining = [b, ...forward.slice(1)]
-  }
+  const doneTo = forward && f > 0 ? routeFraction(forward, f) : 0
   return (
-    <g pointerEvents="none" data-order-arrow={tf.id} fill="none">
+    <g pointerEvents="none" data-order-arrow={tf.id} stroke="none">
       {back && (
-        <path
-          d={cubicsPath(back)}
-          stroke="var(--color-ink-400)"
-          strokeWidth={4}
-          strokeOpacity={0.9}
-          strokeDasharray="6 6"
-          markerEnd="url(#arrow-back)"
-          data-walk-back
-        />
+        <path d={taperedRibbon(back, WALK_BACK_RIBBON)} fill="var(--color-ink-400)" fillOpacity={0.7} data-walk-back />
       )}
-      {remaining.length > 0 && (
-        <path
-          d={cubicsPath(remaining)}
-          stroke={color}
-          strokeWidth={4}
-          strokeOpacity={0.9}
-          strokeDasharray="12 8"
-          markerEnd={`url(#arrow-${tf.faction})`}
-        />
-      )}
-      {done.length > 0 && (
-        <path d={cubicsPath(done)} stroke={color} strokeWidth={6} strokeLinecap="round" data-progress />
+      {forward && <path d={taperedRibbon(forward, ORDER_RIBBON)} fill={color} fillOpacity={0.55} />}
+      {forward && doneTo > 0 && (
+        <path d={taperedRibbon(forward, ORDER_RIBBON, 0, doneTo)} fill={color} fillOpacity={0.9} data-progress />
       )}
     </g>
   )
