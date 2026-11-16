@@ -1,5 +1,7 @@
 // Display formatting rules from the skeleton (§1.4). Pure functions, safe to use from the sim or UI.
 
+import { EPSILON } from './numeric'
+
 function shorten(value: number, suffixes: [number, string][]): string {
   for (const [threshold, suffix] of suffixes) {
     if (Math.abs(value) >= threshold) {
@@ -44,8 +46,8 @@ export function formatInt(value: number): string {
 
 /**
  * Stability to one decimal, truncated rather than rounded: gates like the consolidation lock need a true ≥ 50,
- * so 49.96 must read "49.9", never "50.0". The 1e-9 keeps float dust (49.99999999999) from truncating down.
+ * so 49.96 must read "49.9", never "50.0". EPSILON keeps float dust (49.99999999999) from truncating down.
  */
 export function formatStability(value: number): string {
-  return (Math.floor(value * 10 + 1e-9) / 10).toFixed(1)
+  return (Math.floor(value * 10 + EPSILON) / 10).toFixed(1)
 }

@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
     "lint": "oxlint",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test",
     "test:watch": "vitest",
     "preview": "vite preview"
   },

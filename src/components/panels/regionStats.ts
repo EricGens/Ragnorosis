@@ -14,6 +14,7 @@ import { productionFor } from '../../sim/snapshot'
 import type { EnergyResult, FactionId, GameState, LandRegion, Region, TerrainTrait } from '../../sim/types'
 import { FACTION_IDS, isLand } from '../../sim/types'
 import type { TooltipContent } from '../../store/uiStore'
+import { EPSILON } from '../../sim/numeric'
 
 export type Tone = 'neutral' | 'good' | 'warn' | 'bad'
 
@@ -214,7 +215,7 @@ function landStats(state: GameState, region: LandRegion, perspective: FactionId)
 
 function energyStat(region: Region, demand: number, energy?: EnergyResult, state?: GameState): StatDescriptor {
   const pct = energy ? `${(energy.fulfillment * 100).toFixed(1)}%` : null
-  const blockaded = energy ? energy.delivered + 1e-9 < energy.entitlement : false
+  const blockaded = energy ? energy.delivered + EPSILON < energy.entitlement : false
   const lines = [
     `Fossil-fuel supply rate: ${formatInt(region.energyReserve)} per Pulse (does not deplete).`,
     demand > 0 ? `Local demand: ${formatInt(demand)} per Pulse (100 per Fossil Fuel Plant level).` : 'No local demand.',

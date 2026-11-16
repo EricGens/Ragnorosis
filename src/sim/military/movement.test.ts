@@ -1,29 +1,19 @@
 import { produce } from 'immer'
 import { describe, expect, it } from 'vitest'
-import { advanceTick } from '../advance'
-import { DUMMY_MAP } from '../data/dummyMap'
 import { setFactionRelation } from '../relations'
-import { createInitialState } from '../state'
+import { LIGHT_INFANTRY, newGame, raiseTaskForce, ticks, US } from '../testing'
 import type { GameState, LandRegion } from '../types'
 import { distanceBetween, etaTicks, findPath, moveTaskForces, orderMove, taskForceSpeed } from './movement'
 import { saveDesign } from './roster'
-import { createTaskForce, fillTaskForce, setTarget } from './taskForce'
-
-const US = 'united-states'
+import { createTaskForce, setTarget } from './taskForce'
 
 /** US Light Infantry Task Force (id 1) in NW Land, filled. */
-const base = produce(createInitialState(DUMMY_MAP), (d) => {
-  saveDesign(d, US, { name: 'Light Infantry', platform: 'infantry', modules: ['inf-small-arms-1'] })
-  createTaskForce(d, US, 'nw-land')
-  setTarget(d, 1, 1, 2)
-  fillTaskForce(d, 1)
+const base = newGame((d) => {
+  saveDesign(d, US, LIGHT_INFANTRY)
+  raiseTaskForce(d, US, 'nw-land', [[1, 2]])
 })
 
 const tf = (s: GameState) => s.taskForces[0]
-const ticks = (s: GameState, n: number) => {
-  for (let i = 0; i < n; i++) s = advanceTick(s).state
-  return s
-}
 const hostile = (s: GameState, ...factions: ('china' | 'hive' | 'mankind-united')[]) =>
   produce(s, (d) => {
     for (const f of factions) setFactionRelation(d, US, f, 'hostile')

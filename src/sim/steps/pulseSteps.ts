@@ -9,6 +9,7 @@ import { computePulseSnapshot } from '../snapshot'
 import type { GameState, LandRegion } from '../types'
 import { FACTION_IDS, isLand } from '../types'
 import { creditPulseOutputs } from './productionSteps'
+import { EPSILON } from '../numeric'
 
 function landRegions(state: GameState): LandRegion[] {
   return state.regionOrder.map((id) => state.regions[id]).filter(isLand)
@@ -94,7 +95,7 @@ export function beginPulse(state: GameState): void {
     `Energy: ${formatInt(totalSupply)} supply vs ${formatInt(totalDemand)} demand — fair share ${(fairShare * 100).toFixed(1)}%`,
   )
   for (const [id, r] of Object.entries(energy)) {
-    if (r.delivered + 1e-9 < r.entitlement) {
+    if (r.delivered + EPSILON < r.entitlement) {
       log(
         state,
         'energy',

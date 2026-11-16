@@ -10,6 +10,7 @@ import type { CompositionLine, FactionId, GameState, Priority, TaskForce, UnitDe
 import { PRIORITIES } from '../types'
 import { designStats } from './design'
 import { factionTaskForces, findDesign, unitManpower } from './taskForce'
+import { EPSILON } from '../numeric'
 
 export const WATERFALL_SHARE: Record<Priority, number> = { high: 0.6, normal: 0.3, low: 0.1 }
 /** Stockpile production cap as a multiple of total Task Force demand (§3.9; naval/airships will use 2). */
@@ -234,7 +235,7 @@ export function deliverEquipment(state: GameState, faction: FactionId): void {
 function popUnits(state: GameState, faction: FactionId, key: string, cost: number): number {
   const f = state.factions[faction]
   const banked = f.manufacturing[key] ?? 0
-  const units = Math.floor(banked / cost + 1e-9)
+  const units = Math.floor(banked / cost + EPSILON)
   if (units > 0) f.manufacturing[key] = Math.max(0, banked - units * cost)
   return units
 }

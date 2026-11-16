@@ -1,24 +1,9 @@
 // The 13-region dummy map (skeleton §1.1, §1.6, §4.2.1). This is data, not a special case:
 // swapping in the full 190-region map means replacing this file, not the code that reads it.
 
-import type { BuildingType, FactionId, LandRegion, MaritimeRegion, Region, RegionId, TerrainTrait } from '../types'
+import type { BuildingType, FactionId, LandRegion, MaritimeRegion, RegionId, TerrainTrait } from '../types'
 import { FACTION_IDS } from '../types'
-
-/** Authored map: regions plus each undirected edge listed once. */
-export interface MapDefinition {
-  regions: Region[]
-  edges: [RegionId, RegionId][]
-  /** Edge lengths in miles where they differ from DEFAULT_DISTANCE (Epoch 2 skeleton §4.1). */
-  distances?: [RegionId, RegionId, number][]
-  layout: Record<RegionId, MapLayout>
-}
-
-/** Every land-to-land edge on the dummy map is a flat 300 miles (§4.1). */
-export const DEFAULT_DISTANCE = 300
-
-/** Where a region sits on the rendered map. Land regions occupy grid cells; maritime regions wrap a corner. */
-export type MapLayout =
-  { kind: 'grid'; col: number; row: number } | { kind: 'corner'; corner: 'nw' | 'ne' | 'sw' | 'se' }
+import type { MapDefinition } from './map'
 
 const DEFAULT_POPULARITY = 75
 

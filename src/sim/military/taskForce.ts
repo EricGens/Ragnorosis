@@ -14,7 +14,7 @@ import type {
   UnitDesign,
 } from '../types'
 import { isLand, LINE_ROLES, LINE_SLOTS } from '../types'
-import { designStats, findDuplicate } from './design'
+import { adoptDesign, designStats } from './design'
 import { PLATFORMS } from './platforms'
 
 export type TaskForceResult = { ok: true; id: number } | { ok: false; reason: string }
@@ -265,14 +265,7 @@ export function setTaskForceFaction(state: GameState, id: number, faction: Facti
   for (const line of tf.composition) {
     const design = findDesign(state, from, line.designId)
     if (!design) continue
-    let adopted = findDuplicate(to.designs, design.platform, design.modules)
-    if (!adopted) {
-      let name = design.name
-      for (let n = 2; to.designs.some((d) => d.name.toLowerCase() === name.toLowerCase()); n++)
-        name = `${design.name} (${n})`
-      adopted = { id: to.nextDesignId++, name, platform: design.platform, modules: [...design.modules] }
-      to.designs.push(adopted)
-    }
+    const adopted = adoptDesign(to, design)
     remap.set(line.designId, adopted.id)
     line.designId = adopted.id
   }

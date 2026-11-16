@@ -1,3 +1,5 @@
 # Eric's design documents are hand-authored; never reflow them.
 docs/
 dist/
+# Claude Code settings are hand-laid-out so the permission lists read one entry per line.
+.claude/

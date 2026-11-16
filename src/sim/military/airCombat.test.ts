@@ -1,10 +1,8 @@
 import { produce } from 'immer'
 import { describe, expect, it } from 'vitest'
-import { advanceTick } from '../advance'
-import { DUMMY_MAP } from '../data/dummyMap'
 import { domainControl } from '../formulas/domainControl'
 import { setFactionRelation } from '../relations'
-import { createInitialState } from '../state'
+import { CN, giveRegion, LIGHT_INFANTRY, newGame, raiseTaskForce, ticks, TOWED_ARTILLERY, US } from '../testing'
 import type { GameState, LandRegion } from '../types'
 import { battleFor, orderStandoff } from './battle'
 import { maneuverBonus, relativeBonus, sensorTotals } from './combat'
@@ -12,16 +10,9 @@ import { orderMove } from './movement'
 import { saveDesign } from './roster'
 import { createTaskForce, fillTaskForce, setTarget } from './taskForce'
 
-const US = 'united-states'
-const CN = 'china'
-const ticks = (s: GameState, n: number) => {
-  for (let i = 0; i < n; i++) s = advanceTick(s).state
-  return s
-}
-
 describe('ISR/Radar and freedom of maneuver (§1.2, §1.4)', () => {
   it('caps each platform type at +10, the force at +50, and gives +1 per 2 points of relative advantage', () => {
-    const s = produce(createInitialState(DUMMY_MAP), (d) => {
+    const s = newGame((d) => {
       saveDesign(d, US, {
         name: 'Radar Truck',
         platform: 'vehicle',
@@ -58,21 +49,21 @@ describe('ISR/Radar and freedom of maneuver (§1.2, §1.4)', () => {
 
 /** US artillery in W Land, Chinese artillery in C Land (given to China), hostile. */
 function artilleryScenario(usGuns: number, cnGuns: number, extra?: (d: GameState) => void): GameState {
-  return produce(createInitialState(DUMMY_MAP), (d) => {
-    ;(d.regions['c-land'] as LandRegion).controller = CN
+  return newGame((d) => {
+    giveRegion(d, 'c-land', CN)
     setFactionRelation(d, US, CN, 'hostile')
-    for (const f of [US, CN] as const) {
-      saveDesign(d, f, { name: 'Towed Artillery', platform: 'artillery', modules: ['art-tube'] })
-      saveDesign(d, f, { name: 'Light Infantry', platform: 'infantry', modules: ['inf-small-arms-1'] })
+    for (const f of [US, CN]) {
+      saveDesign(d, f, TOWED_ARTILLERY) // design 1
+      saveDesign(d, f, LIGHT_INFANTRY) // design 2
     }
-    createTaskForce(d, US, 'w-land')
-    setTarget(d, 1, 1, usGuns)
-    setTarget(d, 1, 2, 4)
-    fillTaskForce(d, 1)
-    createTaskForce(d, CN, 'c-land')
-    setTarget(d, 2, 1, cnGuns)
-    setTarget(d, 2, 2, 4)
-    fillTaskForce(d, 2)
+    raiseTaskForce(d, US, 'w-land', [
+      [1, usGuns],
+      [2, 4],
+    ])
+    raiseTaskForce(d, CN, 'c-land', [
+      [1, cnGuns],
+      [2, 4],
+    ])
     extra?.(d)
   })
 }
@@ -136,7 +127,7 @@ describe('standoff fire (§6, §5.2)', () => {
 
 describe('CAS (§5.3) and the combined-arms invasion', () => {
   it('CAS aircraft run at the Front Line, face pooled air defence, and count toward Air Superiority', () => {
-    let s = produce(createInitialState(DUMMY_MAP), (d) => {
+    let s = newGame((d) => {
       ;(d.regions['c-land'] as LandRegion).controller = CN
       setFactionRelation(d, US, CN, 'hostile')
       saveDesign(d, US, { name: 'Light Infantry', platform: 'infantry', modules: ['inf-small-arms-1'] })

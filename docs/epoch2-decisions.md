@@ -146,6 +146,10 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   new path begins; an order that never advanced (progress 0) is replaced free — "not committed until time
   actually advances" (§4.2). Halt is simply an order back to the occupied region, so it pays the same debt.
   Leg overshoot within a tick is dropped rather than carried (at most an hour per leg).
+  **Reviewed and confirmed (Eric, 2026-11-15):** the walk-back is at Combat Speed even through friendly ground. It
+  models uprooting an Army-Group-sized deployment's logistics once it has committed to an axis (his example:
+  Ardennes, then "punch through the Maginot after all"). It can look like a bug — a slow return over ground the
+  force just crossed quickly — but it is intended; don't "fix" it.
 - **Map orders:** a pinned own Task Force is Active; clicking a region then issues the order instead of
   pinning the region. Invalid destinations show a red X with the reason at the click point; the sound the
   skeleton mentions waits for an audio pass.

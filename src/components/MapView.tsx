@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { MapLayout } from '../sim/data/dummyMap'
 import { DUMMY_MAP } from '../sim/data/dummyMap'
+import type { MapLayout } from '../sim/data/map'
 import { pairKey } from '../sim/relations'
 import type { FactionId, Region, RegionId, TaskForce } from '../sim/types'
 import { isLand } from '../sim/types'

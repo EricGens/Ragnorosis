@@ -123,6 +123,28 @@ export function findDuplicate(
   return designs.find((d) => d.id !== exceptId && d.platform === platform && sameModules(d.modules, modules))
 }
 
+/**
+ * Bring another faction's design into this roster: reuse the design with the same platform and module
+ * multiset if there is one, else copy it in (suffixing " (2)", " (3)"… on a name clash). Used wherever
+ * hardware changes hands — devtools reassignment, Equipment seized on surrender (§3.11). Call on an
+ * Immer draft.
+ */
+export function adoptDesign(roster: { designs: UnitDesign[]; nextDesignId: number }, design: UnitDesign): UnitDesign {
+  const existing = findDuplicate(roster.designs, design.platform, design.modules)
+  if (existing) return existing
+  let name = design.name
+  for (let n = 2; roster.designs.some((d) => d.name.toLowerCase() === name.toLowerCase()); n++)
+    name = `${design.name} (${n})`
+  const adopted: UnitDesign = {
+    id: roster.nextDesignId++,
+    name,
+    platform: design.platform,
+    modules: [...design.modules],
+  }
+  roster.designs.push(adopted)
+  return adopted
+}
+
 /** "Combat(Transit) mph" for display; speeds are fractions after the ÷3 tune, so round to 2 places. */
 export function formatSpeed(speed: { combat: number; transit: number }): string {
   const r = (n: number) => Number(n.toFixed(2))

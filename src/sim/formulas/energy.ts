@@ -7,12 +7,12 @@
 //      fair-share baseline, never above it.
 
 import type { EnergyResult, FactionId, GameState, LandRegion, Region, RegionId } from '../types'
+import { EPSILON } from '../numeric'
 import { isLand } from '../types'
 import { domainControl } from './domainControl'
 import { fossilEnergyDemand } from './production'
 
 export const ACCESS_THRESHOLD = 50
-const EPSILON = 1e-9
 
 /** Can `faction` move Energy through `region`? Reads computed domain control. Unaffiliated consumers trade freely. */
 export function passable(state: GameState, region: Region, faction: FactionId | null): boolean {
