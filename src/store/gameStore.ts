@@ -185,13 +185,9 @@ export const useGameStore = create<GameStore>()((set, get) => {
       set({ game: produce(get().game, (d) => void (d.factions[get().activeFaction].focus = focus)) }),
 
     queueBuild: (regionId, building) => {
-      // Captured through an object so TypeScript doesn't narrow away the callback's assignment.
-      const out: { result: QueueResult } = { result: { ok: true } }
-      const game = produce(get().game, (d) => {
-        out.result = queueBuild(d, get().activeFaction, regionId, building)
-      })
-      set({ game, notice: out.result.ok ? null : out.result.reason })
-      return out.result
+      const result = run((d) => queueBuild(d, get().activeFaction, regionId, building))
+      set({ notice: result.ok ? null : result.reason })
+      return result
     },
 
     dismissInterrupts: () => set({ game: produce(get().game, (d) => void (d.interrupts = [])) }),
