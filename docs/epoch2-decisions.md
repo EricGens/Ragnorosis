@@ -107,6 +107,17 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   little that still overshoots at pulse end (the facility bonus, a stranded Construction stream) goes to
   Manpower training. A brand-new sandbox with no designs therefore sends all Equipment focus to Manpower
   until the first Task Force asks for something.
+- **Manpower trains at 5 people per Production point (Eric, 2026-11-16; was 1),** multiplied by the faction-wide
+  Training Facility bonus as before (+20% per level, levels summed across controlled regions). At 1:1 an AT
+  Infantry unit cost 60 Production of Equipment plus 50 more to train its people, so a "manpower-rich" faction
+  still paid for every soldier in industry and replacing battle losses cost it roughly five times what a tank
+  force paid. At 5:1, population is what gets spent and the 2% Manpower cap is the limit. Battle outcomes are
+  untouched; only the cost of raising and reconstituting changes. Knock-on fix: the Manpower "room" used when
+  splitting Production is now counted in allocation points (people of room ÷ people per point), like
+  Equipment's — it was compared in people, which at the new rate would have allocated up to five times more
+  Production than the pool could absorb and thrown the excess away. Equipment prices are deliberately left alone
+  for now: cheaper infantry also means more of it, which turns close fights against upgraded tanks into certain
+  wins (balance arena), so that lever waits until this one has been seen in play.
 - **Sourcing happens at pulse end** (stockpile → lines, then manufacture, then pool → lines), not the
   instant a +/− is clicked; the devtools "Fill to target" bypasses this for test setup. Lowering a target
   *does* return the excess immediately (Equipment to the stockpile, Manpower to the pool), as does

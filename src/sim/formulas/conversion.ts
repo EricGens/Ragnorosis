@@ -33,6 +33,18 @@ export function factionFacilityMultiplier(
   return facilityMultiplier(totalLevel)
 }
 
+/**
+ * People trained per point of Production before Training Facilities (Eric, 2026-11-16; was 1). Manpower is
+ * meant to be paid for mostly in population, not industry: a populous, under-developed faction should be
+ * able to field mass infantry cheaply, limited by the 2% Manpower cap rather than by its factories.
+ */
+export const MANPOWER_PER_PRODUCTION = 5
+
+/** Manpower a faction trains per point of Production: the base rate times its Training Facility bonus. */
+export function manpowerPerPoint(state: GameState, faction: FactionId): number {
+  return MANPOWER_PER_PRODUCTION * factionFacilityMultiplier(state, faction, 'training-facility')
+}
+
 /** Floor to whole units, carrying the fraction forward. */
 export function convertWithRemainder(
   points: number,

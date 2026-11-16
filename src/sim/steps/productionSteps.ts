@@ -4,7 +4,7 @@ import { TICKS_PER_PULSE } from '../clock'
 import { BUILDINGS, buildingCost } from '../data/buildings'
 import { formatInt } from '../format'
 import { allocateProduction } from '../formulas/allocation'
-import { convertWithRemainder, factionFacilityMultiplier } from '../formulas/conversion'
+import { convertWithRemainder, factionFacilityMultiplier, manpowerPerPoint } from '../formulas/conversion'
 import { controlledRegions, drawPopulation, manpowerCap } from '../formulas/manpower'
 import { log } from '../log'
 import { drawdownManpower, equipmentAllocationRoom, manufactureEquipment } from '../military/pipeline'
@@ -22,7 +22,10 @@ export function factionProduction(state: GameState, faction: FactionId): number 
 export function computeAllocation(state: GameState, faction: FactionId): ProductionAllocation {
   const f = state.factions[faction]
   return allocateProduction(factionProduction(state, faction), f.focus, {
-    manpowerCapRoom: manpowerCap(state, faction) - f.manpower,
+    // Room is counted in allocation points, like Equipment's: the people the pool can still hold ÷ people per point.
+    manpowerCapRoom: Math.ceil(
+      Math.max(0, manpowerCap(state, faction) - f.manpower) / manpowerPerPoint(state, faction),
+    ),
     equipmentRoom: equipmentAllocationRoom(state, faction),
     hasProjects: f.projects.length > 0,
   })
@@ -120,11 +123,7 @@ export function creditPulseOutputs(state: GameState): void {
     }
 
     if (manpowerPoints > 0) {
-      const r = convertWithRemainder(
-        manpowerPoints,
-        factionFacilityMultiplier(state, id, 'training-facility'),
-        f.manpowerRemainder,
-      )
+      const r = convertWithRemainder(manpowerPoints, manpowerPerPoint(state, id), f.manpowerRemainder)
       const room = Math.max(0, manpowerCap(state, id) - f.manpower)
       const trained = Math.min(r.units, room)
       f.manpower += trained
