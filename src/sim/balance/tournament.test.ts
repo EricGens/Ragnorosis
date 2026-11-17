@@ -1,4 +1,4 @@
-// Regenerates tournament-report.md: `npm run balance:tournament` (about eight minutes). A round robin of
+// Regenerates tournament-report.md: `npm run balance:tournament` (about ten minutes). A round robin of
 // roughly a hundred Task Force designs at two army sizes, to see whether one design dominates or whether
 // the strong ones counter each other. Skipped in the normal test run. Committed, like balance-report.md,
 // so a rule change shows up as a diff.

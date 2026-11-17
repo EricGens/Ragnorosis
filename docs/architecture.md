@@ -180,7 +180,7 @@ number or catalog entry; add a section to `report.test.ts` when a new mechanic d
 
 `npm run balance:tournament` regenerates `tournament-report.md`: a round robin of about a hundred Task Force
 designs at two army sizes, ranked, with each top design's worst matchups. It answers "is there a dominant
-build, or do the strong ones counter each other?" and takes about eight minutes.
+build, or do the strong ones counter each other?" and takes about ten minutes.
 
 ## 6. How to add things
 
