@@ -6,7 +6,7 @@ import { CN, giveRegion, LIGHT_INFANTRY, newGame, raiseTaskForce, ticks, TOWED_A
 import type { GameState, LandRegion } from '../types'
 import { battleFor, orderStandoff } from './battle'
 import { drawWeighted } from './battleRound'
-import { maneuverBonus, relativeBonus, sensorTotals, unopposedCasChance } from './combat'
+import { maneuverBonus, relativeBonus, sensorTotals, supportFireExposure, unopposedCasChance } from './combat'
 import { orderMove } from './movement'
 import { saveDesign } from './roster'
 import { createTaskForce, fillTaskForce, setTarget } from './taskForce'
@@ -209,5 +209,53 @@ describe('CAS (§5.3) and the combined-arms invasion', () => {
 
   it('intercepted aircraft are held to the Front Line: with air defence for every run, the guns are never touched', () => {
     expect(artilleryUnderAir(40)).toEqual({ everHit: false, lost: 0 })
+  })
+
+  it('cover lets through 1 − Defensibility ÷ 100 of supporting fire, never less than 20% (decisions doc)', () => {
+    const s = newGame()
+    expect(supportFireExposure(s.regions['w-land'] as LandRegion)).toBeCloseTo(0.9) // plain: Defensibility 10
+    expect(supportFireExposure(s.regions['n-land'] as LandRegion)).toBeCloseTo(0.45) // rugged, mountainous, Fort 5: 55
+    expect(supportFireExposure(s.regions['c-land'] as LandRegion)).toBeCloseTo(0.2) // rugged, mountainous, Fort 10: 80
+    const bunker = produce(
+      s,
+      (d) => void ((d.regions['c-land'] as LandRegion).traits = ['rugged', 'mountainous', 'rugged']),
+    )
+    expect(supportFireExposure(bunker.regions['c-land'] as LandRegion)).toBe(0.2) // Defensibility 90: floored
+  })
+
+  it('an invader lands far fewer CAS hits and deep strikes on a fortified defender than on open ground', () => {
+    /** 12 Light Infantry, 12 guns and 6 aircraft invade 60 Light Infantry; count supporting-fire hits over 24 ticks. */
+    const supportHits = (fortified: boolean): number => {
+      let total = 0
+      for (let seed = 1; seed <= 8; seed++) {
+        const s = newGame((d) => {
+          giveRegion(d, 'c-land', CN)
+          const ground = d.regions['c-land'] as LandRegion
+          if (!fortified) {
+            ground.traits = []
+            ground.buildings = {}
+          }
+          setFactionRelation(d, US, CN, 'hostile')
+          saveDesign(d, US, LIGHT_INFANTRY)
+          saveDesign(d, US, TOWED_ARTILLERY)
+          saveDesign(d, US, { name: 'CAS Aircraft', platform: 'light-aircraft', modules: ['la-pgm', 'la-turbofan'] })
+          saveDesign(d, CN, LIGHT_INFANTRY)
+          raiseTaskForce(d, US, 'w-land', [
+            [1, 12],
+            [2, 12],
+            [3, 6],
+          ])
+          raiseTaskForce(d, CN, 'c-land', [[1, 60]])
+          orderMove(d, 1, 'c-land')
+        }, seed)
+        const hits = ticks(s, 24).battles[0].attacker.hits
+        total += hits.cas + hits.longRange
+      }
+      return total
+    }
+    const open = supportHits(false)
+    const dugIn = supportHits(true)
+    expect(open).toBeGreaterThan(100)
+    expect(dugIn).toBeLessThan(open * 0.4) // 20% gets through against 90% on open ground
   })
 })

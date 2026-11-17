@@ -234,6 +234,45 @@ it.runIf(import.meta.env.VITE_BALANCE)(
       out.push('', ...forces.map((f) => `- ${f.name}: ${f.units.map(([d, k]) => `${k} ${d.name}`).join(' + ')}`), '')
     }
 
+    out.push('## Holding ground: a poorer infantry force on defensible terrain', '')
+    out.push(
+      'How often a defender with 3,000 Production holds against a richer combined-arms attacker, by terrain.',
+      "Defensibility strengthens the defender's Front Line and, through cover, absorbs part of the",
+      "attacker's CAS hits and artillery strikes.",
+      '',
+    )
+    const terrains: [string, Battlefield][] = [
+      ['plain (10)', {}],
+      ['Fortification 5 (35)', { fortification: 5 }],
+      ['Fortification 10, rugged, mountainous (80)', { fortification: 10, traits: ['rugged', 'mountainous'] }],
+    ]
+    const richInfantry = mix(
+      '4,500: 35 AT Infantry + 12 Towed Artillery + 6 CAS',
+      [D.atInf, 35],
+      [D.towed, 12],
+      [D.cas, 6],
+    )
+    const richArmour = mix(
+      '6,000: 12 MBT+ + 12 Towed Artillery + 6 CAS + 16 AT Infantry',
+      [D.mbtPlus, 12],
+      [D.towed, 12],
+      [D.cas, 6],
+      [D.atInf, 16],
+    )
+    out.push(
+      `| defender (3,000) | attacker | ${terrains.map((t) => t[0]).join(' | ')} |`,
+      `| --- | --- | ${terrains.map(() => '---:').join(' | ')} |`,
+    )
+    for (const def of [
+      mix('50 AT Infantry', [D.atInf, 50]),
+      mix('30 AT Infantry + 12 Towed Artillery', [D.atInf, 30], [D.towed, 12]),
+    ])
+      for (const atk of [richInfantry, richArmour])
+        out.push(
+          `| ${def.name} | ${atk.name} | ${terrains.map(([, f]) => pct(1 - runMatchup(atk, def, RUNS, f).attackerWinRate)).join(' | ')} |`,
+        )
+    out.push('')
+
     out.push('', '## Is there a win button?', '')
     out.push(
       'The three strongest attackers against every defending composition in a search space of fronts',

@@ -24,6 +24,7 @@ import {
   REINFORCE_PERCENT,
   relativeBonus,
   sensorTotals,
+  supportFireExposure,
   unopposedCasChance,
   unitOrganization,
 } from './combat'
@@ -45,6 +46,8 @@ interface Mods {
   /** ISR adds to ground-column rolls, Radar to Anti-Air-column rolls (§1.2). */
   isr: number
   radar: number
+  /** Share of incoming CAS hits and deep strikes that get through this side's cover (1 = none absorbed). */
+  exposure: number
 }
 
 interface Hit {
@@ -91,6 +94,11 @@ function duel(state: GameState, a: number, b: number): boolean | null {
   if (roll < c.attacker) return true
   if (roll < c.attacker + c.defender) return false
   return null
+}
+
+/** Did this side's cover absorb a supporting-fire hit that would otherwise have landed? */
+function absorbed(state: GameState, target: Fighter): boolean {
+  return target.mods.exposure < 1 && nextRandom(state) >= target.mods.exposure
 }
 
 function occupied(line: (number | null)[]): { id: number; index: number }[] {
@@ -194,6 +202,7 @@ function resolveLongRange(
       const r = duel(state, vs.value, vi.value)
       if (r === null) continue
       if (r && target) {
+        if (absorbed(state, interceptor)) continue
         hits[s].push({ damage: vs.damage, piercing: vs.piercing, target })
         striker.side.hits.longRange += 1
         striker.air.opposite += 1
@@ -223,7 +232,7 @@ function resolveLongRange(
       const targetId = target ? designAt(enemy.side, target) : null
       if (!target || targetId === null) continue
       const v = attackValue(state, me, u.id, enemy, targetId, 'long')
-      if (v.value > 0 && nextRandom(state) * 100 < 5) {
+      if (v.value > 0 && nextRandom(state) * 100 < 5 && !absorbed(state, enemy)) {
         hits[sideIdx].push({ damage: v.damage, piercing: v.piercing, target })
         me.side.hits.longRange += 1
         me.air.opposite += 1
@@ -291,7 +300,7 @@ function resolveCas(
     const target: Hit['target'] = { role: t.role, index: t.index }
     const vc = attackValue(state, me, run.id, enemy, t.id, 'short')
     if (!d) {
-      if (nextRandom(state) * 100 < unopposedCasChance(vc.value)) {
+      if (nextRandom(state) * 100 < unopposedCasChance(vc.value) && !absorbed(state, enemy)) {
         mine.push({ damage: vc.damage, piercing: vc.piercing, target })
         me.side.hits.cas += 1
         me.air.cas += 1
@@ -301,6 +310,7 @@ function resolveCas(
     const vd = attackValue(state, enemy, d.id, me, run.id, 'short')
     const r = duel(state, vc.value, vd.value)
     if (r === true) {
+      if (absorbed(state, enemy)) return
       mine.push({ damage: vc.damage, piercing: vc.piercing, target })
       me.side.hits.cas += 1
       me.air.cas += 1
@@ -503,13 +513,20 @@ export function resolveRound(
       bonus: (invasion ? partisanBonus(region.stability) : 0) + Math.max(0, maneuver),
       isr: 0,
       radar: 0,
+      exposure: 1, // an invader is in the open
     },
     air: { opposite: 0, own: 0, cas: 0, aaKills: 0 },
   }
   const d: Fighter = {
     tf: defender,
     side: battle.defender,
-    mods: { multiplier: invasion ? defenseMultiplier(region) : 1, bonus: Math.max(0, -maneuver), isr: 0, radar: 0 },
+    mods: {
+      multiplier: invasion ? defenseMultiplier(region) : 1,
+      bonus: Math.max(0, -maneuver),
+      isr: 0,
+      radar: 0,
+      exposure: invasion ? supportFireExposure(region) : 1,
+    },
     air: { opposite: 0, own: 0, cas: 0, aaKills: 0 },
   }
   // Sensors (§1.2): from units currently on a line; only the relative delta matters.

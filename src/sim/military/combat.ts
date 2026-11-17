@@ -136,6 +136,18 @@ export function defenseMultiplier(region: LandRegion): number {
   return 1 + defensibility(region) / 100
 }
 
+/**
+ * Cover (Eric, 2026-11-16): a defender's ground also shelters it from supporting fire. Of the CAS hits and
+ * artillery deep strikes an invader lands, only this share gets through — 1 − Defensibility ÷ 100, never
+ * below COVER_FLOOR. Plain ground (Defensibility 10) lets 90% through; a level 10 Fortification in rugged
+ * mountains (80) lets through 20%. Front Line fighting and counter-battery duels are unaffected.
+ */
+export const COVER_FLOOR = 0.2
+
+export function supportFireExposure(region: LandRegion): number {
+  return Math.max(COVER_FLOOR, 1 - defensibility(region) / 100)
+}
+
 /** Inverse-cost targeting weights (§5.1): (1 ÷ cost) ÷ Σ(1 ÷ cost). */
 export function inverseCostWeights(costs: number[]): number[] {
   const inv = costs.map((c) => 1 / Math.max(c, EPSILON))

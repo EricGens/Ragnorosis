@@ -271,6 +271,19 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
      Long-Range Fires' deep strikes remain an even draw across Front Line and Reserve units.
   Measured on "40 AT Infantry plus one 1,200-Production purchase": CAS against MBT+ goes from 44% to 98%, against
   Towed Artillery from 8% to 65%, while SHORAD Vehicles still stop it. Numbers: `src/sim/balance/balance-report.md`.
+- **Cover (Eric, 2026-11-16): Defensibility also shelters a defender from supporting fire.** Of the CAS hits and
+  artillery deep strikes an invader lands, only `max(20%, 1 − Defensibility ÷ 100)` get through: 90% on plain
+  ground (Defensibility 10), 45% at 55, 20% at 80 and above. Front Line fighting, counter-battery duels between the
+  two Long-Range lines, and the invader's own exposure are unchanged; an absorbed hit does nothing at all (no
+  damage, no Organization loss, no Air Superiority credit). Purpose: let mass infantry dug into strong terrain
+  hold against a richer infantry-based combined-arms attacker (0% → 100% in the arena at Defensibility 80)
+  without changing fights on open ground. Known side effect, accepted: fortified defenders of every kind hold more
+  often (a peer defender at Fortification 5 went from about 50% to about 80%). It does **not** stop a tank-fronted
+  attacker — that fight is decided on the Front Line. **Standoff exchanges are not covered yet**; whether a
+  fortified force being shelled from next door should get the same shelter is an open question. Tried and not
+  adopted: a Dispersed posture halving fire against infantry — free for large armies with no cost attached,
+  useless to the poor defender once costs were added; it waits for the Posture system and its reconfiguration lag
+  (GDD §8.6.1).
 - **Standoff exchanges** are a second battle kind: only Long-Range Fires resolve, no Shock, no Planning,
   no partisan bonus, no loss condition — a force can be ground down (units and Organization) but never
   retreats from standoff fire alone. They start on the tick after a side engages and end the tick

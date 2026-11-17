@@ -1318,6 +1318,13 @@ fighters are not, since they carry no anti-ground capability to contribute.
 Line target pairing and the defensive pool itself re-run fresh each tick based on whatever units currently
 remain and are available — not fixed once at engagement start.
 
+**Cover — added 2026-11-16, applies to CAS here and to §5.2's deep strikes alike:** in an invasion, the
+defender's ground absorbs part of the supporting fire aimed at it. Of the CAS hits and Long-Range deep
+strikes (strikes at Front Line or Reserve units) the invader lands, only **`max(20%, 1 − Defensibility ÷ 100)`**
+get through — 90% on plain ground, 20% in a fully fortified rugged, mountainous region. An absorbed hit has
+no effect at all. Front Line combat (§5.1), counter-battery and air-defense duels on the Long-Range line, and
+fire against the invader are unaffected. See epoch2-decisions.md, "Cover".
+
 ### 5.4 Remaining Tier 1 Gaps
 
 *Carried from the implementation-side Claude's original handoff, independently verified against the live

@@ -15,6 +15,7 @@ import type { EnergyResult, FactionId, GameState, LandRegion, Region, TerrainTra
 import { FACTION_IDS, isLand } from '../../sim/types'
 import type { TooltipContent } from '../../store/uiStore'
 import { EPSILON } from '../../sim/numeric'
+import { supportFireExposure } from '../../sim/military/combat'
 
 export type Tone = 'neutral' | 'good' | 'warn' | 'bad'
 
@@ -206,7 +207,8 @@ function landStats(state: GameState, region: LandRegion, perspective: FactionId)
         title: 'Defensibility',
         lines: [
           `10 base + 10 × ${region.traits.length} terrain trait(s) + 5 × ${region.buildings.fortification ?? 0} Fortification level(s).`,
-          'Favors the defending Task Force. Fortification caps at level 10.',
+          `Favors the defending Task Force: its combat values are ×${(1 + defensibility(region) / 100).toFixed(2)}, and cover absorbs ${Math.round((1 - supportFireExposure(region)) * 100)}% of an invader's CAS hits and artillery strikes.`,
+          'Fortification caps at level 10.',
         ],
       },
     },
