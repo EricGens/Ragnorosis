@@ -348,7 +348,8 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 
 ## Source-doc fixes needed
 
-None outstanding. Applied 2026-11-16: skeleton §5.1 (the 50% cap replaces the "~90-point gap" caveat), §5.3 (CAS
-targeting and the unopposed roll) and §5.4 (Shock formula); GDD §8.6.2 (Shock formula and worked multipliers);
-Epoch 1 skeleton §4.5 (Manpower at 5 per Production point). Still describing superseded numbers, by design and
+None outstanding. Applied 2026-11-16: skeleton §3.1 and the Tier-I module list (Small Arms 5/3/2/0, Man-portable
+AT +1/+5/+3/0), §5.1 (the 50% cap replaces the "~90-point gap" caveat; a value below 5 is its own baseline), §5.3
+(CAS targeting, the unopposed roll, and cover) and §5.4 (Shock formula); GDD §8.6.2 (Shock formula and worked
+multipliers); Epoch 1 skeleton §4.5 (Manpower at 5 per Production point). Still describing superseded numbers, by design and
 noted where they are overridden above: the skeleton's unit speeds (all ÷3 since 2026-11-15).
