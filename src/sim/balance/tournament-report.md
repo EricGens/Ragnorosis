@@ -5,93 +5,93 @@ design's results attacking and defending against every design in the pool, itsel
 
 ## 6,000 Production
 
-100 designs, 8 seeds per matchup in each direction.
+110 designs, 8 seeds per matchup in each direction.
 
 | rank | design | overall | attacking | defending | worst matchups |
 | ---: | --- | ---: | ---: | ---: | --- |
-| 1 | MBT (AT) / Light Infantry + Towed + SHORAD | 74% | 89% | 59% | MBT (AT) / AT Infantry + Towed (13%); MBT (AT) / Light Infantry + MLRS (25%); MBT (AT) / AT Infantry + MLRS (25%) |
-| 2 | MBT (AT) / AT Infantry + Towed + SHORAD | 71% | 86% | 56% | AT Infantry + MLRS (13%); Heavy Infantry + MLRS (13%); MBT (AT) / Light Infantry + Towed (19%) |
-| 3 | MBT+ / Light Infantry + Towed + SHORAD | 71% | 86% | 55% | MBT (AT) / Light Infantry + MLRS (6%); MBT (AT) / Light Infantry + Towed (19%); MBT (AT) / AT Infantry + Towed (19%) |
-| 4 | MBT+ / AT Infantry + Towed + SHORAD | 69% | 82% | 55% | MBT (AT) / Light Infantry + Towed (0%); MBT (AT) / AT Infantry + Towed (0%); MBT (AT) / Light Infantry + MLRS (6%) |
-| 5 | MBT (AT) / Light Infantry + Towed | 69% | 77% | 61% | AT Infantry + Towed + CAS (0%); Light Infantry + Towed + CAS + SHORAD (6%); Light Infantry + Towed + CAS (6%) |
-| 6 | MBT (AT) / AT Infantry + Towed | 69% | 77% | 60% | Light Infantry + Towed + CAS (0%); AT Infantry + Towed + CAS (6%); Light Infantry + MLRS + CAS (6%) |
-| 7 | MBT+ / AT Infantry + Towed | 67% | 75% | 58% | MBT (AT) / Light Infantry + Towed + CAS (0%); Light Infantry + MLRS + CAS (6%); MBT (AT) / Light Infantry + CAS (6%) |
-| 8 | Light Infantry + Towed + CAS + SHORAD | 67% | 71% | 62% | MBT (AT) / Light Infantry + Towed + SHORAD (6%); MBT (AT) / AT Infantry + Towed + SHORAD (6%); MBT+ / Light Infantry + Towed + SHORAD (6%) |
-| 9 | AT Infantry + Towed + CAS + SHORAD | 66% | 73% | 60% | MBT+ / Light Infantry + Towed + SHORAD (0%); AT Infantry + MLRS + SHORAD (0%); IFV / Light Infantry + Towed + SHORAD (0%) |
-| 10 | MBT+ / Light Infantry + Towed | 66% | 74% | 59% | IFV / Light Infantry + Towed + CAS (0%); MBT (AT) / Light Infantry + Towed + CAS (6%); MBT (AT) / Light Infantry + CAS (6%) |
-| 11 | MBT (AT) / Light Infantry + Towed + CAS | 66% | 80% | 53% | Light Infantry + Towed + CAS + SHORAD (6%); AT Infantry + Towed + CAS + SHORAD (6%); Light Infantry + MLRS + CAS + SHORAD (6%) |
-| 12 | MBT (AT) / Light Infantry + MLRS | 65% | 76% | 55% | Light Infantry + Towed + CAS (6%); AT Infantry + Towed + CAS (6%); Heavy Infantry + Towed + CAS (6%) |
-| 13 | IFV / Light Infantry + Towed + CAS | 65% | 76% | 54% | Light Infantry + Towed + CAS + SHORAD (13%); MBT+ / Light Infantry + Towed + SHORAD (19%); MBT+ / AT Infantry + Towed + SHORAD (19%) |
-| 14 | MBT+ / Light Infantry + Towed + CAS | 65% | 80% | 50% | Light Infantry + Towed + CAS + SHORAD (13%); AT Infantry + Towed + CAS + SHORAD (13%); MBT (AT) / Light Infantry + CAS + SHORAD (13%) |
-| 15 | MBT (AT) / AT Infantry + MLRS | 64% | 76% | 53% | Light Infantry + Towed + CAS (0%); Light Infantry + MLRS + CAS (6%); MBT (AT) / Light Infantry + CAS (6%) |
+| 1 | 12 MBT (AT) / AT Infantry + Towed + SHORAD | 76% | 90% | 62% | 12 MBT (AT) / Light Infantry + MLRS (13%); Heavy Infantry + MLRS (13%); AT Infantry + MLRS (13%) |
+| 2 | 12 MBT (AT) / Light Infantry + Towed + SHORAD | 76% | 91% | 61% | 12 MBT (AT) / AT Infantry + Towed (19%); 12 MBT (AT) / AT Infantry + MLRS (25%); 12 MBT (AT) / Light Infantry + Towed (25%) |
+| 3 | AT Infantry + Towed + CAS + SHORAD | 73% | 79% | 66% | 12 MBT+ / Light Infantry + Towed + SHORAD (0%); AT Infantry + MLRS + SHORAD (0%); 12 IFV / Light Infantry + Towed + SHORAD (0%) |
+| 4 | 12 MBT (AT) / AT Infantry + Towed | 72% | 81% | 63% | Light Infantry + Towed + CAS (0%); 12 MBT+ / Light Infantry + Towed + CAS (6%); AT Infantry + Towed + CAS (6%) |
+| 5 | 12 MBT (AT) / AT Infantry + Towed + CAS | 72% | 85% | 59% | AT Infantry + CAS + SHORAD (0%); AT Infantry + Towed + CAS + SHORAD (6%); Light Infantry + Towed + CAS + SHORAD (6%) |
+| 6 | 12 MBT (AT) / Light Infantry + Towed + CAS | 71% | 84% | 58% | AT Infantry + Towed + CAS + SHORAD (6%); AT Infantry + CAS + SHORAD (6%); Light Infantry + Towed + CAS + SHORAD (13%) |
+| 7 | 12 MBT+ / AT Infantry + Towed + SHORAD | 71% | 85% | 56% | 12 MBT (AT) / AT Infantry + Towed (0%); 12 MBT (AT) / AT Infantry + MLRS (6%); 12 MBT+ / AT Infantry + MLRS (13%) |
+| 8 | 12 MBT (AT) / AT Infantry + MLRS | 70% | 82% | 58% | 12 MBT (AT) / AT Infantry + CAS (6%); AT Infantry + MLRS + CAS (6%); Light Infantry + Towed + CAS (6%) |
+| 9 | 12 MBT+ / Light Infantry + Towed + SHORAD | 69% | 84% | 54% | 12 MBT (AT) / AT Infantry + Towed (6%); All MBT (AT) + MLRS (6%); 12 MBT (AT) / AT Infantry + MLRS (13%) |
+| 10 | 12 MBT+ / AT Infantry + Towed | 68% | 78% | 59% | 12 MBT (AT) / Light Infantry + Towed + CAS (0%); All MBT+ + Towed + CAS (6%); 12 MBT+ / Light Infantry + MLRS + CAS (6%) |
+| 11 | 12 MBT+ / AT Infantry + Towed + CAS | 68% | 84% | 52% | Light Infantry + CAS + SHORAD (6%); 12 MBT (AT) / AT Infantry + CAS + SHORAD (19%); AT Infantry + Towed + CAS + SHORAD (25%) |
+| 12 | 12 MBT (AT) / Light Infantry + Towed | 68% | 78% | 58% | AT Infantry + Towed + CAS (0%); Light Infantry + Towed + CAS (0%); 12 MBT (AT) / Light Infantry + Towed + CAS (6%) |
+| 13 | 12 MBT+ / Light Infantry + Towed + CAS | 68% | 84% | 51% | 12 MBT (AT) / Light Infantry + CAS + SHORAD (6%); 12 MBT (AT) / AT Infantry + CAS + SHORAD (13%); AT Infantry + Towed + CAS + SHORAD (19%) |
+| 14 | AT Infantry + Towed + CAS | 67% | 69% | 65% | Light Infantry + Towed + CAS + SHORAD (0%); Light Infantry + MLRS + CAS + SHORAD (0%); AT Infantry + Towed + CAS + SHORAD (6%) |
+| 15 | 12 MBT (AT) / Light Infantry + MLRS | 66% | 77% | 55% | AT Infantry + Towed + CAS (6%); Heavy Infantry + Towed + CAS (6%); 12 MBT (AT) / AT Infantry + CAS (6%) |
 
-Weakest five: IFV / AT Infantry (21%); Heavy Infantry + SHORAD (17%); AT Infantry (12%); Heavy Infantry (9%); Light Infantry (8%).
+Weakest five: Light Infantry + SHORAD (16%); All MBT+ (15%); Heavy Infantry (14%); 12 IFV / Light Infantry (13%); Light Infantry (4%).
 
 Top eight against each other (row versus column):
 
 | | #1 | #2 | #3 | #4 | #5 | #6 | #7 | #8 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| #1 MBT (AT) / Light Infantry + Towed + SHORAD | 50% | 63% | 56% | 63% | 31% | 13% | 56% | 94% |
-| #2 MBT (AT) / AT Infantry + Towed + SHORAD | 38% | 50% | 75% | 75% | 19% | 19% | 50% | 94% |
-| #3 MBT+ / Light Infantry + Towed + SHORAD | 44% | 25% | 50% | 50% | 19% | 19% | 19% | 94% |
-| #4 MBT+ / AT Infantry + Towed + SHORAD | 38% | 25% | 50% | 50% | 0% | 0% | 25% | 94% |
-| #5 MBT (AT) / Light Infantry + Towed | 69% | 81% | 81% | 100% | 50% | 44% | 63% | 6% |
-| #6 MBT (AT) / AT Infantry + Towed | 88% | 81% | 81% | 100% | 56% | 50% | 75% | 19% |
-| #7 MBT+ / AT Infantry + Towed | 44% | 50% | 81% | 75% | 38% | 25% | 50% | 50% |
-| #8 Light Infantry + Towed + CAS + SHORAD | 6% | 6% | 6% | 6% | 94% | 81% | 50% | 50% |
+| #1 12 MBT (AT) / AT Infantry + Towed + SHORAD | 50% | 56% | 75% | 19% | 50% | 63% | 75% | 31% |
+| #2 12 MBT (AT) / Light Infantry + Towed + SHORAD | 44% | 50% | 81% | 19% | 44% | 56% | 63% | 25% |
+| #3 AT Infantry + Towed + CAS + SHORAD | 25% | 19% | 50% | 88% | 94% | 94% | 13% | 81% |
+| #4 12 MBT (AT) / AT Infantry + Towed | 81% | 81% | 13% | 50% | 13% | 31% | 100% | 44% |
+| #5 12 MBT (AT) / AT Infantry + Towed + CAS | 50% | 56% | 6% | 88% | 50% | 56% | 69% | 69% |
+| #6 12 MBT (AT) / Light Infantry + Towed + CAS | 38% | 44% | 6% | 69% | 44% | 50% | 63% | 88% |
+| #7 12 MBT+ / AT Infantry + Towed + SHORAD | 25% | 38% | 88% | 0% | 31% | 38% | 50% | 6% |
+| #8 12 MBT (AT) / AT Infantry + MLRS | 69% | 75% | 19% | 56% | 31% | 13% | 94% | 50% |
 
-- #1: 12 MBT (AT) + 19 Light Infantry + 12 Towed Artillery + 6 SHORAD Vehicle
-- #2: 12 MBT (AT) + 16 AT Infantry + 12 Towed Artillery + 6 SHORAD Vehicle
-- #3: 12 MBT+ + 19 Light Infantry + 12 Towed Artillery + 6 SHORAD Vehicle
-- #4: 12 MBT+ + 16 AT Infantry + 12 Towed Artillery + 6 SHORAD Vehicle
-- #5: 12 MBT (AT) + 43 Light Infantry + 12 Towed Artillery
-- #6: 12 MBT (AT) + 36 AT Infantry + 12 Towed Artillery
-- #7: 12 MBT+ + 36 AT Infantry + 12 Towed Artillery
-- #8: 48 Light Infantry + 12 Towed Artillery + 6 CAS Aircraft + 6 SHORAD Vehicle
+- #1: 12 MBT (AT) + 16 AT Infantry + 12 Towed Artillery + 6 SHORAD Vehicle
+- #2: 12 MBT (AT) + 19 Light Infantry + 12 Towed Artillery + 6 SHORAD Vehicle
+- #3: 40 AT Infantry + 12 Towed Artillery + 6 CAS Aircraft + 6 SHORAD Vehicle
+- #4: 12 MBT (AT) + 36 AT Infantry + 12 Towed Artillery
+- #5: 12 MBT (AT) + 16 AT Infantry + 12 Towed Artillery + 6 CAS Aircraft
+- #6: 12 MBT (AT) + 19 Light Infantry + 12 Towed Artillery + 6 CAS Aircraft
+- #7: 12 MBT+ + 16 AT Infantry + 12 Towed Artillery + 6 SHORAD Vehicle
+- #8: 12 MBT (AT) + 26 AT Infantry + 12 MLRS
 
-## 20,000 Production (best 34 of 108 after a first round)
+## 20,000 Production (best 34 of 144 after a first round)
 
 34 designs, 8 seeds per matchup in each direction.
 
 | rank | design | overall | attacking | defending | worst matchups |
 | ---: | --- | ---: | ---: | ---: | --- |
-| 1 | MBT+ / AT Infantry + MLRS + SHORAD | 79% | 88% | 71% | MBT (AT) / Light Infantry + MLRS + SHORAD (38%); MBT+ / Light Infantry + MLRS + CAS + SHORAD (44%) |
-| 2 | MBT+ / Light Infantry + MLRS + CAS + SHORAD | 78% | 88% | 69% | MBT+ / AT Infantry + MLRS + CAS + SHORAD (38%) |
-| 3 | MBT (AT) / Light Infantry + MLRS + SHORAD | 78% | 87% | 68% | MBT+ / Light Infantry + MLRS + SHORAD (38%); MBT (AT) / Light Infantry + MLRS + CAS + SHORAD (44%) |
-| 4 | MBT+ / Light Infantry + MLRS + SHORAD | 77% | 86% | 69% | MBT (AT) / AT Infantry + MLRS + CAS + SHORAD (31%); MBT+ / AT Infantry + MLRS + SHORAD (38%); MBT+ / Light Infantry + MLRS + CAS + SHORAD (38%) |
-| 5 | MBT+ / AT Infantry + MLRS + CAS + SHORAD | 76% | 85% | 67% | MBT+ / AT Infantry + MLRS + SHORAD (31%); MBT (AT) / Light Infantry + MLRS + SHORAD (38%); MBT (AT) / AT Infantry + MLRS + SHORAD (38%) |
-| 6 | MBT (AT) / AT Infantry + MLRS + SHORAD | 76% | 82% | 69% | MBT+ / Light Infantry + MLRS + SHORAD (31%); MBT+ / AT Infantry + MLRS + SHORAD (38%) |
-| 7 | MBT (AT) / AT Infantry + MLRS + CAS + SHORAD | 74% | 86% | 62% | MBT+ / Light Infantry + MLRS + CAS + SHORAD (31%); MBT (AT) / AT Infantry + MLRS + SHORAD (38%); MBT+ / AT Infantry + MLRS + SHORAD (44%) |
-| 8 | MBT (AT) / Light Infantry + MLRS + CAS + SHORAD | 74% | 86% | 62% | MBT (AT) / AT Infantry + MLRS + SHORAD (25%); MBT (AT) / AT Infantry + MLRS + CAS + SHORAD (25%); IFV / AT Infantry + MLRS + SHORAD (38%) |
-| 9 | IFV / AT Infantry + MLRS + CAS + SHORAD | 65% | 76% | 54% | MBT (AT) / Light Infantry + MLRS + SHORAD (19%); MBT+ / Light Infantry + MLRS + SHORAD (19%); MBT+ / AT Infantry + MLRS + SHORAD (25%) |
-| 10 | IFV / Light Infantry + MLRS + CAS + SHORAD | 65% | 75% | 55% | MBT (AT) / Light Infantry + MLRS + SHORAD (13%); MBT+ / AT Infantry + MLRS + SHORAD (19%); MBT (AT) / AT Infantry + MLRS + SHORAD (25%) |
-| 11 | IFV / Light Infantry + MLRS + SHORAD | 62% | 74% | 50% | MBT (AT) / Light Infantry + MLRS + SHORAD (25%); MBT (AT) / AT Infantry + MLRS + SHORAD (25%); MBT+ / Light Infantry + MLRS + CAS + SHORAD (31%) |
-| 12 | IFV / AT Infantry + MLRS + SHORAD | 61% | 71% | 51% | MBT+ / AT Infantry + MLRS + SHORAD (13%); MBT+ / Light Infantry + MLRS + CAS + SHORAD (25%); MBT+ / AT Infantry + MLRS + CAS + SHORAD (25%) |
-| 13 | AT Infantry + MLRS + CAS + SHORAD | 58% | 59% | 57% | MBT+ / Light Infantry + MLRS + CAS + SHORAD (6%); MBT (AT) / Light Infantry + MLRS + SHORAD (13%); MBT+ / AT Infantry + MLRS + CAS + SHORAD (13%) |
-| 14 | AT Infantry + MLRS + SHORAD | 56% | 58% | 54% | MBT+ / AT Infantry + MLRS + SHORAD (13%); MBT+ / Light Infantry + MLRS + SHORAD (13%); MBT+ / Light Infantry + MLRS + CAS + SHORAD (19%) |
-| 15 | Light Infantry + MLRS + CAS + SHORAD | 54% | 61% | 48% | MBT+ / AT Infantry + MLRS + SHORAD (13%); MBT (AT) / Light Infantry + MLRS + SHORAD (13%); MBT (AT) / AT Infantry + MLRS + SHORAD (13%) |
+| 1 | 24 MBT+ / AT Infantry + MLRS + SHORAD | 83% | 91% | 74% | none below 45% |
+| 2 | 12 MBT+ / AT Infantry + MLRS + SHORAD | 79% | 89% | 70% | 24 MBT+ / Light Infantry + MLRS + CAS + SHORAD (38%); 24 MBT+ / AT Infantry + MLRS + SHORAD (44%) |
+| 3 | 12 MBT (AT) / AT Infantry + MLRS + SHORAD | 78% | 84% | 72% | 24 MBT+ / Light Infantry + MLRS + CAS + SHORAD (31%); 12 MBT+ / AT Infantry + MLRS + SHORAD (38%); 24 MBT+ / AT Infantry + MLRS + SHORAD (44%) |
+| 4 | 24 MBT+ / Light Infantry + MLRS + CAS + SHORAD | 78% | 90% | 65% | 24 MBT+ / AT Infantry + MLRS + SHORAD (38%) |
+| 5 | 24 MBT+ / AT Infantry + MLRS + CAS + SHORAD | 76% | 89% | 62% | 24 MBT+ / AT Infantry + MLRS + SHORAD (31%); 12 MBT+ / AT Infantry + MLRS + SHORAD (38%) |
+| 6 | 24 MBT+ / Light Infantry + MLRS + SHORAD | 75% | 86% | 64% | 12 MBT (AT) / AT Infantry + MLRS + CAS + SHORAD (31%); 24 MBT+ / AT Infantry + MLRS + SHORAD (44%); 12 MBT+ / AT Infantry + MLRS + SHORAD (44%) |
+| 7 | 12 MBT (AT) / Light Infantry + MLRS + CAS + SHORAD | 75% | 87% | 62% | 12 MBT (AT) / AT Infantry + MLRS + SHORAD (38%); 24 MBT+ / Light Infantry + MLRS + CAS + SHORAD (38%); 24 MBT+ / AT Infantry + MLRS + CAS + SHORAD (38%) |
+| 8 | 12 MBT+ / AT Infantry + MLRS + CAS + SHORAD | 73% | 85% | 61% | 24 MBT+ / Light Infantry + MLRS + SHORAD (19%); 24 MBT+ / AT Infantry + MLRS + SHORAD (31%); 12 MBT+ / AT Infantry + MLRS + SHORAD (31%) |
+| 9 | 12 MBT (AT) / AT Infantry + MLRS + CAS + SHORAD | 72% | 86% | 58% | 24 MBT+ / AT Infantry + MLRS + SHORAD (25%); 12 MBT (AT) / Light Infantry + MLRS + CAS + SHORAD (31%); 12 MBT (AT) / AT Infantry + MLRS + SHORAD (38%) |
+| 10 | 12 MBT (AT) / Light Infantry + MLRS + SHORAD | 71% | 82% | 60% | 12 MBT+ / AT Infantry + MLRS + SHORAD (31%); 24 MBT+ / AT Infantry + MLRS + SHORAD (38%); 12 MBT (AT) / AT Infantry + MLRS + SHORAD (38%) |
+| 11 | 12 MBT+ / Light Infantry + MLRS + CAS + SHORAD | 69% | 85% | 54% | 24 MBT+ / AT Infantry + MLRS + CAS + SHORAD (31%); 12 MBT+ / AT Infantry + MLRS + CAS + SHORAD (31%); 12 MBT (AT) / Light Infantry + MLRS + SHORAD (31%) |
+| 12 | 12 MBT+ / Light Infantry + MLRS + SHORAD | 65% | 76% | 53% | 24 MBT+ / AT Infantry + MLRS + SHORAD (19%); 24 MBT+ / Light Infantry + MLRS + SHORAD (19%); 12 MBT (AT) / Light Infantry + MLRS + CAS + SHORAD (19%) |
+| 13 | AT Infantry + MLRS + SHORAD | 53% | 54% | 52% | 24 MBT+ / AT Infantry + MLRS + SHORAD (0%); 24 MBT+ / Light Infantry + MLRS + SHORAD (0%); 12 MBT+ / AT Infantry + MLRS + SHORAD (13%) |
+| 14 | AT Infantry + MLRS + CAS + SHORAD | 52% | 53% | 52% | 12 MBT (AT) / Light Infantry + MLRS + SHORAD (6%); 12 MBT+ / Light Infantry + MLRS + CAS + SHORAD (6%); 24 MBT+ / AT Infantry + MLRS + SHORAD (13%) |
+| 15 | 24 MBT+ / AT Infantry + Towed + SHORAD | 52% | 54% | 50% | 12 MBT (AT) / AT Infantry + MLRS + SHORAD (0%); 12 MBT+ / AT Infantry + MLRS + SHORAD (13%); 24 MBT+ / Light Infantry + MLRS + CAS + SHORAD (13%) |
 
-Weakest five: IFV / AT Infantry + Towed + CAS + SHORAD (21%); AT Infantry + Towed + CAS + SHORAD (19%); Light Infantry + Towed + CAS + SHORAD (18%); IFV / AT Infantry + Towed + CAS (18%); IFV / Light Infantry + Towed + CAS (14%).
+Weakest five: 12 IFV / Light Infantry + MLRS + CAS (28%); AT Infantry + Towed + CAS + SHORAD (20%); All MBT+ + Towed + CAS + SHORAD (18%); 12 IFV / Light Infantry + Towed + CAS + SHORAD (17%); Light Infantry + Towed + CAS + SHORAD (11%).
 
 Top eight against each other (row versus column):
 
 | | #1 | #2 | #3 | #4 | #5 | #6 | #7 | #8 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| #1 MBT+ / AT Infantry + MLRS + SHORAD | 50% | 44% | 38% | 63% | 69% | 63% | 56% | 50% |
-| #2 MBT+ / Light Infantry + MLRS + CAS + SHORAD | 56% | 50% | 50% | 63% | 38% | 50% | 69% | 56% |
-| #3 MBT (AT) / Light Infantry + MLRS + SHORAD | 63% | 50% | 50% | 38% | 63% | 50% | 56% | 44% |
-| #4 MBT+ / Light Infantry + MLRS + SHORAD | 38% | 38% | 63% | 50% | 44% | 69% | 31% | 50% |
-| #5 MBT+ / AT Infantry + MLRS + CAS + SHORAD | 31% | 63% | 38% | 56% | 50% | 38% | 50% | 38% |
-| #6 MBT (AT) / AT Infantry + MLRS + SHORAD | 38% | 50% | 50% | 31% | 63% | 50% | 63% | 75% |
-| #7 MBT (AT) / AT Infantry + MLRS + CAS + SHORAD | 44% | 31% | 44% | 69% | 50% | 38% | 50% | 75% |
-| #8 MBT (AT) / Light Infantry + MLRS + CAS + SHORAD | 50% | 44% | 56% | 50% | 63% | 25% | 25% | 50% |
+| #1 24 MBT+ / AT Infantry + MLRS + SHORAD | 50% | 56% | 56% | 63% | 69% | 56% | 56% | 69% |
+| #2 12 MBT+ / AT Infantry + MLRS + SHORAD | 44% | 50% | 63% | 38% | 63% | 56% | 50% | 69% |
+| #3 12 MBT (AT) / AT Infantry + MLRS + SHORAD | 44% | 38% | 50% | 31% | 50% | 56% | 63% | 63% |
+| #4 24 MBT+ / Light Infantry + MLRS + CAS + SHORAD | 38% | 63% | 69% | 50% | 50% | 56% | 63% | 63% |
+| #5 24 MBT+ / AT Infantry + MLRS + CAS + SHORAD | 31% | 38% | 50% | 50% | 50% | 50% | 63% | 56% |
+| #6 24 MBT+ / Light Infantry + MLRS + SHORAD | 44% | 44% | 44% | 44% | 50% | 50% | 50% | 81% |
+| #7 12 MBT (AT) / Light Infantry + MLRS + CAS + SHORAD | 44% | 50% | 38% | 38% | 38% | 50% | 50% | 56% |
+| #8 12 MBT+ / AT Infantry + MLRS + CAS + SHORAD | 31% | 31% | 38% | 38% | 44% | 19% | 44% | 50% |
 
-- #1: 12 MBT+ + 239 AT Infantry + 12 MLRS + 6 SHORAD Vehicle
-- #2: 12 MBT+ + 263 Light Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
-- #3: 12 MBT (AT) + 287 Light Infantry + 12 MLRS + 6 SHORAD Vehicle
-- #4: 12 MBT+ + 287 Light Infantry + 12 MLRS + 6 SHORAD Vehicle
-- #5: 12 MBT+ + 219 AT Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
-- #6: 12 MBT (AT) + 239 AT Infantry + 12 MLRS + 6 SHORAD Vehicle
-- #7: 12 MBT (AT) + 219 AT Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
-- #8: 12 MBT (AT) + 263 Light Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
+- #1: 24 MBT+ + 195 AT Infantry + 12 MLRS + 6 SHORAD Vehicle
+- #2: 12 MBT+ + 239 AT Infantry + 12 MLRS + 6 SHORAD Vehicle
+- #3: 12 MBT (AT) + 239 AT Infantry + 12 MLRS + 6 SHORAD Vehicle
+- #4: 24 MBT+ + 211 Light Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
+- #5: 24 MBT+ + 175 AT Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
+- #6: 24 MBT+ + 235 Light Infantry + 12 MLRS + 6 SHORAD Vehicle
+- #7: 12 MBT (AT) + 263 Light Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
+- #8: 12 MBT+ + 219 AT Infantry + 12 MLRS + 6 CAS Aircraft + 6 SHORAD Vehicle
 

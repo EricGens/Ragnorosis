@@ -76,7 +76,7 @@ export const UNOPPOSED_CAS_VALUE_SHARE = 0.5
 /** Hit chance (percent) of a CAS run no air defence rose to meet. */
 export function unopposedCasChance(value: number): number {
   if (value <= 0) return 0
-  return Math.min(ADVANTAGE_CAP_PERCENT, BASE_HIT_PERCENT + value * UNOPPOSED_CAS_VALUE_SHARE)
+  return Math.min(ADVANTAGE_CAP_PERCENT, baselineChance(value) + value * UNOPPOSED_CAS_VALUE_SHARE)
 }
 
 /** Only the delta matters: +1 to the advantaged side per 2 points (1–2 → +1, 3–4 → +2 …). */
@@ -100,12 +100,22 @@ export function columnFor(platform: PlatformId): number {
 }
 
 /**
+ * The baseline chance for a side with some relevant value: 5%, "a natural 20" — unless its value is below 5,
+ * in which case the chance is the value itself (Eric, 2026-11-16). Improvised capability (Light Infantry's 2
+ * against Tanks) gets a 2% lucky shot, not the same 5% as a unit equipped for the job.
+ */
+export function baselineChance(value: number): number {
+  return value <= 0 ? 0 : Math.min(BASE_HIT_PERCENT, value)
+}
+
+/**
  * The single partitioned roll (§5.1): attacker %, defender %, remainder is a push. A side with no
- * relevant vector value can't score at all; the advantaged side adds the raw point gap, capped.
+ * relevant vector value can't score at all; otherwise it gets its baseline, and the advantaged side adds
+ * the raw point gap, capped.
  */
 export function engagementChances(attackValue: number, defendValue: number): { attacker: number; defender: number } {
   const chance = (own: number, other: number) =>
-    own <= 0 ? 0 : own > other ? Math.min(ADVANTAGE_CAP_PERCENT, BASE_HIT_PERCENT + (own - other)) : BASE_HIT_PERCENT
+    own <= 0 ? 0 : Math.min(ADVANTAGE_CAP_PERCENT, baselineChance(own) + Math.max(0, own - other))
   return { attacker: chance(attackValue, defendValue), defender: chance(defendValue, attackValue) }
 }
 

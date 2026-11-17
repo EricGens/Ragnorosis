@@ -9,6 +9,7 @@ import { LINE_ROLES, LINE_SLOTS } from '../types'
 import {
   AIR_PER_CAS_EFFECT,
   AIR_PER_LONG_RANGE_SUCCESS,
+  baselineChance,
   columnFor,
   defenseMultiplier,
   destructionChance,
@@ -232,7 +233,7 @@ function resolveLongRange(
       const targetId = target ? designAt(enemy.side, target) : null
       if (!target || targetId === null) continue
       const v = attackValue(state, me, u.id, enemy, targetId, 'long')
-      if (v.value > 0 && nextRandom(state) * 100 < 5 && !absorbed(state, enemy)) {
+      if (nextRandom(state) * 100 < baselineChance(v.value) && !absorbed(state, enemy)) {
         hits[sideIdx].push({ damage: v.damage, piercing: v.piercing, target })
         me.side.hits.longRange += 1
         me.air.opposite += 1
@@ -365,7 +366,7 @@ function resolveFrontLine(state: GameState, a: Fighter, b: Fighter, costs: Battl
       const near = nearest(enemy.side.frontLine)
       if (near === null) continue
       const v = attackValue(state, me, (ua ?? ub)!, enemy, near, 'short')
-      if (v.value > 0 && nextRandom(state) * 100 < 5) {
+      if (nextRandom(state) * 100 < baselineChance(v.value)) {
         const target = drawTarget(enemy)
         if (target) {
           out[w].push({ damage: v.damage, piercing: v.piercing, target })

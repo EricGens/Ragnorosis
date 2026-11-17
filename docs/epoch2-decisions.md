@@ -219,13 +219,22 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 - **Light Infantry gets 2 against Tanks; Man-portable AT drops to +3 (Eric, 2026-11-16).** Small Arms I is now
   5/3/2/0 (was 5/3/0/0), reflecting IEDs, tank traps and the like, and the infantry AT module is +1/+5/+3/0 (was
   +1/+5/+5/0), so totals with the AT module are unchanged: AT Infantry stays 6/8/5/0 and Heavy Infantry 6/8/5/5. AA
-  Infantry becomes 5/3/2/5. The 5% floor for any nonzero value is deliberately kept — "a natural 20": the enemy
-  made a mistake or you got a lucky shot — so a graduated floor (a value of 2 hitting 2% of the time) was measured
-  and **not** adopted; it would also have cut Small Arms against Vehicles from 5% to 3%. Consequence to be aware
-  of: with the floor intact, Light Infantry lands hits on tanks as often as AT Infantry does; what the AT module
-  still buys is Piercing (four to five times the tank value destroyed) and a smaller gap for the tank to exploit.
-  Only Infantry's modules changed — the Vehicle and Tank crew-served equivalents, which the skeleton describes as
-  the same modules renamed, keep 0 and +5.
+  Infantry becomes 5/3/2/5. Only Infantry's modules changed — the Vehicle and Tank crew-served equivalents, which
+  the skeleton describes as the same modules renamed, keep 0 and +5.
+- **A value below 5 is its own baseline chance (Eric, 2026-11-16).** The 5% floor — "a natural 20": the enemy made
+  a mistake or you got a lucky shot — now applies to units with a value of 5 or more. Below that the baseline is
+  the value itself: Light Infantry's 2 against Tanks is a 2% shot, AT Infantry's 5 keeps the full 5%. The
+  advantaged side still adds its point gap on top of its own baseline (`min(50, min(5, value) + gap)`), and the
+  same baseline applies to Flanking, unpaired Long-Range Fires and unopposed CAS. Without this, giving Light
+  Infantry any anti-tank value at all made it as good at beating tanks as AT Infantry (95% against plain MBTs at
+  equal Production, where it now loses). Accepted knock-on: any value under 5 on the weaker side hits less often
+  than before — Small Arms against Vehicles (3) and an Autocannon against Tanks (3) are 3% shots when outmatched.
+- **Tried in the tournament and not adopted (2026-11-16):** (a) *reinforcement weighted by ground combat value*,
+  so better units come up from Reserves first. It does make a bench of 24 tanks clearly beat 12 at army scale,
+  but it strengthens tank-fronted designs everywhere, removes the infantry-fronted designs from the top ten at
+  6,000 Production, and turns the infantry into a pure Organization bank that never reaches the line (Light
+  Infantry filler becomes strictly best). (b) *Reserves contributing 50% of their Organization*: almost no change
+  at either army size. Results are reproducible with `npm run balance:tournament` after re-adding either rule.
 - **Beaten defender retreat target:** adjacent land it can enter (permissive, no hostile Task Force), own
   territory first, then Friendly, then anything else. **The rout is a real move (Eric, 2026-09-15):** the
   Task Force gets a normal move order to that region, walked at Combat Speed with the usual arrow, at

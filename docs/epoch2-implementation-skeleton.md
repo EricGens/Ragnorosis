@@ -1067,7 +1067,9 @@ long-range weapon, can't fill a long-range-fires slot).
 
 **The roll, confirmed d20-style:**
 - **Baseline: 5% chance of a successful engagement for either side**, provided that side has *any* nonzero
-  value in the relevant matchup vector against its opponent.
+  value in the relevant matchup vector against its opponent. **Revised 2026-11-16: a value below 5 is its own
+  baseline** — a unit with 2 in the relevant column gets a 2% chance, not 5%; the 5% "natural 20" is for units
+  with 5 or more. The same baseline applies to Flanking, unpaired Long-Range Fires and unopposed CAS.
 - **A side with zero relevant vector value against its specific opponent has zero chance of scoring a hit in
   that pairing** — not just a low baseline, a hard exclusion from that side of the roll. The opposing side's
   own roll against them still proceeds normally using its own vector value, though.
