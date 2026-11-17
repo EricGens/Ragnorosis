@@ -1549,12 +1549,17 @@ by the underlying combat vectors themselves (a strong, well-rounded Task Force n
 across Front Line, CAS, and long-range fires simultaneously) — the one factor not already baked in is speed,
 so that's what actually drives Shock's magnitude:
 
-**`Shock Multiplier = Average Combat Speed of the attacker's Front-Line units × 0.3`**
+**`Shock Multiplier = 1 + Average Combat Speed of the attacker's Front-Line units × 0.15`**
+
+*(Revised 2026-11-16 from `× 0.3` with no base. Combat Speeds were divided by 3 in playtest tuning, so an
+Infantry front line is now 5/3 mph, Tanks 8/3, Vehicles 10/3. The old curve gave ×1.5 / ×2.4 / ×3.0, which
+let a tank-fronted combined-arms attacker win every battle inside the Shock window with no defensive counter;
+see epoch2-decisions.md and the balance report.)*
 
 Applied identically to both the attack vector and damage — confirmed no situation currently requires
-splitting the two. Worked example: an Infantry-only front line (5 mph Combat Speed) → 1.5×; a hypothetical
-10 mph front line → 3.0×, reflecting genuine overrunning/bypassing/encircling capability rather than just a
-flat bonus. **Tech modifiers apply as multiplicative layers on top of this speed-derived base**, not a
+splitting the two. Worked example: an Infantry-only front line → 1.25×; Tanks → 1.4×; Vehicles → 1.5×. A
+faster assault still shocks harder, reflecting genuine overrunning/bypassing/encircling capability rather
+than just a flat bonus, but within a compressed range. **Tech modifiers apply as multiplicative layers on top of this speed-derived base**, not a
 replacement for it — an offensive tech might grant e.g. a further ×1.05, a defensive tech might mitigate an
 attacker's Shock by e.g. ×0.95 — exact values deferred to the Tech epoch, but the architecture (one base
 value, multiplicative modifiers stacking on top) is confirmed now and consistent with how every other scaling

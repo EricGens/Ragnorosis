@@ -1069,9 +1069,10 @@ long-range weapon, can't fill a long-range-fires slot).
 - **Advantage is the raw point difference between the two sides' relevant vectors, added directly to the
   advantaged side's percentage** — confirmed via worked example: attacker 5 vs. defender 10.8 (heavy
   infantry, fortified region) → defender's advantage is +5.8 → attacker 5%, defender 10.8%, remainder 84.2%
-  push (no engagement that tick). **Caveat worth flagging, not urgent:** this formula has a ceiling around a
-  ~90-point advantage gap, past which the three percentages would stop summing to 100% — nothing currently
-  in play approaches that, but worth remembering once large tech gaps enter later.
+  push (no engagement that tick). **The advantaged side's percentage is capped at 50%:
+  `advantaged side % = min(50, 5 + point_gap)`** — the same universal rule §5.2 states, so the three
+  percentages can never exceed 100% and the weaker side always keeps its chance (ruling of 2026-09-15,
+  epoch2-decisions.md; this replaces an earlier caveat here about a "~90-point advantage gap").
 - **Flanking:** a front-line unit with no paired opponent (because the opposing front line couldn't fill
   every slot) gets an unopposed roll against the nearest enemy front-line unit — baseline 5% only, no
   advantage math, since there's no opposing vector to compare against.
@@ -1276,9 +1277,14 @@ defense, both now resolved via the existing four-column vector.
 
 ### 5.3 CAS — fully resolved this session
 
-**Targeting, confirmed as distinct in shape from both Front Line and Deep Strike:** each CAS unit (up to 6
-per side) pairs against a **random Front Line unit on the opposing Task Force** — not the enemy's own CAS
-line, not a sorted/ranked pairing. CAS targets the ground battle directly.
+**Targeting, confirmed as distinct in shape from both Front Line and Deep Strike — revised 2026-11-16
+(epoch2-decisions.md, "CAS rules revised"):** each CAS unit (up to 6 per side) pairs against a
+**value-weighted unit on the opposing Task Force** — not the enemy's own CAS line. **An intercepted aircraft
+chooses among the enemy's Front Line units only; an unopposed aircraft chooses among Front Line and
+Long-Range units together** (with air superiority it loiters and hunts artillery). **The draw is in
+proportion to Production cost — the more valuable the unit, the more likely it is picked** (a 200-cost tank
+beside a 50-cost infantry unit is chosen four times in five). This is deliberately the reverse of Front Line
+hits (§5.1), which are drawn by *inverse* cost. CAS targets the ground battle directly.
 
 **Defense is resolved independently per side, not as one combined pass:** each Task Force separately pools
 together whatever air-defense-capable units it currently has available to intercept the *enemy's* CAS
@@ -1289,10 +1295,17 @@ sorted by anti-air vector value, same as everywhere else in this combat system.
 
 **Real variance in outcome depending purely on what's actually available:** a CAS run can face a hard counter
 (a dedicated fighter or SAM pulled into defense), a soft target (infantry with minimal AA), or a fully
-unopposed roll if the defending Task Force has nothing air-defense-capable left at all.
+unopposed roll. **Opposed or unopposed is decided per aircraft, not per Task Force:** defenders are assigned
+one per aircraft, best first, so any aircraft beyond the number of available defenders is unopposed even if
+the defending Task Force has some air defense.
+
+**The unopposed roll, revised 2026-11-16: `hit chance = 5% + half the aircraft's vector value against its
+chosen target`, capped at 50%** — about 11% against Infantry and 10% against Tanks for a single-PGM aircraft,
+instead of the flat 5% baseline. This applies to CAS only: Flanking (§5.1) and unpaired Long-Range Fires
+(§5.2) keep the flat 5%.
 
 **Resolution mechanics, identical in shape to every other combat roll in this system:** successful CAS rolls
-apply the aircraft's damage to the targeted Front Line unit; successful defensive rolls apply damage to the
+apply the aircraft's damage to the targeted unit; successful defensive rolls apply damage to the
 CAS aircraft itself. Same Health/Damage survival check, same Organization consequences, **same
 (damage, piercing) pair capture and post-Armor/Piercing multiplier, as Front Line combat (§5.1)** — universal
 across every combat resolution context in this system, not a Front-Line-specific mechanic.
@@ -1315,7 +1328,8 @@ GDD. One item below is now resolved by §5.1 above.*
   behavior, drain-per-damage-taken rate, and the exact percentage of the loser's equipment the victor gains
   on a decisive battle (§8.6.6 currently just says "a %," no number).
 - [x] **Shock bonus magnitude and availability, fully resolved (GDD §8.6.2, v2.8):** 24-tick duration,
-  `Speed × 0.3` magnitude formula (applied identically to attack vector and damage), a Planning/Ready state
+  `1 + Speed × 0.15` magnitude formula (revised 2026-11-16 from `Speed × 0.3`; Infantry ×1.25, Tanks ×1.4,
+  Vehicles ×1.5 — applied identically to attack vector and damage), a Planning/Ready state
   machine replacing the old flat cooldown (invasion combat → Planning; one full clean Pulse with zero
   invasion combat clears it; long-range fires never trigger or block clearing; only the attacker enters
   Planning, never a pure defender), and confirmed multiplicative tech-modifier architecture (exact values
