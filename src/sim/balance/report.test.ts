@@ -165,6 +165,114 @@ it.runIf(import.meta.env.VITE_BALANCE)(
       )
     }
 
+    out.push('', '## What counters what: a base of infantry plus one purchase', '')
+    out.push(
+      'Both sides have the same infantry base and the same extra Production, and each spends the extra on one',
+      "thing. Each cell is the row force's result against the column force, averaged over attacking it and",
+      'defending against it (50% = even). Tanks and vehicles are placed on the Front Line ahead of the base;',
+      'air-defence units wait in Reserves, where they intercept CAS.',
+      '',
+    )
+    const count = (budget: number, d: DesignInput) => Math.floor(budget / designStats(d.platform, d.modules).cost)
+    type Purchase = {
+      name: string
+      build: (base: DesignInput, baseN: number, extra: number) => [DesignInput, number][]
+    }
+    const ahead = (name: string, d: DesignInput): Purchase => ({
+      name,
+      build: (base, k, x) => [
+        [d, count(x, d)],
+        [base, k],
+      ],
+    })
+    const behind = (name: string, d: DesignInput): Purchase => ({
+      name,
+      build: (base, k, x) => [
+        [base, k],
+        [d, count(x, d)],
+      ],
+    })
+    const purchases: Purchase[] = [
+      { name: 'More infantry', build: (base, k, x) => [[base, k + count(x, base)]] },
+      behind('AA Infantry', D.aaInf),
+      ahead('Recon Vehicles', D.recon),
+      behind('SHORAD Vehicles', D.shorad),
+      ahead('IFVs', D.ifv),
+      ahead('MBT+', D.mbtPlus),
+      ahead('MBT (AT)', D.mbtAT),
+      behind('Towed Artillery', D.towed),
+      behind('MLRS', D.mlrs),
+      behind('CAS', D.cas),
+      {
+        name: 'Spread',
+        build: (base, k, x) => [
+          [D.mbtPlus, count(x / 3, D.mbtPlus)],
+          [base, k],
+          [D.towed, count(x / 3, D.towed)],
+          [D.cas, count(x / 3, D.cas)],
+        ],
+      },
+    ]
+    for (const [base, baseN, extra] of [
+      [D.lightInf, 40, 1200],
+      [D.atInf, 40, 1200],
+      [D.atInf, 100, 2400],
+    ] as const) {
+      const forces = purchases.map((p) => mix(p.name, ...p.build(base, baseN, extra)))
+      const wins = forces.map((a) => forces.map((b) => runMatchup(a, b, 30).attackerWinRate))
+      out.push(`### Base: ${baseN} ${base.name}, plus ${extra} Production`, '')
+      out.push(
+        `| you ↓ / opponent → | ${forces.map((f) => f.name).join(' | ')} | average |`,
+        `| --- | ${forces.map(() => '---:').join(' | ')} | ---: |`,
+      )
+      forces.forEach((f, i) => {
+        const row = forces.map((_, j) => (wins[i][j] + (1 - wins[j][i])) / 2)
+        out.push(
+          `| **${f.name}** | ${row.map(pct).join(' | ')} | ${pct(row.reduce((s, v) => s + v, 0) / row.length)} |`,
+        )
+      })
+      out.push('', ...forces.map((f) => `- ${f.name}: ${f.units.map(([d, k]) => `${k} ${d.name}`).join(' + ')}`), '')
+    }
+
+    out.push('## Holding ground: a poorer infantry force on defensible terrain', '')
+    out.push(
+      'How often a defender with 3,000 Production holds against a richer combined-arms attacker, by terrain.',
+      "Defensibility strengthens the defender's Front Line and, through cover, absorbs part of the",
+      "attacker's CAS hits and artillery strikes.",
+      '',
+    )
+    const terrains: [string, Battlefield][] = [
+      ['plain (10)', {}],
+      ['Fortification 5 (35)', { fortification: 5 }],
+      ['Fortification 10, rugged, mountainous (80)', { fortification: 10, traits: ['rugged', 'mountainous'] }],
+    ]
+    const richInfantry = mix(
+      '4,500: 35 AT Infantry + 12 Towed Artillery + 6 CAS',
+      [D.atInf, 35],
+      [D.towed, 12],
+      [D.cas, 6],
+    )
+    const richArmour = mix(
+      '6,000: 12 MBT+ + 12 Towed Artillery + 6 CAS + 16 AT Infantry',
+      [D.mbtPlus, 12],
+      [D.towed, 12],
+      [D.cas, 6],
+      [D.atInf, 16],
+    )
+    out.push(
+      `| defender (3,000) | attacker | ${terrains.map((t) => t[0]).join(' | ')} |`,
+      `| --- | --- | ${terrains.map(() => '---:').join(' | ')} |`,
+    )
+    for (const def of [
+      mix('50 AT Infantry', [D.atInf, 50]),
+      mix('30 AT Infantry + 12 Towed Artillery', [D.atInf, 30], [D.towed, 12]),
+    ])
+      for (const atk of [richInfantry, richArmour])
+        out.push(
+          `| ${def.name} | ${atk.name} | ${terrains.map(([, f]) => pct(1 - runMatchup(atk, def, RUNS, f).attackerWinRate)).join(' | ')} |`,
+        )
+    out.push('')
+
     out.push('', '## Is there a win button?', '')
     out.push(
       'The three strongest attackers against every defending composition in a search space of fronts',

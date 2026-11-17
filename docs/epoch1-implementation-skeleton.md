@@ -610,7 +610,8 @@ buildings" framing was imprecise, not the underlying numbers.
 ### 4.5 Production Facility & Training Facility — RESOLVED
 
 **Base conversion rates**, before any building bonus:
-- **Manpower:** 1 Production point → 1 Population converted to available Manpower. **Capped this epoch at 2%
+- **Manpower:** 1 Production point → 5 Population converted to available Manpower *(revised 2026-11-16 from
+  1; see epoch2-decisions.md — Manpower is meant to be paid for in population, not industry)*. **Capped this epoch at 2%
   of the faction's total Population, summed across every controlled region — confirmed this session as a
   faction-wide cap, not per-region**, consistent with Manpower already being a faction-wide pool (§1.4's
   growth work established the 2% figure itself; further refinement — raising the cap via mobilization/
@@ -625,7 +626,7 @@ buildings" framing was imprecise, not the underlying numbers.
 
 **Building bonus, both facilities, same formula:** `output_per_point = base × (1 + 0.20 × level)` — **linear**
 in level, not compounding. Worked and verified: a level 5 Training Facility converts 1 Production point into
-2 Population-to-Manpower (1 × (1 + 0.20×5) = 2.0); a level 1 Production Facility converts 1 Production point
+10 Population-to-Manpower (5 × (1 + 0.20×5) = 10); a level 1 Production Facility converts 1 Production point
 into 1.2 Small Arms, rounded to the nearest integer this epoch (1 × (1 + 0.20×1) = 1.2).
 
 ### 4.6 Military Panel — NEW UI element, resolved this session

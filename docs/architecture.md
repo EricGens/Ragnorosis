@@ -178,6 +178,10 @@ combined-arms forces, what Shock is worth, mass against quality at several army 
 committed, so a tuning change shows up in the PR as a diff to it. Rerun it after changing any combat
 number or catalog entry; add a section to `report.test.ts` when a new mechanic deserves watching.
 
+`npm run balance:tournament` regenerates `tournament-report.md`: a round robin of well over a hundred Task Force
+designs at two army sizes, ranked, with each top design's worst matchups. It answers "is there a dominant
+build, or do the strong ones counter each other?" and takes roughly a quarter of an hour (longer on fewer cores).
+
 ## 6. How to add things
 
 **A formula or a tuning constant.** Pure function in `formulas/` (or `military/combat.ts`), exported

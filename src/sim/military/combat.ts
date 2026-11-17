@@ -66,6 +66,19 @@ export function sensorTotals(
   return { radar: Math.min(SENSOR_TF_CAP, radar), isr: Math.min(SENSOR_TF_CAP, isr) }
 }
 
+/**
+ * An unopposed CAS run adds this share of the aircraft's value against its target to the baseline (Eric,
+ * 2026-11-16): 5% + half value, so a standard CAS aircraft hits about 11% against Infantry and 10% against
+ * Tanks instead of a flat 5%. Flanking and unpaired Long-Range Fires stay at the flat baseline.
+ */
+export const UNOPPOSED_CAS_VALUE_SHARE = 0.5
+
+/** Hit chance (percent) of a CAS run no air defence rose to meet. */
+export function unopposedCasChance(value: number): number {
+  if (value <= 0) return 0
+  return Math.min(ADVANTAGE_CAP_PERCENT, baselineChance(value) + value * UNOPPOSED_CAS_VALUE_SHARE)
+}
+
 /** Only the delta matters: +1 to the advantaged side per 2 points (1–2 → +1, 3–4 → +2 …). */
 export function relativeBonus(own: number, other: number): number {
   const delta = own - other
@@ -87,12 +100,22 @@ export function columnFor(platform: PlatformId): number {
 }
 
 /**
+ * The baseline chance for a side with some relevant value: 5%, "a natural 20" — unless its value is below 5,
+ * in which case the chance is the value itself (Eric, 2026-11-16). Improvised capability (Light Infantry's 2
+ * against Tanks) gets a 2% lucky shot, not the same 5% as a unit equipped for the job.
+ */
+export function baselineChance(value: number): number {
+  return value <= 0 ? 0 : Math.min(BASE_HIT_PERCENT, value)
+}
+
+/**
  * The single partitioned roll (§5.1): attacker %, defender %, remainder is a push. A side with no
- * relevant vector value can't score at all; the advantaged side adds the raw point gap, capped.
+ * relevant vector value can't score at all; otherwise it gets its baseline, and the advantaged side adds
+ * the raw point gap, capped.
  */
 export function engagementChances(attackValue: number, defendValue: number): { attacker: number; defender: number } {
   const chance = (own: number, other: number) =>
-    own <= 0 ? 0 : own > other ? Math.min(ADVANTAGE_CAP_PERCENT, BASE_HIT_PERCENT + (own - other)) : BASE_HIT_PERCENT
+    own <= 0 ? 0 : Math.min(ADVANTAGE_CAP_PERCENT, baselineChance(own) + Math.max(0, own - other))
   return { attacker: chance(attackValue, defendValue), defender: chance(defendValue, attackValue) }
 }
 
@@ -121,6 +144,18 @@ export function shockMultiplier(averageCombatSpeed: number): number {
 /** Defensibility → defending-vector multiplier (§3.6): 1 + D ÷ 100. */
 export function defenseMultiplier(region: LandRegion): number {
   return 1 + defensibility(region) / 100
+}
+
+/**
+ * Cover (Eric, 2026-11-16): a defender's ground also shelters it from supporting fire. Of the CAS hits and
+ * artillery deep strikes an invader lands, only this share gets through — 1 − Defensibility ÷ 100, never
+ * below COVER_FLOOR. Plain ground (Defensibility 10) lets 90% through; a level 10 Fortification in rugged
+ * mountains (80) lets through 20%. Front Line fighting and counter-battery duels are unaffected.
+ */
+export const COVER_FLOOR = 0.2
+
+export function supportFireExposure(region: LandRegion): number {
+  return Math.max(COVER_FLOOR, 1 - defensibility(region) / 100)
 }
 
 /** Inverse-cost targeting weights (§5.1): (1 ÷ cost) ÷ Σ(1 ÷ cost). */

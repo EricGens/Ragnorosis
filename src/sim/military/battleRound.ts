@@ -9,6 +9,7 @@ import { LINE_ROLES, LINE_SLOTS } from '../types'
 import {
   AIR_PER_CAS_EFFECT,
   AIR_PER_LONG_RANGE_SUCCESS,
+  baselineChance,
   columnFor,
   defenseMultiplier,
   destructionChance,
@@ -24,6 +25,8 @@ import {
   REINFORCE_PERCENT,
   relativeBonus,
   sensorTotals,
+  supportFireExposure,
+  unopposedCasChance,
   unitOrganization,
 } from './combat'
 import { eligibleRoles, findDesign } from './taskForce'
@@ -44,6 +47,8 @@ interface Mods {
   /** ISR adds to ground-column rolls, Radar to Anti-Air-column rolls (§1.2). */
   isr: number
   radar: number
+  /** Share of incoming CAS hits and deep strikes that get through this side's cover (1 = none absorbed). */
+  exposure: number
 }
 
 interface Hit {
@@ -90,6 +95,11 @@ function duel(state: GameState, a: number, b: number): boolean | null {
   if (roll < c.attacker) return true
   if (roll < c.attacker + c.defender) return false
   return null
+}
+
+/** Did this side's cover absorb a supporting-fire hit that would otherwise have landed? */
+function absorbed(state: GameState, target: Fighter): boolean {
+  return target.mods.exposure < 1 && nextRandom(state) >= target.mods.exposure
 }
 
 function occupied(line: (number | null)[]): { id: number; index: number }[] {
@@ -193,6 +203,7 @@ function resolveLongRange(
       const r = duel(state, vs.value, vi.value)
       if (r === null) continue
       if (r && target) {
+        if (absorbed(state, interceptor)) continue
         hits[s].push({ damage: vs.damage, piercing: vs.piercing, target })
         striker.side.hits.longRange += 1
         striker.air.opposite += 1
@@ -222,7 +233,7 @@ function resolveLongRange(
       const targetId = target ? designAt(enemy.side, target) : null
       if (!target || targetId === null) continue
       const v = attackValue(state, me, u.id, enemy, targetId, 'long')
-      if (v.value > 0 && nextRandom(state) * 100 < 5) {
+      if (nextRandom(state) * 100 < baselineChance(v.value) && !absorbed(state, enemy)) {
         hits[sideIdx].push({ damage: v.damage, piercing: v.piercing, target })
         me.side.hits.longRange += 1
         me.air.opposite += 1
@@ -232,12 +243,30 @@ function resolveLongRange(
   return { hits, unpaired }
 }
 
+/** Pick an index with probability proportional to its weight. One draw from the state's RNG. */
+export function drawWeighted(state: GameState, weights: number[]): number {
+  let roll = nextRandom(state) * weights.reduce((s, w) => s + w, 0)
+  for (let i = 0; i < weights.length; i++) {
+    roll -= weights[i]
+    if (roll < 0) return i
+  }
+  return weights.length - 1
+}
+
 /**
- * CAS (§5.3): each aircraft runs at a random enemy Front Line unit; the enemy pools whatever
- * air-defence-capable units it has in Reserves plus its unpaired Long-Range assets, best first, to
- * intercept. A run with no interceptor left is unopposed.
+ * CAS (§5.3, with Eric's 2026-11-16 rulings): the enemy pools whatever air-defence-capable units it has in
+ * Reserves plus its unpaired Long-Range assets, best first, one interceptor per aircraft. An intercepted
+ * aircraft is held to the enemy's Front Line and fights a duel for its run. An aircraft nobody rose to
+ * meet is unopposed: it may also hunt the enemy's Long-Range line, and it hits at 5% + half its value.
+ * Either way the pilot prefers the richer target — candidates are drawn in proportion to Production cost.
  */
-function resolveCas(state: GameState, me: Fighter, enemy: Fighter, enemyUnpairedLR: number[]): [Hit[], Hit[]] {
+function resolveCas(
+  state: GameState,
+  me: Fighter,
+  enemy: Fighter,
+  enemyUnpairedLR: number[],
+  costs: Battle['costs'],
+): [Hit[], Hit[]] {
   const mine: Hit[] = []
   const theirs: Hit[] = []
   const runs = occupied(me.side.cas)
@@ -255,24 +284,35 @@ function resolveCas(state: GameState, me: Fighter, enemy: Fighter, enemyUnpaired
     if (index >= 0 && aaOf(id) > 0) defenders.push({ id, aa: aaOf(id), where: { role: 'longRange', index } })
   }
   defenders.sort((x, y) => y.aa - x.aa)
-  const targets = occupied(enemy.side.frontLine)
+  type Candidate = { id: number; index: number; role: LineRole }
+  const frontLine: Candidate[] = occupied(enemy.side.frontLine).map((u) => ({ ...u, role: 'frontLine' }))
+  const longRange: Candidate[] = occupied(enemy.side.longRange).map((u) => ({ ...u, role: 'longRange' }))
   runs.forEach((run, k) => {
-    if (targets.length === 0) return
-    const t = targets[Math.floor(nextRandom(state) * targets.length)]
-    const vc = attackValue(state, me, run.id, enemy, t.id, 'short')
     const d = defenders[k]
-    const vd = d ? attackValue(state, enemy, d.id, me, run.id, 'short') : { value: 0, damage: 0, piercing: 0 }
+    const candidates = d ? frontLine : [...frontLine, ...longRange]
+    if (candidates.length === 0) return
+    const t =
+      candidates[
+        drawWeighted(
+          state,
+          candidates.map((c) => costs[costKey(enemy.tf.faction, c.id)] ?? 1),
+        )
+      ]
+    const target: Hit['target'] = { role: t.role, index: t.index }
+    const vc = attackValue(state, me, run.id, enemy, t.id, 'short')
     if (!d) {
-      if (vc.value > 0 && nextRandom(state) * 100 < 5) {
-        mine.push({ damage: vc.damage, piercing: vc.piercing, target: { role: 'frontLine', index: t.index } })
+      if (nextRandom(state) * 100 < unopposedCasChance(vc.value) && !absorbed(state, enemy)) {
+        mine.push({ damage: vc.damage, piercing: vc.piercing, target })
         me.side.hits.cas += 1
         me.air.cas += 1
       }
       return
     }
+    const vd = attackValue(state, enemy, d.id, me, run.id, 'short')
     const r = duel(state, vc.value, vd.value)
     if (r === true) {
-      mine.push({ damage: vc.damage, piercing: vc.piercing, target: { role: 'frontLine', index: t.index } })
+      if (absorbed(state, enemy)) return
+      mine.push({ damage: vc.damage, piercing: vc.piercing, target })
       me.side.hits.cas += 1
       me.air.cas += 1
     } else if (r === false) {
@@ -326,7 +366,7 @@ function resolveFrontLine(state: GameState, a: Fighter, b: Fighter, costs: Battl
       const near = nearest(enemy.side.frontLine)
       if (near === null) continue
       const v = attackValue(state, me, (ua ?? ub)!, enemy, near, 'short')
-      if (v.value > 0 && nextRandom(state) * 100 < 5) {
+      if (nextRandom(state) * 100 < baselineChance(v.value)) {
         const target = drawTarget(enemy)
         if (target) {
           out[w].push({ damage: v.damage, piercing: v.piercing, target })
@@ -474,13 +514,20 @@ export function resolveRound(
       bonus: (invasion ? partisanBonus(region.stability) : 0) + Math.max(0, maneuver),
       isr: 0,
       radar: 0,
+      exposure: 1, // an invader is in the open
     },
     air: { opposite: 0, own: 0, cas: 0, aaKills: 0 },
   }
   const d: Fighter = {
     tf: defender,
     side: battle.defender,
-    mods: { multiplier: invasion ? defenseMultiplier(region) : 1, bonus: Math.max(0, -maneuver), isr: 0, radar: 0 },
+    mods: {
+      multiplier: invasion ? defenseMultiplier(region) : 1,
+      bonus: Math.max(0, -maneuver),
+      isr: 0,
+      radar: 0,
+      exposure: invasion ? supportFireExposure(region) : 1,
+    },
     air: { opposite: 0, own: 0, cas: 0, aaKills: 0 },
   }
   // Sensors (§1.2): from units currently on a line; only the relative delta matters.
@@ -497,8 +544,8 @@ export function resolveRound(
   let hitsA = lr.hits[0]
   let hitsD = lr.hits[1]
   if (invasion) {
-    const [casA, aaD] = resolveCas(state, a, d, lr.unpaired[1])
-    const [casD, aaA] = resolveCas(state, d, a, lr.unpaired[0])
+    const [casA, aaD] = resolveCas(state, a, d, lr.unpaired[1], battle.costs)
+    const [casD, aaA] = resolveCas(state, d, a, lr.unpaired[0], battle.costs)
     const fl = resolveFrontLine(state, a, d, battle.costs)
     hitsA = [...hitsA, ...casA, ...aaA, ...fl[0]]
     hitsD = [...hitsD, ...casD, ...aaD, ...fl[1]]

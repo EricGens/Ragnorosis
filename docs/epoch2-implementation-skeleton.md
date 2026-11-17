@@ -340,7 +340,10 @@ values checked programmatically against prior sessions, zero discrepancies found
 **Main Weapon Module (requires exactly 1)**
 | Module | Cost | Supply | Combat Vector (Inf/Veh/Tank/AA) | Piercing | Damage |
 |---|---|---|---|---|---|
-| Small Arms I | +50 | +1.0 | +5/+3/0/0 | 0 | +5 |
+| Small Arms I | +50 | +1.0 | +5/+3/+2/0 | 0 | +5 |
+
+*(Revised 2026-11-16: Small Arms I carries +2 against Tanks and Man-portable AT +3, was 0 and +5; AT Infantry's
+total is unchanged. See epoch2-decisions.md.)*
 
 Renames the Equipment to **Light Infantry** when no Misc modules are attached. Advanced Small Arms tiers and
 the Man-portable Laser module are deferred to future epochs.
@@ -348,7 +351,7 @@ the Man-portable Laser module are deferred to future epochs.
 **Misc Modules (optional, up to 2)**
 | Module | Cost | Supply | Combat Vector | Piercing | Damage |
 |---|---|---|---|---|---|
-| Man-portable AT | +10 | +0.1 | +1/+5/+5/0 | +5 | 0 |
+| Man-portable AT | +10 | +0.1 | +1/+5/+3/0 | +5 | 0 |
 | Man-portable AA | +10 | +0.1 | 0/0/0/+5 | 0 | 0 |
 
 Renames to **AT Infantry** or **AA Infantry** when taken alone, **Heavy Infantry** when both are taken.
@@ -738,8 +741,10 @@ module inherits the improvement automatically, rather than needing every derived
 by hand.
 
 **Confirmed Tier-I module values** (Infantry / Vehicle / Tank / Anti-Air):
-- **Small Arms I:** +5 / +3 / 0 / 0
-- **AT Module I:** +1 / +5 / +5 / 0
+- **Small Arms I:** +5 / +3 / +2 / 0 *(Infantry's; revised 2026-11-16 — 2 against Tanks for improvised
+  anti-armour such as IEDs and tank traps. The Vehicle and Tank crew-served versions keep 0.)*
+- **AT Module I:** +1 / +5 / +3 / 0 *(Infantry's Man-portable AT; revised 2026-11-16 from +5 against Tanks so
+  AT Infantry still totals 5. The Vehicle and Tank crew-served AT modules keep +5.)*
 - **AA Module I:** 0 / 0 / 0 / +5
 
 **A real design correction surfaced by this decomposition, worth having on record:** the AT module's Vehicle
@@ -1062,16 +1067,19 @@ long-range weapon, can't fill a long-range-fires slot).
 
 **The roll, confirmed d20-style:**
 - **Baseline: 5% chance of a successful engagement for either side**, provided that side has *any* nonzero
-  value in the relevant matchup vector against its opponent.
+  value in the relevant matchup vector against its opponent. **Revised 2026-11-16: a value below 5 is its own
+  baseline** — a unit with 2 in the relevant column gets a 2% chance, not 5%; the 5% "natural 20" is for units
+  with 5 or more. The same baseline applies to Flanking, unpaired Long-Range Fires and unopposed CAS.
 - **A side with zero relevant vector value against its specific opponent has zero chance of scoring a hit in
   that pairing** — not just a low baseline, a hard exclusion from that side of the roll. The opposing side's
   own roll against them still proceeds normally using its own vector value, though.
 - **Advantage is the raw point difference between the two sides' relevant vectors, added directly to the
   advantaged side's percentage** — confirmed via worked example: attacker 5 vs. defender 10.8 (heavy
   infantry, fortified region) → defender's advantage is +5.8 → attacker 5%, defender 10.8%, remainder 84.2%
-  push (no engagement that tick). **Caveat worth flagging, not urgent:** this formula has a ceiling around a
-  ~90-point advantage gap, past which the three percentages would stop summing to 100% — nothing currently
-  in play approaches that, but worth remembering once large tech gaps enter later.
+  push (no engagement that tick). **The advantaged side's percentage is capped at 50%:
+  `advantaged side % = min(50, 5 + point_gap)`** — the same universal rule §5.2 states, so the three
+  percentages can never exceed 100% and the weaker side always keeps its chance (ruling of 2026-09-15,
+  epoch2-decisions.md; this replaces an earlier caveat here about a "~90-point advantage gap").
 - **Flanking:** a front-line unit with no paired opponent (because the opposing front line couldn't fill
   every slot) gets an unopposed roll against the nearest enemy front-line unit — baseline 5% only, no
   advantage math, since there's no opposing vector to compare against.
@@ -1276,9 +1284,14 @@ defense, both now resolved via the existing four-column vector.
 
 ### 5.3 CAS — fully resolved this session
 
-**Targeting, confirmed as distinct in shape from both Front Line and Deep Strike:** each CAS unit (up to 6
-per side) pairs against a **random Front Line unit on the opposing Task Force** — not the enemy's own CAS
-line, not a sorted/ranked pairing. CAS targets the ground battle directly.
+**Targeting, confirmed as distinct in shape from both Front Line and Deep Strike — revised 2026-11-16
+(epoch2-decisions.md, "CAS rules revised"):** each CAS unit (up to 6 per side) pairs against a
+**value-weighted unit on the opposing Task Force** — not the enemy's own CAS line. **An intercepted aircraft
+chooses among the enemy's Front Line units only; an unopposed aircraft chooses among Front Line and
+Long-Range units together** (with air superiority it loiters and hunts artillery). **The draw is in
+proportion to Production cost — the more valuable the unit, the more likely it is picked** (a 200-cost tank
+beside a 50-cost infantry unit is chosen four times in five). This is deliberately the reverse of Front Line
+hits (§5.1), which are drawn by *inverse* cost. CAS targets the ground battle directly.
 
 **Defense is resolved independently per side, not as one combined pass:** each Task Force separately pools
 together whatever air-defense-capable units it currently has available to intercept the *enemy's* CAS
@@ -1289,10 +1302,17 @@ sorted by anti-air vector value, same as everywhere else in this combat system.
 
 **Real variance in outcome depending purely on what's actually available:** a CAS run can face a hard counter
 (a dedicated fighter or SAM pulled into defense), a soft target (infantry with minimal AA), or a fully
-unopposed roll if the defending Task Force has nothing air-defense-capable left at all.
+unopposed roll. **Opposed or unopposed is decided per aircraft, not per Task Force:** defenders are assigned
+one per aircraft, best first, so any aircraft beyond the number of available defenders is unopposed even if
+the defending Task Force has some air defense.
+
+**The unopposed roll, revised 2026-11-16: `hit chance = 5% + half the aircraft's vector value against its
+chosen target`, capped at 50%** — about 11% against Infantry and 10% against Tanks for a single-PGM aircraft,
+instead of the flat 5% baseline. This applies to CAS only: Flanking (§5.1) and unpaired Long-Range Fires
+(§5.2) keep the flat 5%.
 
 **Resolution mechanics, identical in shape to every other combat roll in this system:** successful CAS rolls
-apply the aircraft's damage to the targeted Front Line unit; successful defensive rolls apply damage to the
+apply the aircraft's damage to the targeted unit; successful defensive rolls apply damage to the
 CAS aircraft itself. Same Health/Damage survival check, same Organization consequences, **same
 (damage, piercing) pair capture and post-Armor/Piercing multiplier, as Front Line combat (§5.1)** — universal
 across every combat resolution context in this system, not a Front-Line-specific mechanic.
@@ -1305,6 +1325,13 @@ fighters are not, since they carry no anti-ground capability to contribute.
 Line target pairing and the defensive pool itself re-run fresh each tick based on whatever units currently
 remain and are available — not fixed once at engagement start.
 
+**Cover — added 2026-11-16, applies to CAS here and to §5.2's deep strikes alike:** in an invasion, the
+defender's ground absorbs part of the supporting fire aimed at it. Of the CAS hits and Long-Range deep
+strikes (strikes at Front Line or Reserve units) the invader lands, only **`max(20%, 1 − Defensibility ÷ 100)`**
+get through — 90% on plain ground, 20% in a fully fortified rugged, mountainous region. An absorbed hit has
+no effect at all. Front Line combat (§5.1), counter-battery and air-defense duels on the Long-Range line, and
+fire against the invader are unaffected. See epoch2-decisions.md, "Cover".
+
 ### 5.4 Remaining Tier 1 Gaps
 
 *Carried from the implementation-side Claude's original handoff, independently verified against the live
@@ -1315,7 +1342,8 @@ GDD. One item below is now resolved by §5.1 above.*
   behavior, drain-per-damage-taken rate, and the exact percentage of the loser's equipment the victor gains
   on a decisive battle (§8.6.6 currently just says "a %," no number).
 - [x] **Shock bonus magnitude and availability, fully resolved (GDD §8.6.2, v2.8):** 24-tick duration,
-  `Speed × 0.3` magnitude formula (applied identically to attack vector and damage), a Planning/Ready state
+  `1 + Speed × 0.15` magnitude formula (revised 2026-11-16 from `Speed × 0.3`; Infantry ×1.25, Tanks ×1.4,
+  Vehicles ×1.5 — applied identically to attack vector and damage), a Planning/Ready state
   machine replacing the old flat cooldown (invasion combat → Planning; one full clean Pulse with zero
   invasion combat clears it; long-range fires never trigger or block clearing; only the attacker enters
   Planning, never a pure defender), and confirmed multiplicative tech-modifier architecture (exact values

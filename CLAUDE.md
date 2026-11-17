@@ -15,6 +15,7 @@ npm run check    # type-check + lint + format check + tests. Run before every PR
 npm test         # tests only (~1s)
 npm run format   # Prettier, 120 columns
 npm run balance  # regenerate src/sim/balance/balance-report.md (a few minutes); rerun after changing combat numbers
+npm run balance:tournament  # regenerate tournament-report.md: ~130 Task Force designs, round robin (~15 min)
 ```
 
 Node 24 via nvm. If `node` isn't on PATH in a tool shell: `export PATH="$HOME/.nvm/versions/node/<version>/bin:$PATH"`.

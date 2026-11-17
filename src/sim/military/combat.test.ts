@@ -7,6 +7,7 @@ import { CN, giveRegion, land, LIGHT_INFANTRY, newGame, raiseTaskForce, ticks, U
 import type { GameState, LandRegion } from '../types'
 import { battleFor, defenderRetreatTarget } from './battle'
 import {
+  baselineChance,
   defenseMultiplier,
   destructionChance,
   engagementChances,
@@ -27,6 +28,17 @@ describe('formulas (§5.1, §5.4, GDD §8.6)', () => {
     expect(engagementChances(5, 10.8)).toEqual({ attacker: 5, defender: 10.8 })
     expect(engagementChances(10.8, 5)).toEqual({ attacker: 10.8, defender: 5 })
     expect(engagementChances(5, 5)).toEqual({ attacker: 5, defender: 5 })
+  })
+
+  it('gives a value below 5 that value as its baseline: improvised capability is a 2% shot, not 5%', () => {
+    expect([0, 1, 2, 4.5, 5, 12].map(baselineChance)).toEqual([0, 1, 2, 4.5, 5, 5])
+    // Light Infantry (2 vs Tanks) against an MBT+ (17 vs Infantry): 2% against 5 + 15.
+    expect(engagementChances(2, 17)).toEqual({ attacker: 2, defender: 20 })
+    // AT Infantry (5) keeps the full natural-20 chance.
+    expect(engagementChances(5, 17)).toEqual({ attacker: 5, defender: 17 })
+    // The advantaged side adds its gap to its own baseline, so 3 vs 2 is 3 + 1, not 5 + 1.
+    expect(engagementChances(3, 2)).toEqual({ attacker: 4, defender: 2 })
+    expect(engagementChances(3, 3)).toEqual({ attacker: 3, defender: 3 })
   })
 
   it('caps the advantaged side at 50% and excludes a side with no relevant value', () => {

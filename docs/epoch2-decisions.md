@@ -118,6 +118,10 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   Production than the pool could absorb and thrown the excess away. Equipment prices are deliberately left alone
   for now: cheaper infantry also means more of it, which turns close fights against upgraded tanks into certain
   wins (balance arena), so that lever waits until this one has been seen in play.
+- **The 2% Manpower cap is a peacetime baseline, not a ceiling to tune (Eric, 2026-11-16).** Technologies and
+  global effects (conscription-like measures as the world escalates) will raise the share of the population a
+  faction can draw on. With training now cheap, the cap is the real limit on mass infantry by design — if it feels
+  tight early, that is intended; don't loosen the base value.
 - **Sourcing happens at pulse end** (stockpile → lines, then manufacture, then pool → lines), not the
   instant a +/− is clicked; the devtools "Fill to target" bypasses this for test setup. Lowering a target
   *does* return the excess immediately (Equipment to the stockpile, Manpower to the pool), as does
@@ -212,6 +216,25 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   their Organization, and Shock boosting hit chance but not damage. Numbers: `src/sim/balance/balance-report.md`.
   The battle log now shows the multiplier to two decimals. This supersedes the "`SHOCK_PER_MPH` ×3" note under
   Movement's speed tune.
+- **Light Infantry gets 2 against Tanks; Man-portable AT drops to +3 (Eric, 2026-11-16).** Small Arms I is now
+  5/3/2/0 (was 5/3/0/0), reflecting IEDs, tank traps and the like, and the infantry AT module is +1/+5/+3/0 (was
+  +1/+5/+5/0), so totals with the AT module are unchanged: AT Infantry stays 6/8/5/0 and Heavy Infantry 6/8/5/5. AA
+  Infantry becomes 5/3/2/5. Only Infantry's modules changed — the Vehicle and Tank crew-served equivalents, which
+  the skeleton describes as the same modules renamed, keep 0 and +5.
+- **A value below 5 is its own baseline chance (Eric, 2026-11-16).** The 5% floor — "a natural 20": the enemy made
+  a mistake or you got a lucky shot — now applies to units with a value of 5 or more. Below that the baseline is
+  the value itself: Light Infantry's 2 against Tanks is a 2% shot, AT Infantry's 5 keeps the full 5%. The
+  advantaged side still adds its point gap on top of its own baseline (`min(50, min(5, value) + gap)`), and the
+  same baseline applies to Flanking, unpaired Long-Range Fires and unopposed CAS. Without this, giving Light
+  Infantry any anti-tank value at all made it as good at beating tanks as AT Infantry (95% against plain MBTs at
+  equal Production, where it now loses). Accepted knock-on: any value under 5 on the weaker side hits less often
+  than before — Small Arms against Vehicles (3) and an Autocannon against Tanks (3) are 3% shots when outmatched.
+- **Tried in the tournament and not adopted (2026-11-16):** (a) *reinforcement weighted by ground combat value*,
+  so better units come up from Reserves first. It does make a bench of 24 tanks clearly beat 12 at army scale,
+  but it strengthens tank-fronted designs everywhere, removes the infantry-fronted designs from the top ten at
+  6,000 Production, and turns the infantry into a pure Organization bank that never reaches the line (Light
+  Infantry filler becomes strictly best). (b) *Reserves contributing 50% of their Organization*: almost no change
+  at either army size. Results are reproducible with `npm run balance:tournament` after re-adding either rule.
 - **Beaten defender retreat target:** adjacent land it can enter (permissive, no hostile Task Force), own
   territory first, then Friendly, then anything else. **The rout is a real move (Eric, 2026-09-15):** the
   Task Force gets a normal move order to that region, walked at Combat Speed with the usual arrow, at
@@ -254,6 +277,34 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 - **CAS air-defence "kills"** count destroyed aircraft only (the skeleton says kills); CAS attack effects
   count hits. Air-vs-air duel successes pick their region 50/50 as specified; nothing this epoch can
   actually duel air-to-air.
+- **CAS rules revised (Eric, 2026-11-16), superseding §5.3 where they differ.** Three changes, all to make air power
+  a real counter in a web of counters rather than six flat 5% rolls:
+  1. **An unopposed run hits at 5% + half the aircraft's value** against its target (cap 50%): about 11% against
+     Infantry and 10% against Tanks for a standard aircraft. Full value was tried and overshot — CAS beat everything
+     but dedicated air-defence vehicles 98–100% of the time. Flanking and unpaired Long-Range Fires deliberately
+     stay at the flat 5%; giving artillery the same bonus pushed it to an ~90% average.
+  2. **An unopposed aircraft may strike the enemy's Long-Range line as well as its Front Line** — with air
+     superiority it loiters and hunts artillery. An intercepted aircraft is held to the Front Line.
+  3. **CAS targets are drawn in proportion to Production cost** — the pilot passes over infantry for a tank or a
+     gun. This is the reverse of Front Line hits, which stay inverse-cost (the valuable unit is the protected one).
+     Long-Range Fires' deep strikes remain an even draw across Front Line and Reserve units.
+  Measured on "40 AT Infantry plus one 1,200-Production purchase": CAS against MBT+ goes from 44% to 98%, against
+  Towed Artillery from 8% to 65%, while SHORAD Vehicles still stop it. Numbers: `src/sim/balance/balance-report.md`.
+- **Cover (Eric, 2026-11-16): Defensibility also shelters a defender from supporting fire.** Of the CAS hits and
+  artillery deep strikes an invader lands, only `max(20%, 1 − Defensibility ÷ 100)` get through: 90% on plain
+  ground (Defensibility 10), 45% at 55, 20% at 80 and above. Front Line fighting, counter-battery duels between the
+  two Long-Range lines, and the invader's own exposure are unchanged; an absorbed hit does nothing at all (no
+  damage, no Organization loss, no Air Superiority credit). Purpose: let mass infantry dug into strong terrain
+  hold against a richer infantry-based combined-arms attacker (0% → 100% in the arena at Defensibility 80)
+  without changing fights on open ground. Known side effect, accepted: fortified defenders of every kind hold more
+  often (a peer defender at Fortification 5 went from about 50% to about 80%). It does **not** stop a tank-fronted
+  attacker — that fight is decided on the Front Line. **Standoff exchanges are not covered yet, but should be
+  (Eric, 2026-11-16):** a force taking fire in a standoff fight is meant to benefit from its fortifications. The
+  details of standoff fire are not fully designed; when they are, cover for both sides (each in its own region)
+  is one of the things to settle. Tried and not
+  adopted: a Dispersed posture halving fire against infantry — free for large armies with no cost attached,
+  useless to the poor defender once costs were added; it waits for the Posture system and its reconfiguration lag
+  (GDD §8.6.1).
 - **Standoff exchanges** are a second battle kind: only Long-Range Fires resolve, no Shock, no Planning,
   no partisan bonus, no loss condition — a force can be ground down (units and Organization) but never
   retreats from standoff fire alone. They start on the tick after a side engages and end the tick
@@ -297,7 +348,8 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
 
 ## Source-doc fixes needed
 
-- **GDD §8.6.2:** the Shock formula `Average Combat Speed × 0.3` is superseded by `1 + Average Combat Speed × 0.15`
-  (at the post-tune speeds); the worked multipliers there should become ×1.25 / ×1.4 / ×1.5.
-- **Skeleton §5.1:** replace the "~90-point advantage gap" caveat paragraph with the universal
-  `min(50, 5 + point_gap)` rule already stated in §5.2, so the two sections agree.
+None outstanding. Applied 2026-11-16: skeleton §3.1 and the Tier-I module list (Small Arms 5/3/2/0, Man-portable
+AT +1/+5/+3/0), §5.1 (the 50% cap replaces the "~90-point gap" caveat; a value below 5 is its own baseline), §5.3
+(CAS targeting, the unopposed roll, and cover) and §5.4 (Shock formula); GDD §8.6.2 (Shock formula and worked
+multipliers); Epoch 1 skeleton §4.5 (Manpower at 5 per Production point). Still describing superseded numbers, by design and
+noted where they are overridden above: the skeleton's unit speeds (all ÷3 since 2026-11-15).

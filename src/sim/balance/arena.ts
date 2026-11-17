@@ -79,10 +79,19 @@ export function forceCost(force: Force): { cost: number; manpower: number } {
 function raise(state: GameState, faction: FactionId, regionId: string, force: Force): number {
   const tf = createTaskForce(state, faction, regionId)
   if (!tf.ok) throw new Error(tf.reason)
+  // The same design listed twice (say, a base of infantry plus more infantry as an add-on) is one unit type.
+  const ids = new Map<string, number>()
+  const counts = new Map<number, number>()
   for (const [design, count] of force.units) {
-    const saved = saveDesign(state, faction, design)
-    if (!saved.ok) throw new Error(`${force.name}: ${saved.reason}`)
-    const set = setTarget(state, tf.id, saved.id, count)
+    let id = ids.get(design.name)
+    if (id === undefined) {
+      const saved = saveDesign(state, faction, design)
+      if (!saved.ok) throw new Error(`${force.name}: ${saved.reason}`)
+      id = saved.id
+      ids.set(design.name, id)
+    }
+    counts.set(id, (counts.get(id) ?? 0) + count)
+    const set = setTarget(state, tf.id, id, counts.get(id)!)
     if (!set.ok) throw new Error(set.reason)
   }
   fillTaskForce(state, tf.id)
