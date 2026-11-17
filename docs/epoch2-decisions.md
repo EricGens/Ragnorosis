@@ -216,6 +216,16 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   their Organization, and Shock boosting hit chance but not damage. Numbers: `src/sim/balance/balance-report.md`.
   The battle log now shows the multiplier to two decimals. This supersedes the "`SHOCK_PER_MPH` ×3" note under
   Movement's speed tune.
+- **Light Infantry gets 2 against Tanks; Man-portable AT drops to +3 (Eric, 2026-11-16).** Small Arms I is now
+  5/3/2/0 (was 5/3/0/0), reflecting IEDs, tank traps and the like, and the infantry AT module is +1/+5/+3/0 (was
+  +1/+5/+5/0), so totals with the AT module are unchanged: AT Infantry stays 6/8/5/0 and Heavy Infantry 6/8/5/5. AA
+  Infantry becomes 5/3/2/5. The 5% floor for any nonzero value is deliberately kept — "a natural 20": the enemy
+  made a mistake or you got a lucky shot — so a graduated floor (a value of 2 hitting 2% of the time) was measured
+  and **not** adopted; it would also have cut Small Arms against Vehicles from 5% to 3%. Consequence to be aware
+  of: with the floor intact, Light Infantry lands hits on tanks as often as AT Infantry does; what the AT module
+  still buys is Piercing (four to five times the tank value destroyed) and a smaller gap for the tank to exploit.
+  Only Infantry's modules changed — the Vehicle and Tank crew-served equivalents, which the skeleton describes as
+  the same modules renamed, keep 0 and +5.
 - **Beaten defender retreat target:** adjacent land it can enter (permissive, no hostile Task Force), own
   territory first, then Friendly, then anything else. **The rout is a real move (Eric, 2026-09-15):** the
   Task Force gets a normal move order to that region, walked at Combat Speed with the usual arrow, at
@@ -279,8 +289,10 @@ either disagrees with the GDD, see "Source-doc fixes needed" at the bottom.
   hold against a richer infantry-based combined-arms attacker (0% → 100% in the arena at Defensibility 80)
   without changing fights on open ground. Known side effect, accepted: fortified defenders of every kind hold more
   often (a peer defender at Fortification 5 went from about 50% to about 80%). It does **not** stop a tank-fronted
-  attacker — that fight is decided on the Front Line. **Standoff exchanges are not covered yet**; whether a
-  fortified force being shelled from next door should get the same shelter is an open question. Tried and not
+  attacker — that fight is decided on the Front Line. **Standoff exchanges are not covered yet, but should be
+  (Eric, 2026-11-16):** a force taking fire in a standoff fight is meant to benefit from its fortifications. The
+  details of standoff fire are not fully designed; when they are, cover for both sides (each in its own region)
+  is one of the things to settle. Tried and not
   adopted: a Dispersed posture halving fire against infantry — free for large armies with no cost attached,
   useless to the poor defender once costs were added; it waits for the Posture system and its reconfiguration lag
   (GDD §8.6.1).

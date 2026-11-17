@@ -16,9 +16,9 @@ const AA = 'inf-man-aa'
 describe('Infantry equipment types (skeleton §3.1 table)', () => {
   const cases: [string, string[], number, number, number[], number][] = [
     // name, modules, cost, supply, vector short values, piercing
-    ['Light Infantry', [SA], 50, 1.0, [5, 3, 0, 0], 0],
+    ['Light Infantry', [SA], 50, 1.0, [5, 3, 2, 0], 0], // 2 vs Tanks: improvised anti-armour (decisions doc)
     ['AT Infantry', [SA, AT], 60, 1.1, [6, 8, 5, 0], 5],
-    ['AA Infantry', [SA, AA], 60, 1.1, [5, 3, 0, 5], 0],
+    ['AA Infantry', [SA, AA], 60, 1.1, [5, 3, 2, 5], 0],
     ['Heavy Infantry', [SA, AT, AA], 70, 1.2, [6, 8, 5, 5], 5],
   ]
 

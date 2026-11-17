@@ -94,11 +94,12 @@ function named(base: string, tags: string[]): string {
 // ---------------------------------------------------------------------------------------------
 // Infantry (§3.1)
 
-// One row per module, mirroring the skeleton's tables.
+// One row per module, mirroring the skeleton's tables. Small Arms carries 2 against Tanks (improvised
+// anti-armour: IEDs, tank traps) and Man-portable AT adds 3, so AT Infantry still totals 5 (Eric, 2026-11-16).
 // prettier-ignore
 const INFANTRY_MODULES: ModuleDef[] = [
-  { id: 'inf-small-arms-1', name: 'Small Arms I', slot: 'weapon', cost: 50, supply: 1.0, vector: v(5, 3, 0, 0), piercing: 0, damage: 5, role: 'ground' },
-  { id: 'inf-man-at', name: 'Man-portable AT', slot: 'misc', cost: 10, supply: 0.1, vector: v(1, 5, 5, 0), piercing: 5, damage: 0 },
+  { id: 'inf-small-arms-1', name: 'Small Arms I', slot: 'weapon', cost: 50, supply: 1.0, vector: v(5, 3, 2, 0), piercing: 0, damage: 5, role: 'ground' },
+  { id: 'inf-man-at', name: 'Man-portable AT', slot: 'misc', cost: 10, supply: 0.1, vector: v(1, 5, 3, 0), piercing: 5, damage: 0 },
   { id: 'inf-man-aa', name: 'Man-portable AA', slot: 'misc', cost: 10, supply: 0.1, vector: v(0, 0, 0, 5), piercing: 0, damage: 0 },
 ]
 

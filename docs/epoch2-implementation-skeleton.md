@@ -340,7 +340,10 @@ values checked programmatically against prior sessions, zero discrepancies found
 **Main Weapon Module (requires exactly 1)**
 | Module | Cost | Supply | Combat Vector (Inf/Veh/Tank/AA) | Piercing | Damage |
 |---|---|---|---|---|---|
-| Small Arms I | +50 | +1.0 | +5/+3/0/0 | 0 | +5 |
+| Small Arms I | +50 | +1.0 | +5/+3/+2/0 | 0 | +5 |
+
+*(Revised 2026-11-16: Small Arms I carries +2 against Tanks and Man-portable AT +3, was 0 and +5; AT Infantry's
+total is unchanged. See epoch2-decisions.md.)*
 
 Renames the Equipment to **Light Infantry** when no Misc modules are attached. Advanced Small Arms tiers and
 the Man-portable Laser module are deferred to future epochs.
@@ -348,7 +351,7 @@ the Man-portable Laser module are deferred to future epochs.
 **Misc Modules (optional, up to 2)**
 | Module | Cost | Supply | Combat Vector | Piercing | Damage |
 |---|---|---|---|---|---|
-| Man-portable AT | +10 | +0.1 | +1/+5/+5/0 | +5 | 0 |
+| Man-portable AT | +10 | +0.1 | +1/+5/+3/0 | +5 | 0 |
 | Man-portable AA | +10 | +0.1 | 0/0/0/+5 | 0 | 0 |
 
 Renames to **AT Infantry** or **AA Infantry** when taken alone, **Heavy Infantry** when both are taken.
@@ -738,8 +741,10 @@ module inherits the improvement automatically, rather than needing every derived
 by hand.
 
 **Confirmed Tier-I module values** (Infantry / Vehicle / Tank / Anti-Air):
-- **Small Arms I:** +5 / +3 / 0 / 0
-- **AT Module I:** +1 / +5 / +5 / 0
+- **Small Arms I:** +5 / +3 / +2 / 0 *(Infantry's; revised 2026-11-16 — 2 against Tanks for improvised
+  anti-armour such as IEDs and tank traps. The Vehicle and Tank crew-served versions keep 0.)*
+- **AT Module I:** +1 / +5 / +3 / 0 *(Infantry's Man-portable AT; revised 2026-11-16 from +5 against Tanks so
+  AT Infantry still totals 5. The Vehicle and Tank crew-served AT modules keep +5.)*
 - **AA Module I:** 0 / 0 / 0 / +5
 
 **A real design correction surfaced by this decomposition, worth having on record:** the AT module's Vehicle

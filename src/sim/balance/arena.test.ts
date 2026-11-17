@@ -22,8 +22,8 @@ describe('balance arena', () => {
     expect(r.attackerWon).toBe(r.outcome !== 'defender-won')
   })
 
-  it('shows a hard counter: Light Infantry has no vector against Tanks and never beats them', () => {
-    const m = runMatchup(pure(3000, DESIGNS.lightInf), pure(3000, DESIGNS.mbt), 10)
+  it('shows a hard counter: Light Utility Vehicles have no vector against Tanks and never touch them', () => {
+    const m = runMatchup(pure(3000, DESIGNS.utility), pure(3000, DESIGNS.mbt), 10)
     expect(m.attackerWinRate).toBe(0)
     expect(m.defenderLossShare).toBe(0)
   })
